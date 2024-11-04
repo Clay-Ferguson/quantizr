@@ -31,7 +31,7 @@ export class FriendsListType extends TypeBase {
                 new SearchUsersDlg().open();
             }, null, "-primary"),
             new Button("Search Follows", () => {
-                const friendsDlg = new FriendsDlg("Follows", null, true);
+                const friendsDlg = new FriendsDlg("Follows", null, true, false);
                 friendsDlg.open();
             }, null, "-primary")
         ]);

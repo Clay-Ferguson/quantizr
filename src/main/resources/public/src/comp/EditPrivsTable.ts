@@ -9,7 +9,7 @@ export class EditPrivsTable extends ListBox {
         super(null);
 
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;
-        this.attribs.className = "scrollY privsTable scrollBorder customScrollbar";
+        this.attribs.className = "scrollY privsTable scrollBorder customScrollbar mb-3";
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 

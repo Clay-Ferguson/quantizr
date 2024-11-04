@@ -23,7 +23,7 @@ export class MultiBlockDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new TextContent("Enter Fediverse Usernames (one per line)"),
+                new TextContent("Enter Usernames (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Block All", this._block, null, "-primary"),

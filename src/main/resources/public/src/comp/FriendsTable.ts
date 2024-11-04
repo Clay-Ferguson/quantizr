@@ -10,7 +10,7 @@ export class FriendsTable extends ListBox {
     constructor(public friends: FriendInfo[], private selectableRows: boolean, private dlg: Comp) {
         super();
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;
-        this.attribs.className = "scrollY scrollBorder personsList customScrollbar";
+        this.attribs.className = "scrollY scrollBorder personsList customScrollbar mb-3";
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 

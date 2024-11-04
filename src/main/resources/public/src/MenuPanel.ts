@@ -40,7 +40,7 @@ export class MenuPanel extends Comp {
     }
 
     // leaving for reference how to open this.
-    static editFriends = () => { new FriendsDlg("Following", null, true).open(); };
+    static editFriends = () => { new FriendsDlg("Following", null, true, true).open(); };
 
     static openBookmarksNode = () => {
         S.util.setUserPreferences(true);

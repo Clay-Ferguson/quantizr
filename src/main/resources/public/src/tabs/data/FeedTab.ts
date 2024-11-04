@@ -11,7 +11,7 @@ import { FeedViewProps } from "../FeedViewProps";
 
 export class FeedTab extends TabBase<FeedViewProps> {
     name = "Feed";
-    tooltip = "Reverse-chronological list of Fediverse posts";
+    tooltip = "Reverse-chronological list of posts";
     id = C.TAB_FEED;
     props = new FeedViewProps();
     static URL_PARAM = "feed";

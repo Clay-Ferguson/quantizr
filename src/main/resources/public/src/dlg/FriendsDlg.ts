@@ -48,7 +48,7 @@ export class FriendsDlg extends DialogBase {
         }
     }, 500);
 
-    constructor(title: string, private nodeId: string, private displayOnly: boolean) {
+    constructor(title: string, private nodeId: string, private displayOnly: boolean, private allowImportExport) {
         super(title);
         FriendsDlg.inst = this;
         this.mergeState<LS>({
@@ -180,8 +180,8 @@ export class FriendsDlg extends DialogBase {
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.displayOnly && !this.nodeId ? new Button("Ok", this._save, null, "-primary") : null,
-                    !this.displayOnly ? new Button("Import", this._import) : null,
-                    state.friends?.length > 0 ? new Button("Export", this._export) : null,
+                    this.allowImportExport ? new Button("Import", this._import) : null,
+                    this.allowImportExport && state.friends?.length > 0 ? new Button("Export", this._export) : null,
                     new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this._cancel, null, "float-right")
                 ], "mt-3"),
                 new Clearfix() // required in case only ButtonBar children are float-right, which would break layout

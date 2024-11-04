@@ -105,7 +105,7 @@ export class User {
             return;
         }
 
-        const dlg = new ConfirmDlg("### IMPORTANT \n\nOn the payments page, use the email address associated with your Quanta account.\n\n "+
+        const dlg = new ConfirmDlg("### IMPORTANT \n\nOn the payments page, use the email address associated with your Quanta account.\n\n " +
             "It may take a minute or two for the funds to become available, so refresh your brower to see your new funds, under `Menu -> AI -> Settings`. \n\n##### Proceed to Payments Page?",
             "Payment Instructions", null, "[markdown]");
 
@@ -231,7 +231,7 @@ export class User {
     }
 
     showUsersList = (node: NodeInfo) => {
-        const friendsDlg = new FriendsDlg("User Shares", node.id, true);
+        const friendsDlg = new FriendsDlg("User Shares", node.id, true, false);
         friendsDlg.open();
     }
 }
