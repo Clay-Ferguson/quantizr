@@ -29,6 +29,7 @@
     font-size: 130%;
     border-top-left-radius: $dlg-border-radius;
     border-top-right-radius: $dlg-border-radius;
+    font-weight: 300;
 }
 
 .appModalTitlePopup {
@@ -36,6 +37,7 @@
     border-top-left-radius: $dlg-border-radius;
     border-top-right-radius: $dlg-border-radius;
     background-color: $primary;
+    font-weight: 300;
 }
 
 .dlgTitleTopmost {
@@ -200,10 +202,12 @@
 .dialogTitle {
     font-size: 30px;
     margin-bottom: 20px;
+    font-weight: 300;
 }
 
 .dialogSubTitle {
     font-size: 20px;
+    font-weight: 300;
     margin-bottom: 20px;
 }
 

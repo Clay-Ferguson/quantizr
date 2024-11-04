@@ -17,7 +17,7 @@
     padding-top: 10px;
     padding-bottom: 10px;
 
-    &:not(:last-child) { 
+    &:not(:last-child) {
         border-bottom: 2px solid $nodeBorderBottomColor;
     }
 }
@@ -25,12 +25,14 @@
 .rssChapterLink {
     cursor: pointer;
     font-size: 18px;
+    font-weight: 300;
     margin-left: 12px;
 }
 
 .rssChapterTitle {
     cursor: pointer;
     font-size: 18px;
+    font-weight: 300;
 }
 
 .rssChapterImage {
@@ -50,6 +52,7 @@
 .rssAnchor {
     cursor: pointer;
     font-size: 24px;
+    font-weight: 300;
     text-decoration: none;
     margin-right: $bigGap;
 }
@@ -66,11 +69,13 @@
 
 .rssFeedTitle {
     font-size: 150%;
+    font-weight: 300;
     text-decoration: none;
 }
 
 .rssSubTitle {
     font-size: 110%;
+    font-weight: 300;
 }
 
 .rssFeedImage {

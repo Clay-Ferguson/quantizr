@@ -8,6 +8,7 @@
 .userAdminHeading {
     margin-bottom: $smallGap;
     font-size: 115%;
+    font-weight: 300;
 }
 
 .userProfileDlgAvatar {
@@ -104,4 +105,3 @@
 .followCount {
     @extend .profileInfoButton;
 }
-
