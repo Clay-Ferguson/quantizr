@@ -201,13 +201,12 @@ export class MenuPanel extends Comp {
                     new Menu("By Modified", [
                         new MenuItem("Recursive", MenuPanel.timelineByModifiedRecursive, onMainTab && !!hltNode, null, true),
                         new MenuItem("Non-Recursive", MenuPanel.timelineByModifiedNonRecursive, onMainTab && !!hltNode, null, true),
-                    ]),
+                    ], null, null, null, true),
                     new Menu("By Created", [
                         new MenuItem("Recursive", MenuPanel.timelineByCreatedRecursive, onMainTab && !!hltNode, null, true),
                         new MenuItem("Non-Recursive", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true),
-                    ])
-                ]),
-                new MenuItemSeparator(), //
+                    ], null, null, null, true)
+                ], null, null, null, true),
                 new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
                 new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
@@ -222,12 +221,11 @@ export class MenuPanel extends Comp {
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
                 //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-                new MenuItemSeparator(), //
-
-                new MenuItem("Shared Nodes", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
-                new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
-                new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
-                new MenuItemSeparator(), //
+                new Menu("Shared Nodes", [
+                    new MenuItem("All", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
+                    new MenuItem("Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
+                    new MenuItem("Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
+                ], null, null, null, true),
 
                 new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
                 new MenuItem("Search and Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
@@ -297,11 +295,11 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Move", [
-                new MenuItem("Move Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
-                new MenuItem("Move Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
+                new MenuItem("Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
+                new MenuItem("Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
                 new MenuItemSeparator(), //
-                new MenuItem("Move to Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
-                new MenuItem("Move to Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
+                new MenuItem("To Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
+                new MenuItem("To Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
             ], null));
         }
 
@@ -343,7 +341,7 @@ export class MenuPanel extends Comp {
                 new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
                 new MenuItemSeparator(), //
                 new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
-                new MenuItem("Past Due", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
+                new MenuItem("Overdue", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("Today", MenuPanel.calendarToday, onMainTab && !!hltNode, null, true),
                 new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
@@ -389,13 +387,14 @@ export class MenuPanel extends Comp {
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItemSeparator(),
-                ast.isAnonUser ? null : new MenuItem("Chat Mode", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, null, "aiModeRadioGroup"),
-                ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.setAiWritingMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, null, "aiModeRadioGroup"),
-                ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.setAiAgentMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, null, "aiModeRadioGroup")
+                new Menu("Mode", [
+                    ast.isAnonUser ? null : new MenuItem("Chat", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
+                        () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, null, "aiModeRadioGroup"),
+                    ast.isAnonUser ? null : new MenuItem("Writing", MenuPanel.setAiWritingMode, allowEditMode && !fullScreenViewer, //
+                        () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, null, "aiModeRadioGroup"),
+                    ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent", MenuPanel.setAiAgentMode, allowEditMode && !fullScreenViewer, //
+                        () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, null, "aiModeRadioGroup")
+                ], null, null, null, true)
             ], null));
         }
 

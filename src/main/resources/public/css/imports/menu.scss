@@ -84,6 +84,13 @@
     border: 1px solid transparent;
 }
 
+.menuItemInner {
+    cursor: pointer;
+    background-color: transparent;
+    padding: 5px 5px 5px 5px;
+    border: 1px solid transparent;
+}
+
 .menuItem:hover {
     background-color: $primary;
     border: 1px solid gray;
