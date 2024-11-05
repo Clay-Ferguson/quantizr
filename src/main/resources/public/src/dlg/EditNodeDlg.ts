@@ -551,11 +551,11 @@ export class EditNodeDlg extends DialogBase {
         const websiteByNameUrl = window.location.origin + websitePathPart;
 
         const children = [
-            new Div("Website Published to...", { className: "largerFont" }), //
+            new Div("Website Published. Click link to open.", { className: "largerFont mb-4" }), //
             new Div(websiteByNameUrl, {
                 className: "linkDisplay",
                 title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(websiteByNameUrl)
+                onClick: () => window.open(websiteByNameUrl, "_blank")
             })];
 
         const dlg = new MessageDlg(null, "Website is Ready", null, new Div(null, null, children), false, 0, null);

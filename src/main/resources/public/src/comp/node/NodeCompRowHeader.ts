@@ -203,7 +203,7 @@ export class NodeCompRowHeader extends Comp {
                     website ? new Icon({
                         className: "fa fa-boxes-packing fa-lg websiteIcon mr-3",
                         title: "Node is a Website",
-                        onClick: () => S.util.copyToClipboard(websiteByNameUrl)
+                        onClick: () => window.open(websiteByNameUrl, "_blank")
                     }) : null
                 ]);
             }
