@@ -2,11 +2,11 @@
 
 # Quanta Web Platform
 
-[Live Instance: https://quanta.wiki](https://quanta.wiki)
+[Live Demo Instance: https://quanta.wiki](https://quanta.wiki)
 
 Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
-* [AI Chat & Agents](https://quanta.wiki/n/gpt-ai)
+* AI Chat & Agents
 * Wikis & micro-blogging
 * Document collaboration and publishing
 * PDF Generation
@@ -26,8 +26,8 @@ These nodes are the main elements of the app, similar to Facebook Posts or Twitt
 
 ## Documentation
 
-* [User Guide](https://github.com/Clay-Ferguson/quantizr/blob/master/docs/user-guide/index.md) 
-* [Technical Guide](https://github.com/Clay-Ferguson/quantizr/blob/master/docs/technical-guide/index.md) 
+* [User Guide](https://clay-ferguson.github.io/quantizr/user-guide) 
+* [Technical Guide](https://clay-ferguson.github.io/quantizr/technical-guide/index.html) 
 
 ## Technology Stack
 
