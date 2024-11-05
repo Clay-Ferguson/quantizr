@@ -82,8 +82,10 @@ export class MenuPanel extends Comp {
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
-    static timelineByCreated = () => S.srch.timelineAfterUserInput("ctm");
-    static timelineByModified = () => S.srch.timelineAfterUserInput("mtm");
+    static timelineByCreatedRecursive = () => S.srch.timelineWithOptions("ctm", true);
+    static timelineByCreatedNonRecursive = () => S.srch.timelineWithOptions("ctm", false);
+    static timelineByModifiedRecursive = () => S.srch.timelineWithOptions("mtm", true);
+    static timelineByModifiedNonRecursive = () => S.srch.timelineWithOptions("mtm", false);
     static showCalendar = () => S.render.showCalendar(null);
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
@@ -195,8 +197,16 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("View", [
-                new MenuItem("Timeline: By Modified", MenuPanel.timelineByModified, onMainTab && !!hltNode, null, true),
-                new MenuItem("Timeline: By Created", MenuPanel.timelineByCreated, onMainTab && !!hltNode, null, true),
+                new Menu("Timeline", [
+                    new Menu("By Modified", [
+                        new MenuItem("Recursive", MenuPanel.timelineByModifiedRecursive, onMainTab && !!hltNode, null, true),
+                        new MenuItem("Non-Recursive", MenuPanel.timelineByModifiedNonRecursive, onMainTab && !!hltNode, null, true),
+                    ]),
+                    new Menu("By Created", [
+                        new MenuItem("Recursive", MenuPanel.timelineByCreatedRecursive, onMainTab && !!hltNode, null, true),
+                        new MenuItem("Non-Recursive", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true),
+                    ])
+                ]),
                 new MenuItemSeparator(), //
                 new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
                 new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),

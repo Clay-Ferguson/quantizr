@@ -6,7 +6,6 @@ import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
@@ -268,17 +267,9 @@ export class Search {
         this.timeline(null, "mtm", null, "by Modify Time (recursive)", 0, true);
     }
 
-    async timelineAfterUserInput(prop: string) {
+    async timelineWithOptions(prop: string, recursive: boolean) {
         let description = prop === "ctm" ? "by Create Time" : "by Modify Time";
-        let recursive = false;
-        const dlg = new ConfirmDlg("Include all subnodes recursively?", "Timeline Options");
-        await dlg.open();
-        if (dlg.yes) {
-            recursive = true;
-        }
-        if (!recursive) {
-            description += " (non-recursive)";
-        }
+        description += recursive ? " (recursive)" : " (non-recursive)";
         this.timeline(null, prop, null, description, 0, recursive);
     }
 
