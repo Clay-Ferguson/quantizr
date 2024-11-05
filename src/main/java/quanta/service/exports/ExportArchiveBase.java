@@ -223,6 +223,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String ret = XString.getResourceAsString(context, templateFile);
         ret = ret.replace("/*{{style}}*/",
                 XString.getResourceAsString(context, "/public/export-includes/html/style.css"));
+        ret = ret.replace("/*{{script}}*/",
+                XString.getResourceAsString(context, "/public/export-includes/html/script.js"));
         if (toc.length() > 0) {
             ret = ret.replace("{{toc}}", toc);
         }
@@ -833,12 +835,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 case "html":
                 case "md":
                     String mdLink = null;
+                    String sizePart = "";
                     if (att.getCssSize() != null
                             && (att.getCssSize().endsWith("%") || att.getCssSize().endsWith("px"))) {
-                        mdLink = "\n<img src='" + fullUrl + "' style='width:" + att.getCssSize() + "'/>\n\n";
-                    } else {
-                        mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
+                        sizePart = "style='width:" + att.getCssSize() + "'";
                     }
+
+                    // NOTE: This simple markdown works too but looses the styling
+                    // mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
+                    String domId = "img_" + nodeId + "_" + att.getKey();
+                    mdLink = "<img id='%s' src='%s' %s/>\n\n".formatted(domId, fullUrl, sizePart);
                     processMdAtt(injectingTag, content, att, mdLink);
                     break;
                 default:

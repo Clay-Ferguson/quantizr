@@ -143,6 +143,12 @@ export class Nav {
     }
 
     async openContentNode(nodePathOrId: string, jumpToRss: boolean) {
+        // todo-0: temporary hack until this is configurable as a property
+        if (nodePathOrId == ":user-guide") {
+            window.open("https://quanta.wiki/pub/user-guide", "_blank");
+            return;
+        }
+
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
             upLevel: false,
