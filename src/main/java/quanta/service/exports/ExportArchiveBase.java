@@ -882,25 +882,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return content;
     }
 
-    // todo-0: we should be able to bring this back in a way that works for ALL
-    // images, so we can simply
-    // add a chunk of JS to the exported HTML that makes this happen
-    //
-    // private String appendImgLink(String nodeId, String binFileNameStr, String
-    // url, Attachment att) {
-    // String domId = "img_" + nodeId + "_" + att.getKey();
-    // String style = "";
-    // if (att.getCssSize() != null && (att.getCssSize().endsWith("%") ||
-    // att.getCssSize().endsWith("px"))) {
-    // style = "style='width:" + att.getCssSize() + "'";
-    // }
-    // return ("<div class='attachment'><img title='" + binFileNameStr + "' id='" +
-    // domId + "' " + style
-    // + " onclick='document.getElementById(\"" + domId + "\").style.width=\"100%\"'
-    // src='" + url
-    // + "'/></div>");
-    // }
-
     private String formatContentForHtml(SubNode node, String content) {
         if (node.isType(NodeType.PLAIN_TEXT)) {
             return "\n```\n" + content + "\n```\n";

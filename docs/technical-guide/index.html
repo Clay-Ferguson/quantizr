@@ -4,26 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quanta Technical Docs</title>
+    <title># Quanta Technical Docs</title>
     <style>
         /* Do not remove. This is an insertion tag */
-         /* Ensure full height usage */
- html,
- body {
-     font-family: 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important;
-     margin: 0px;
-     padding: 0px;
-     height: 100%;
-     overflow: hidden;
-     background-color: black;
- }
+         /* WARNING: Only put cosmetic stuff in here that has NO impact on page layout */
 
- /* Main content area styling */
- .content {
-     background-color: black;
-     color: white;
-     overflow-y: auto;
-     padding: 0 2rem 0 2rem;
+ .content p {
+     max-width: 50rem;
+     line-height: 1.5rem;
+     margin-bottom: 2.5rem;
+     margin-left: 1rem;
  }
 
  h1 a {
@@ -34,42 +24,72 @@
      color: orange;
  }
 
+ h1 a {
+     text-decoration: none;
+ }
+
+ h2 a {
+     text-decoration: none;
+ }
+
+ h3 a {
+     text-decoration: none;
+ }
+
+ h4 a {
+     text-decoration: none;
+ }
+
+ h5 a {
+     text-decoration: none;
+ }
+
+ h6 a {
+     text-decoration: none;
+ }
+
  h1 {
      margin-top: 2.5rem;
      color: lightgreen;
-     font-size: 1.7rem;
+     font-size: 2.3rem;
+     font-weight: 100;
  }
 
  h2 {
-     margin-top: 2.5rem;
+     margin-top: 2rem;
      color: orange;
-     font-size: 1.6rem;
+     font-size: 2rem;
+     font-weight: 100;
  }
 
  h3 {
-     font-size: 1.5rem;
+     font-size: 1.8rem;
+     font-weight: 100;
  }
 
  h4 {
-     font-size: 1.4rem;
+     font-size: 1.7rem;
+     font-weight: 100;
  }
 
  h5 {
-     font-size: 1.3rem;
+     font-size: 1.6rem;
+     font-weight: 100;
  }
 
  h6 {
-     font-size: 1.2rem;
+     font-size: 1.5rem;
+     font-weight: 100;
  }
 
  a {
      color: white;
-     text-decoration: none;
  }
 
  img {
      border: 1px solid gray;
      border-radius: 6px;
+     cursor: pointer;
  }
 
  table {
@@ -103,6 +123,10 @@
      border: none;
  }
 
+ .nav {
+     text-decoration: none;
+ }
+
  /* This styles the top left header */
  .nav h4 a {
      margin-left: 1rem;
@@ -124,11 +148,53 @@
      color: lightgray;
  }
 
+ ::-webkit-scrollbar {
+     width: 20px;
+     height: 20px;
+     background-color: black;
+ }
+
+ /* NOTE: This is only required to keep my Dark Reader extension from messing up the scrollbar */
+ * {
+     scrollbar-color: unset !important;
+ }
+
+ ::-webkit-scrollbar-track {
+     background-color: rgb(41, 52, 68);
+ }
+
+ ::-webkit-scrollbar-thumb {
+     background-color: slategray;
+     border: 1px solid silver;
+ }
+
+ ::-webkit-scrollbar-thumb:hover {
+     background: darkgray;
+ }
+
+        html,
+        body {
+            font-family: 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important;
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        /* Main content area styling */
+        .content {
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            padding: 0 2rem 0 2rem;
+        }
+
         /* Main container using grid */
         .container {
             display: grid;
             grid-template-columns: 30% 70%;
-            height: 100%;
+            height: 100vh;
         }
 
         /* Left navigation styling */
@@ -138,6 +204,37 @@
             overflow-y: auto;
             border-right: 2px solid gray;
             padding-right: 1rem;
+        }
+
+        /* Media query for narrow screens */
+        @media screen and (max-width: 900px) {
+
+            html,
+            body {
+                overflow-y: auto;
+                /* Enable main scrollbar for mobile view */
+                height: auto;
+            }
+
+            .container {
+                display: block;
+                height: auto;
+            }
+
+            .nav {
+                border-right: none;
+                border-bottom: 2px solid gray;
+                padding: 1rem;
+                width: auto;
+                overflow-y: visible;
+                /* Remove separate scrollbar */
+            }
+
+            .content {
+                padding: 1rem;
+                overflow-y: visible;
+                /* Remove separate scrollbar */
+            }
         }
     </style>
     <link rel="stylesheet" href="prism.css">
@@ -580,6 +677,35 @@ docker service scale quanta-stack-distro_quanta-distro=1
         </main>
     </div>
     <script src="prism.js"></script>
+    <script>// Function to handle click event for images (to expand/unexpand them)
+function imgClick(event) {
+    const img = event.target;
+
+    // Check if original width has been saved
+    if (!img.hasAttribute("data-original-width")) {
+        // Save the original width
+        img.setAttribute("data-original-width", img.style.width || img.width + "px");
+        // Set the width to 100%
+        img.style.width = "100%";
+    } else {
+        // Toggle between 100% and original width
+        if (img.style.width === "100%") {
+            img.style.width = img.getAttribute("data-original-width");
+        } else {
+            img.style.width = "100%";
+        }
+    }
+}
+
+// Attach the imgClick function to all <img> tags after the page loads
+window.addEventListener("load", () => {
+    const images = document.querySelectorAll("img");
+    images.forEach((img) => {
+        img.addEventListener("click", imgClick);
+    });
+});
+
+</script>
 </body>
 
 </html>
