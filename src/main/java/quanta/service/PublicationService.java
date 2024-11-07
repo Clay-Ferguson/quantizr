@@ -138,7 +138,7 @@ public class PublicationService extends ServiceBase {
             return;
         }
         DBObject metaData = new BasicDBObject();
-        metaData.put("nodeId", node.getIdStr());
+        metaData.put("nodeId", node.getId());
         metaData.put("type", "website");
         String binWebsite =
                 grid.store(new ByteArrayInputStream(html.getBytes()), "website", "text/html", metaData).toString();

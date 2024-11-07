@@ -99,7 +99,7 @@ public class AttachmentService extends ServiceBase {
      * todo-1: for troubleshooting purposes let's keep all gridfs items for a while, and so they'll show
      * up continually as orphans but that's fine
      */
-    private static final boolean ALLOW_DELETES = false;
+    private static final boolean ALLOW_DELETES = true;
 
     // number of minutes in a day
     private static final int VERIFY_FREQUENCY_MINS = 60 * 24;
@@ -524,7 +524,7 @@ public class AttachmentService extends ServiceBase {
      */
     public void cm_getFile(String fileName, String disposition, HttpServletResponse response) {
         if (fileName.contains(".."))
-        throw new RuntimeEx("bad request.");
+            throw new RuntimeEx("bad request.");
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
         try {
@@ -974,7 +974,7 @@ public class AttachmentService extends ServiceBase {
 
                 // Scan all files in the grid
                 for (GridFSFile file : files) {
-                    // by default we delete the grid item unless we reach discover it is being used
+                    // by default we delete the grid item unless we discover it is being used
                     delete = true;
                     Document meta = file.getMetadata();
                     String binId = file.getObjectId().toHexString();;
@@ -982,16 +982,31 @@ public class AttachmentService extends ServiceBase {
                     // if node has metadata
                     if (meta != null) {
                         // Get which nodeId owns this grid file
-                        ObjectId nodeId = (ObjectId) meta.get("nodeId");
+                        Object nodeId = meta.get("nodeId");
+
+                        // if we have a nodeId, then we can look up the node to see if it is in use
                         if (nodeId != null) {
-                            nodeIdStr = nodeId.toHexString();
+                            if (nodeId instanceof ObjectId) {
+                                nodeIdStr = ((ObjectId) nodeId).toHexString();
+                            } else {
+                                nodeIdStr = nodeId.toString();
+                            }
                             SubNode node = svc_mongoRead.getNode(nodeIdStr);
 
                             // did we find the node that owns this grid item
                             if (node != null) {
-                                // scan all attachments on the node to look for the actual attachment
+                                String type = (String) meta.get("type");
+
+                                // check if this binary item is the cached website for a node
+                                if ("website".equals(type)) {
+                                    // if the node has a website property, that means the user still wants to keep
+                                    if (node.hasProp(NodeProp.WEBSITE.s())) {
+                                        delete = false;
+                                    }
+                                }
+                                // else scan all attachments on the node to look for the actual attachment
                                 // that uses this grid item
-                                if (node.getAttachments() != null) {
+                                else if (node.getAttachments() != null) {
                                     // scan all attachments to see if we have one pointing to binId
                                     for (String key : node.getAttachments().keySet()) {
                                         Attachment att = node.getAttachments().get(key);
