@@ -228,7 +228,6 @@ export class MenuPanel extends Comp {
                 ], null, null, null, true),
 
                 new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
-                new MenuItem("Search and Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
 
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
@@ -273,19 +272,20 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
-                ast.isAdminUser ? new MenuItem("Direct Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
+                ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 
                 new MenuItem("Clear Selections", S.nodeUtil._clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
-                new MenuItemSeparator(), //
 
-                new MenuItem("Split Node", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Join Nodes", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
-
+                new Menu("Multi-Node", [
+                    new MenuItem("Split", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
+                    new MenuItem("Join", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
+                    new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
+                ], null, null, null, true),
+                new MenuItem("Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
                 new MenuItemSeparator(), //
                 new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
@@ -361,24 +361,26 @@ export class MenuPanel extends Comp {
                 new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
                 new MenuItemSeparator(), //
 
-                new MenuItem("Import", S.edit._openImportDlg, onMainTab && importFeatureEnabled, null, true),
+                new Menu("Import From...", [
+                    new MenuItem("Archive", S.edit._openImportDlg, onMainTab && importFeatureEnabled, null, true),
+                    new MenuItem("JSON", MenuPanel.importJson, onMainTab && selNodeIsMine, null, true), //
+                    new MenuItem("ToC", MenuPanel.importToC, onMainTab && selNodeIsMine, null, true), //
+                ], null, null, null, true),
                 new MenuItem("Export", S.edit._openExportDlg, onMainTab && exportFeatureEnabled, null, true),
-                new MenuItemSeparator(), //
-
-                new MenuItem("Import JSON", MenuPanel.importJson, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Import ToC", MenuPanel.importToC, onMainTab && selNodeIsMine, null, true), //
-
 
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
             ], null));
 
-            children.push(new Menu("Signature", [
-                S.crypto.avail ? new MenuItem("Sign All", MenuPanel.signAllSubGraph, selNodeIsMine, null, true) : null, //
-                S.crypto.avail ? new MenuItem("Sign Unsigned", MenuPanel.signUnsignedSubGraph, selNodeIsMine, null, true) : null, //
-                new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Remove", S.view._removeSignatures, onMainTab && selNodeIsMine, null, true), //
-            ], null));
+            // S.crypto.avail
+            if (S.crypto.avail) {
+                children.push(new Menu("Signature", [
+                    new MenuItem("Sign All", MenuPanel.signAllSubGraph, selNodeIsMine, null, true), //
+                    new MenuItem("Sign Unsigned", MenuPanel.signUnsignedSubGraph, selNodeIsMine, null, true), //
+                    new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
+                    new MenuItem("Remove", S.view._removeSignatures, onMainTab && selNodeIsMine, null, true), //
+                ], null));
+            }
         }
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
