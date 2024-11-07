@@ -204,49 +204,42 @@ export class EditAttachmentsPanel extends Comp {
     moveAttDown(att: Attachment, node: NodeInfo) {
         const list: Attachment[] = S.props.getOrderedAtts(node);
         if (!list) return;
-        let idx: number = 0;
-        let setNext: number = -1;
-        for (const a of list) {
-            const aObj: Attachment = node.attachments[(a as any).key];
-            if (setNext !== -1) {
-                aObj.ordinal = setNext;
-                setNext = -1;
-            }
-            else if (a.ordinal === att.ordinal) {
-                aObj.ordinal = idx + 1;
-                setNext = idx;
-            }
-            else {
-                aObj.ordinal = idx;
-            }
-            idx++;
-        }
 
+        // Find the index of the attachment to move down
+        const index = list.findIndex(a => a.ordinal === att.ordinal);
+        if (index === -1 || index === list.length - 1) return; // Can't move down if not found or already at the bottom
+
+        // Swap the ordinals of the current attachment and the one below it
+        const nextAttachment = list[index + 1];
+
+        // Swap the ordinals
+        [att.ordinal, nextAttachment.ordinal] = [nextAttachment.ordinal, att.ordinal];
+
+        // Mark the dialog as needing to save changes
         this.dlg.binaryDirty = true;
-        dispatch("attachmentMoveUp", _s => { });
+
+        // Notify that an attachment move down operation occurred
+        dispatch("attachmentMoveDown", _s => { });
     }
 
     moveAttUp(att: Attachment, node: NodeInfo) {
         const list: Attachment[] = S.props.getOrderedAtts(node);
         if (!list) return;
-        let idx: number = 0;
-        let lastA = null;
-        for (const a of list) {
-            const aObj: Attachment = node.attachments[(a as any).key];
-            if (a.ordinal === att.ordinal) {
-                aObj.ordinal = idx - 1;
-                if (lastA) {
-                    lastA.o = idx;
-                }
-            }
-            else {
-                aObj.ordinal = idx;
-            }
-            idx++;
-            lastA = a;
-        }
 
+        // Find the index of the attachment to move up
+        const index = list.findIndex(a => a.ordinal === att.ordinal);
+        if (index === -1 || index === 0) return; // Can't move up if not found or already at the top
+
+        // Swap the ordinals of the current attachment and the one above it
+        const prevAttachment = list[index - 1];
+
+        // Swap the ordinals
+        [att.ordinal, prevAttachment.ordinal] = [prevAttachment.ordinal, att.ordinal];
+
+        // Mark the dialog as needing to save changes
         this.dlg.binaryDirty = true;
+
+        // Notify that an attachment move up operation occurred
         dispatch("attachmentMoveUp", _s => { });
     }
 
