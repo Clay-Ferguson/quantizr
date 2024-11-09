@@ -354,7 +354,6 @@ i'm backing out for now
     font-weight: 500;
     line-height: 1;
     padding: 5px;
-    margin-left: $smallGap;
     border-radius: 100px;
     border: 1px solid white;
 }
@@ -384,6 +383,12 @@ i'm backing out for now
 }
 
 .priorityTag5 {
+    @extend .priorityTag;
+    background-color: blueviolet;
+    color: yellow;
+}
+
+.priorityTag6 {
     @extend .priorityTag;
     background-color: blue;
     color: yellow;
