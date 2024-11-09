@@ -434,7 +434,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
         const linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
-            title: "Copy RSS Item URL into clipboard",
+            title: "Copy RSS Item URL to clipboard",
             onClick: () => S.util.copyToClipboard(entry.link)
         });
 
@@ -469,11 +469,9 @@ export class RSSView extends AppTab<any, RSSView> {
         const footerSpan = new Span(entry.publishDate, { className: "mr-3" });
 
         children.push(new Div(null, null, [
-            new Span(null, { className: "float-right" }, [
+            new Span(null, { className: "-float-right" }, [
                 footerSpan, postIcon, linkIcon, bookmarkIcon
-            ]),
-            // is this clearfix needed now that we wrapped this stuff in this div?
-            new Clearfix()
+            ])
         ]));
 
         return new Div(null, { className: "rssFeedItem" }, children);

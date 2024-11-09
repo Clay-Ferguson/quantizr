@@ -175,7 +175,7 @@ export class EditNodeDlg extends DialogBase {
     createPrioritySelection(): Selection {
         const ast = getAs();
         return new Selection(null, "Priority", [
-            { key: "0", val: "none" },
+            { key: "0", val: "n/a" },
             { key: "1", val: "P1" },
             { key: "2", val: "P2" },
             { key: "3", val: "P3" },

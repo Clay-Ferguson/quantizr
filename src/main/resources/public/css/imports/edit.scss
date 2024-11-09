@@ -252,6 +252,7 @@ th {
 .tagsFlexContainer {
     display: flex;
     flex-wrap: wrap;
+    margin-left: $smallGap;
 }
 
 .propsListItemCheckBox {

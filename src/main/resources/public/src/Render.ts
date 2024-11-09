@@ -788,9 +788,7 @@ export class Render {
         const attrs = classes ? { className: classes } : null;
         return new Div(null, attrs, [
             new Div(null, { className: "inlineBlock" }, [
-                new Div(null, {
-                    className: "tagsFlexContainer"
-                }, spans)
+                new Div(null, { className: "tagsFlexContainer" }, spans)
             ]),
             new Button("", (evt: Event) => {
                 evt.stopPropagation();
