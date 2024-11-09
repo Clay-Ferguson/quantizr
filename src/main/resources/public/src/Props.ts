@@ -276,7 +276,6 @@ export class Props {
             case J.NodeProp.INLINE_CHILDREN:
             case J.NodeProp.PRIORITY:
             case J.NodeProp.LAYOUT:
-            case J.NodeProp.ORDER_BY:
             case J.NodeProp.UNPUBLISHED:
             case J.NodeProp.IN_PENDING_PATH:
             case J.NodeProp.TRUNCATED:
