@@ -25,6 +25,12 @@
     h6 {
         @apply text-base font-thin mb-2;
     }
+
+    /* Without this tailwind will remove the default list styling (which is bullet points in front of the list items) */
+    ol,
+    ul {
+        list-style: initial;
+    }
 }
 
 @tailwind components;
