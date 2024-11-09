@@ -963,22 +963,20 @@ public class AttachmentService extends ServiceBase {
         MongoTranMgr.ensureTran();
         log.debug("gridMaintenanceScan()");
         return svc_arun.run(() -> {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder report = new StringBuilder();
             int delCount = 0;
             HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
             // query all grid items
             GridFSFindIterable files = grid.find(new Query());
             if (files != null) {
-                boolean delete = true;
-
                 // Scan all files in the grid
                 for (GridFSFile file : files) {
-                    // by default we delete the grid item unless we discover it is being used
-                    delete = true;
+                    boolean delete = false;
                     Document meta = file.getMetadata();
                     String binId = file.getObjectId().toHexString();;
                     String nodeIdStr = null;
+
                     // if node has metadata
                     if (meta != null) {
                         // Get which nodeId owns this grid file
@@ -1000,25 +998,27 @@ public class AttachmentService extends ServiceBase {
                                 // check if this binary item is the cached website for a node
                                 if ("website".equals(type)) {
                                     // if the node has a website property, that means the user still wants to keep
-                                    if (node.hasProp(NodeProp.WEBSITE.s())) {
-                                        delete = false;
+                                    if (!node.hasProp(NodeProp.WEBSITE.s())) {
+                                        delete = true;
                                     }
                                 }
                                 // else scan all attachments on the node to look for the actual attachment
                                 // that uses this grid item
                                 else if (node.getAttachments() != null) {
+                                    boolean found = false;
                                     // scan all attachments to see if we have one pointing to binId
                                     for (String key : node.getAttachments().keySet()) {
                                         Attachment att = node.getAttachments().get(key);
 
                                         // if this attachment is in use, then don't delete the grid item
-                                        if (att.getBin() != null && att.getBin().equals(binId)) {
+                                        if (binId.equals(att.getBin())) {
                                             // log.debug("Grid Item Found: " + binId
                                             // + " on node: " + node.getIdStr() + " with att.key: " + key);
-                                            delete = false;
+                                            found = true;
                                             break;
                                         }
                                     }
+                                    delete = !found;
                                 }
 
                                 if (!delete) {
@@ -1037,12 +1037,20 @@ public class AttachmentService extends ServiceBase {
                                     }
                                 }
                             }
+                            // node doesn't exist. Delete orphaned grid item
+                            else {
+                                delete = true;
+                            }
                         }
+                    } else {
+                        String msg = "Grid Obj missing Metadata: binId=" + binId;
+                        report.append(msg + "\n");
+                        log.debug(msg);
                     }
 
                     if (delete) {
                         String msg = "Grid Orphan: binId=" + binId + " nodeId=" + nodeIdStr;
-                        sb.append(msg + "\n");
+                        report.append(msg + "\n");
                         log.debug(msg);
 
                         if (ALLOW_DELETES) {
@@ -1069,8 +1077,8 @@ public class AttachmentService extends ServiceBase {
                     statsMap.put(accntNode.getOwner(), stats);
                 }
             }
-            sb.append(String.valueOf(delCount) + " grid orphans found.\n\n");
-            String ret = sb.toString();
+            report.append(String.valueOf(delCount) + " grid orphans found.\n\n");
+            String ret = report.toString();
             log.debug(ret);
             svc_user.writeUserStats(statsMap);
             return ret;
