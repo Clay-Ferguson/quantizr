@@ -11,7 +11,7 @@ export class SpeechEngine {
     // directly trigger a DOM change.
     public queuedSpeech: string[] = null;
 
-    private voices: SpeechSynthesisVoice[] = null;
+    public voices: SpeechSynthesisVoice[] = null;
 
     // this is a guess (and recommendation from online sources) at how long a sentence we can get
     // away with and still avoid the Chrome bug which cuts off long sentences. 
@@ -40,7 +40,7 @@ export class SpeechEngine {
     private callback: (text: string) => void;
 
     constructor() {
-        this.initVoices();
+        this.getVoices();
     }
 
     // --------------------------------------------------------------
@@ -117,20 +117,6 @@ export class SpeechEngine {
     // Text to Speech
     // --------------------------------------------------------------
 
-    initVoices() {
-        // need to google "how to verify all voices loaded"
-        const interval = setInterval(() => {
-            this.getVoices();
-            if (this.voices) {
-                clearInterval(interval);
-                console.log("tts loaded " + this.voices.length + " voices");
-            }
-            else {
-                console.log("can't get voices yet from tts. Still trying.");
-            }
-        }, 1000);
-    }
-
     // called directly by button on main top right corner.
     _speakClipboard = async () => {
         if (!this.tts) return;
@@ -181,9 +167,9 @@ export class SpeechEngine {
         // only because speech has had bugs over the years and one bug report I saw claimed putting
         // the call in a timeout helped, I'm doing that here, because I had a hunch this was best
         // even before I saw someone else make the claim.
-        setTimeout(() => {
-            this.getVoices();
-            if (!this.voices) {
+        setTimeout(async () => {
+            await this.getVoices();
+            if (!this.voices || this.voices.length === 0) {
                 console.warn("Voices not loaded. Can't speak text");
                 return;
             }
@@ -256,18 +242,13 @@ export class SpeechEngine {
                         // replace backquote or else the engine will pronounce the actual word 'backquote' which we of courose
                         // do not want.
                         sayThis = sayThis.replaceAll("`", "\"");
-
-                        const voices = this.getVoices();
                         const utter = new SpeechSynthesisUtterance(sayThis);
-                        if (!voices || voices.length === 0) {
-                            console.warn("No voices available.");
-                            return;
-                        }
+
                         if (ast.speechVoice >= 0) {
-                            utter.voice = voices[ast.speechVoice < voices.length ? ast.speechVoice : 0];
+                            utter.voice = this.voices[ast.speechVoice < this.voices.length ? ast.speechVoice : 0];
                         }
                         else {
-                            utter.voice = voices[0];
+                            utter.voice = this.voices[0];
                         }
 
                         if (ast.speechRate) {
@@ -370,18 +351,22 @@ export class SpeechEngine {
         }
     }
 
-    getVoices() {
-        if (this.voices) return this.voices;
-        this.voices = this.tts.getVoices();
-        this.filterVoices();
-        this.tts.onvoiceschanged = () => {
-            this.voices = this.tts.getVoices();
-            this.filterVoices();
-        };
+    getVoices(): Promise<SpeechSynthesisVoice[]> {
+        return new Promise((resolve) => {
+            if (this.voices) {
+                resolve(this.voices);
+            } else {
+                this.tts.onvoiceschanged = () => {
+                    this.voices = this.tts.getVoices();
+                    this.filterVoices();
+                    resolve(this.voices);
+                };
+            }
+        });
     }
 
     ttsSupported() {
-        return this.tts; // && this.voices && this.voices.length > 0;
+        return this.tts && this.voices && this.voices.length > 0;
     }
 
     filterVoices() {

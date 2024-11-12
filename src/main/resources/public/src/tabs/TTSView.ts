@@ -133,7 +133,7 @@ export class TTSView extends AppTab<any, TTSView> {
     makeVoiceChooser(voiceKey: string): Selection {
         const data: any[] = [];
         let idx = 0;
-        S.speech.getVoices()?.forEach(voice => {
+        S.speech.voices?.forEach(voice => {
             data.push({ key: "" + idx, val: voice.name });
             idx++;
         });

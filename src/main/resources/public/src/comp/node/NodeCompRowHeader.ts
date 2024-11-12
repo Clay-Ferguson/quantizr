@@ -107,7 +107,7 @@ export class NodeCompRowHeader extends Comp {
                     if (S.speech.ttsSupported()) {
                         children.push(new Icon({
                             className: "fa fa-volume-high fa-lg rowHeaderIcon",
-                            title: "Speech-to-Text (Read Aloud)",
+                            title: "Text-to-Speech (Read Aloud)",
                             [C.DOM_ID_ATTR]: this._getContentDomId(),
                             onClick: S.nav._ttsClick
                         }));
