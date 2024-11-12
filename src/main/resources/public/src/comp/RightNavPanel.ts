@@ -109,14 +109,8 @@ export class RightNavPanel extends Comp {
 
         const textToSpeech = !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
             className: "fa fa-volume-high fa-lg mr-3 cursor-pointer",
-
-            // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can
-            // happen.
-            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-            onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: () => S.speech.speakSelOrClipboard(false),
-            title: "Text-to-Speech: Selected text or clipboard"
+            onClick: S.speech._speakClipboard,
+            title: "Text-to-Speech: Speak clipboard content"
         }) : null;
 
         if (textToSpeech) {
@@ -124,7 +118,7 @@ export class RightNavPanel extends Comp {
                 for (const item of evt.dataTransfer.items) {
                     // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
                     if (item.kind === "string") {
-                        item.getAsString(s => S.speech.speakText(s));
+                        item.getAsString(s => S.speech.speakText(s, true));
                         return;
                     }
                 }

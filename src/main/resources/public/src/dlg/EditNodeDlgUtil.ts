@@ -519,18 +519,6 @@ export class EditNodeDlgUtil {
         }
     }
 
-    speakerClickInEditor() {
-        if (getAs().speechSpeaking) {
-            S.speech.stopSpeaking();
-        }
-        else {
-            const content = S.quanta.selectedForTts ? S.quanta.selectedForTts : this.dlg.contentEditorState.getValue();
-            if (content) {
-                S.speech.speakText(content, false);
-            }
-        }
-    }
-
     cancelEdit() {
         const ast = getAs();
         this.dlg.closeByUser();

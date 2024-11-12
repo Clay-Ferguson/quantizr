@@ -578,18 +578,13 @@ export class Nav {
     }
 
     _ttsClick = (evt: Event) => {
-        if (getAs().speechSpeaking) {
-            S.speech.stopSpeaking();
-        }
-        else {
-            const domId = S.domUtil.getPropFromDom(evt, C.DOM_ID_ATTR);
-            // find the markdown body element and get the text content from it
-            const elm = document.querySelector(`#${domId} .mkBody`);
-            const content = elm ? elm.textContent : null;
+        const domId = S.domUtil.getPropFromDom(evt, C.DOM_ID_ATTR);
+        // find the markdown body element and get the text content from it
+        const elm = document.querySelector(`#${domId} .mkBody`);
+        const content = elm ? elm.textContent : null;
 
-            if (content) {
-                S.speech.speakText(content, false);
-            }
+        if (content) {
+            S.speech.speakText(content, true);
         }
     }
 

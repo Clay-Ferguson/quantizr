@@ -840,12 +840,6 @@ export class Util {
         if (!res) return;
 
         const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX);
-        let voice2 = voice;
-
-        if (S.speech.USE_VOICE2) {
-            voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX);
-        }
-
         const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE);
 
         await promiseDispatch("LoginResponse", s => {
@@ -854,7 +848,6 @@ export class Util {
             s.isAdminUser = res.userProfile.userName === PrincipalName.ADMIN;
             s.isAnonUser = res.userProfile.userName === PrincipalName.ANON;
             s.speechVoice = voice || 0;
-            s.speechVoice2 = voice2 || 0;
             s.speechRate = rate || "normal";
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm

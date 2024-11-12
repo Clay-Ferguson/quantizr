@@ -100,10 +100,8 @@ export class AppState {
     speechPaused: boolean = false;
     speechSpeaking: boolean = false;
     speechVoice: number = -1; // index into speech.voices array (-1 means not set)
-    speechVoice2: number = -1; // index into speech.voices array (-1 means not set)
     speechRate: string = "normal"; // slow, normal, fast
     ttsRan: boolean = false;
-    showTtsInputText: boolean = false;
 
     // if the URL is like 'https://quanta.wiki' and no path or query on the url then default
     // to showing this LHS menu always.

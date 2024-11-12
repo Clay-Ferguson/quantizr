@@ -1051,13 +1051,6 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.insertUserNames()
             }),
 
-            !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
-                className: "fa fa-lg fa-volume-high editorIcon",
-                onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-                onMouseOut: () => { S.quanta.selectedForTts = null; },
-                onClick: () => this.utl.speakerClickInEditor(),
-                title: "Text-to-Speech: Editor Text or Selection"
-            }) : null,
             new Selection(null, null, [
                 { key: "h0", val: "" },
                 { key: "h1", val: "H1" },

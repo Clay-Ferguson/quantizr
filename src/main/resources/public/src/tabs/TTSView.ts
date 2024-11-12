@@ -1,7 +1,6 @@
 import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -9,17 +8,14 @@ import { Icon } from "../comp/core/Icon";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
-import { TextArea } from "../comp/core/TextArea";
 import { Constants as C } from "../Constants";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
 
 interface LS { // Local State
 }
 export class TTSView extends AppTab<any, TTSView> {
 
-    static textAreaState: Validator = new Validator();
     static inst: TTSView = null;
     static ttsHighlightIdx: number = -1;
 
@@ -43,38 +39,17 @@ export class TTSView extends AppTab<any, TTSView> {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const speakBtn = !ast.mobileMode ? new Icon({
-            className: "fa fa-volume-high fa-2x cursor-pointer",
-            // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can
-            // happen.
-            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-            onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: () => S.speech.speakSelOrClipboard(true),
-            title: "Text-to-Speech: Speak from input below, Selected Text, or Clipboard"
-        }) : null;
 
         // make the entire tab area a drop target for speaking text.
         S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
                 if (item.kind === "string") {
-                    item.getAsString(s => S.speech.speakText(s));
+                    item.getAsString(s => S.speech.speakText(s, true));
                     return;
                 }
             }
         });
-
-        const appendTextBtn = !ast.mobileMode && S.speech.queuedSpeech?.length > 0 ? new Icon({
-            className: "fa fa-circle-plus fa-2x cursor-pointer mr-6",
-            // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can
-            // happen.
-            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-            onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: S.speech._appendSelOrClipboard,
-            title: "Text-to-Speech: Append more text from...\n\nText Area below, Selected Text, or Clipboard"
-        }) : null;
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
             className: "fa fa-refresh fa-2x mr-6 cursor-pointer",
@@ -82,11 +57,11 @@ export class TTSView extends AppTab<any, TTSView> {
             title: "Restart from the top"
         }) : null;
 
-        const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-2x mr-6 cursor-pointer",
-            onClick: () => S.speech.stopSpeaking(),
-            title: "Stop Speaking Text"
-        }) : null;
+        // const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
+        //     className: "fa fa-stop fa-2x mr-6 cursor-pointer",
+        //     onClick: () => S.speech.stopSpeaking(),
+        //     title: "Stop Speaking Text"
+        // }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-pause fa-2x mr-6 cursor-pointer",
@@ -138,26 +113,13 @@ export class TTSView extends AppTab<any, TTSView> {
             this.children = [
                 this.headingBar = new TabHeading([
                     new Div("Text-to-Speech", { className: "tabTitle" }),
-                    new Div(null, { className: "float-right" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                    new Div(null, { className: "float-right" }, [pauseBtn, resumeBtn, speakAgainBtn]),
                     new Clearfix()
                 ], null),
                 new FlexRowLayout([
-                    this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
-                    S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
+                    this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX),
                     this.makeRateChooser(),
-                    new Checkbox("Text Input", { className: "ml-6 mt-3" }, {
-                        setValue: (checked: boolean) => dispatch("setTtsInput", s => {
-                            if (!checked) {
-                                TTSView.textAreaState.setValue("");
-                            }
-                            s.showTtsInputText = checked;
-                        }),
-                        getValue: (): boolean => getAs().showTtsInputText
-                    })
                 ]),
-                getAs().showTtsInputText ? new TextArea("Enter Text to Speak", {
-                    rows: 3
-                }, TTSView.textAreaState) : null,
                 paraComps?.length > 0 ? new Div(null, { className: "speechTxtArea" }, paraComps) : null
             ];
         } else {
@@ -168,7 +130,7 @@ export class TTSView extends AppTab<any, TTSView> {
         return true;
     }
 
-    makeVoiceChooser(voiceKey: string, primaryVoice: boolean): Selection {
+    makeVoiceChooser(voiceKey: string): Selection {
         const data: any[] = [];
         let idx = 0;
         S.speech.getVoices()?.forEach(voice => {
@@ -176,21 +138,18 @@ export class TTSView extends AppTab<any, TTSView> {
             idx++;
         });
 
-        return new Selection(null, primaryVoice ? "Voice" : "Quotation Voice",
+        return new Selection(null, "Voice",
             data, null, "selectVoiceDropDown", {
             setValue: (val: string) => {
                 const voiceInt = parseInt(val);
                 S.localDB.setVal(voiceKey, voiceInt);
                 dispatch("ChangeSpeechVoice", s => {
-                    if (primaryVoice) {
-                        s.speechVoice = voiceInt;
-                    }
-                    else {
-                        s.speechVoice2 = voiceInt;
-                    }
+
+                    s.speechVoice = voiceInt;
+
                 })
             },
-            getValue: (): string => "" + (primaryVoice ? getAs().speechVoice : getAs().speechVoice2)
+            getValue: (): string => "" + getAs().speechVoice
         });
     }
 

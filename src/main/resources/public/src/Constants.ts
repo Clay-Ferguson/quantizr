@@ -100,6 +100,5 @@ export class Constants {
     static readonly ID_PREFIX_EDIT: string = "edit_";
 
     static readonly LOCALDB_VOICE_INDEX: string = "voiceIndex";
-    static readonly LOCALDB_VOICE2_INDEX: string = "voice2Index";
     static readonly LOCALDB_VOICE_RATE: string = "voiceRate";
 }

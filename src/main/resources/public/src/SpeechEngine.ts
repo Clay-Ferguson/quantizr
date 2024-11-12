@@ -7,9 +7,6 @@ declare let webkitSpeechRecognition: any;
 declare let SpeechRecognition: any;
 
 export class SpeechEngine {
-    // I'm disabling the dual voice thing for now
-    public USE_VOICE2: boolean = false;
-
     // we keep this array here and not in AppState, because changes to this will never need to
     // directly trigger a DOM change.
     public queuedSpeech: string[] = null;
@@ -17,13 +14,14 @@ export class SpeechEngine {
     private voices: SpeechSynthesisVoice[] = null;
 
     // this is a guess (and recommendation from online sources) at how long a sentence we can get
-    // away with and still avoid the Chrome bug which cuts off long sentences. If sentence is short
-    // enough we push the whole thing. There's a tradeoff here where you can set a large number for
-    // this (like well over 200), which causes the ttsTimer (below) to activate a lot with "i think"
+    // away with and still avoid the Chrome bug which cuts off long sentences. 
+    // There's a tradeoff here where you can set a large number for
+    // this (like well over 200), which causes the ttsTimer (below) to activate a lot which "i think"
     // can cause a slight speaker popping, --OR-- you can set this value to like 200, and the
     // popping will definitely not happen, but the sentence structure won't be perfect (meaning the
     // speaking voice may pause at awkward times every now and then)
-    MAX_UTTERANCE_CHARS: number = 250;
+    // (UPDATE: Seems to now run smoothly with 1000 chars, whereas 250 was what we used for a long time.)
+    MAX_UTTERANCE_CHARS: number = 1000; //250
 
     // add type-safety here (TS can find type easily)
     recognition: any = null;
@@ -33,7 +31,7 @@ export class SpeechEngine {
     ttsIdx: number = 0;
 
     // we need this to have instantly fast (independent of AppState) way to detect
-    // if we are tunning speech. ttsRunning means it's actively speaking now.
+    // if we are running speech. ttsRunning means it's actively speaking now.
     ttsRunning: boolean = false;
     ttsSpeakingTime: number = 0;
     utter: SpeechSynthesisUtterance = null;
@@ -133,52 +131,13 @@ export class SpeechEngine {
         }, 1000);
     }
 
-    speakSelOrClipboard(allowUseEditField: boolean) {
-        if (allowUseEditField && TTSView.textAreaState.getValue()) {
-            this.speakText(TTSView.textAreaState.getValue(), false);
-        }
-        else if (S.quanta.selectedForTts) {
-            this.speakText(S.quanta.selectedForTts, false);
-        }
-        else {
-            this.speakClipboard();
-        }
-    }
-
-    // Append more text to buffer of what's being read.
-    _appendSelOrClipboard = async () => {
-        let textToAdd: string = null;
-
-        if (TTSView.textAreaState.getValue()) {
-            textToAdd = TTSView.textAreaState.getValue();
-            TTSView.textAreaState.setValue("");
-        }
-        else if (S.quanta.selectedForTts) {
-            textToAdd = S.quanta.selectedForTts;
-        }
-        else {
-            textToAdd = await (navigator as any)?.clipboard?.readText();
-        }
-
-        if (textToAdd) {
-            this.appendTextToBuffer(textToAdd);
-            await promiseDispatch("speechEngineStateChange", _s => {
-                setTimeout(() => {
-                    this.highlightByIndex(this.ttsIdx);
-                }, 250);
-            });
-        }
-        else {
-            S.util.showMessage("Neither Selected text nor Clipboard text is available.", "Warning");
-        }
-    }
-
-    async speakClipboard() {
+    // called directly by button on main top right corner.
+    _speakClipboard = async () => {
         if (!this.tts) return;
 
         const clipTxt = await (navigator as any)?.clipboard?.readText();
         if (clipTxt) {
-            this.speakText(clipTxt);
+            this.speakText(clipTxt, true);
         }
         else {
             S.util.showMessage("Clipboard text not available.", "Warning");
@@ -186,26 +145,16 @@ export class SpeechEngine {
     }
 
     async speakText(text: string, selectTab: boolean = true, replayFromIdx: number = -1) {
-        const ast = getAs();
-
-        // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
-        // but it would be better to use a listener or something to know precisely when it's ready
-        // to start speaking again.
-        if (ast.speechSpeaking) {
-            this.stopSpeaking();
-            setTimeout(() => {
-                this.speakTextNow(text, selectTab, replayFromIdx);
-            }, 1200);
-        }
-        else {
+        await this.stopSpeaking();
+        setTimeout(() => {
             this.speakTextNow(text, selectTab, replayFromIdx);
-        }
+        }, 1200);
     }
 
-    jumpToIdx(idx: number) {
+    async jumpToIdx(idx: number) {
         if (this.queuedSpeech?.length > 1 && idx >= 0 && idx < this.queuedSpeech?.length) {
 
-            this.stopSpeaking();
+            await this.stopSpeaking();
             this.highlightByIndex(idx);
 
             // Timeout to give the engine time to stop what it's doing. We could use PubSub, or a faster
@@ -218,7 +167,10 @@ export class SpeechEngine {
 
     // you can pass null, and this method will repeat it's current text.
     async speakTextNow(text: string, selectTab: boolean = true, replayFromIdx: number = -1) {
-        if (!this.tts || (!text && replayFromIdx === -1)) return;
+        if (!this.tts || (!text && replayFromIdx === -1)) {
+            console.log("TTS engine not available. Can't speak text.");
+            return;
+        }
         this.ttsRunning = true;
         this.createTtsTimer();
 
@@ -259,20 +211,24 @@ export class SpeechEngine {
 
                 if (this.queuedSpeech.length === 0) {
                     this.queuedSpeech = null;
+                    console.log("No text to speak.");
                     return;
                 }
 
-                let utter: SpeechSynthesisUtterance = null;
-
                 /* NOTE: This utterFunc gets used over and over in a daisy chain type way to process the
                 next utterance every time the previous one completes. */
-                const utterFunc = () => {
-                    if (!this.ttsRunning || !this.queuedSpeech) return;
+                const utterFunc = async () => {
+                    console.log("utterFunc() called.");
+                    if (!this.ttsRunning || !this.queuedSpeech) {
+                        console.log("TTS not running. Stopping speaking.");
+                        return;
+                    }
                     const ast = getAs();
 
                     // If we're out of stuff to speak
                     if (this.ttsIdx >= this.queuedSpeech.length) {
-                        this.stopSpeaking();
+                        await this.stopSpeaking();
+                        console.log("No more text to speak.");
                         return;
                     }
 
@@ -284,7 +240,8 @@ export class SpeechEngine {
                         while (sayThis === C.TTS_BREAK) {
                             // no more left?
                             if (++this.ttsIdx >= this.queuedSpeech.length) {
-                                this.stopSpeaking();
+                                await this.stopSpeaking();
+                                console.log("No more text to speak.");
                                 return;
                             }
 
@@ -300,34 +257,47 @@ export class SpeechEngine {
                         // do not want.
                         sayThis = sayThis.replaceAll("`", "\"");
 
-                        utter = new SpeechSynthesisUtterance(sayThis);
-
-                        const isQuote = sayThis.startsWith("\"");
-                        if (isQuote && this.USE_VOICE2 && ast.speechVoice2 >= 0) {
-                            const voices = this.getVoices();
-                            utter.voice = voices[(ast.speechVoice2 < voices.length ? ast.speechVoice2 : 0)];
+                        const voices = this.getVoices();
+                        const utter = new SpeechSynthesisUtterance(sayThis);
+                        if (!voices || voices.length === 0) {
+                            console.warn("No voices available.");
+                            return;
                         }
-                        else if (ast.speechVoice >= 0) {
-                            const voices = this.getVoices();
-                            utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)];
+                        if (ast.speechVoice >= 0) {
+                            utter.voice = voices[ast.speechVoice < voices.length ? ast.speechVoice : 0];
+                        }
+                        else {
+                            utter.voice = voices[0];
                         }
 
                         if (ast.speechRate) {
                             utter.rate = this.parseRateValue(ast.speechRate);
                         }
 
+                        utter.volume = 1;
+
+                        utter.onerror = (ev: SpeechSynthesisErrorEvent) => {
+                            console.error("TTS error: " + ev.error);
+                            this.ttsRunning = false;
+                        }
+
                         utter.onend = () => {
+                            console.log("Utterance ended.");
                             this.ttsSpeakingTime = 0;
                             this.utter = null;
                             if (!this.ttsRunning) return;
                             utterFunc();
                         }
 
-                        if (!this.ttsRunning) return;
+                        if (!this.ttsRunning) {
+                            console.log("TTS not running. Stopping speaking.");
+                            return;
+                        }
                         this.ttsSpeakingTime = 0;
                         this.utter = utter;
                         this.highlightByIndex(this.ttsIdx);
                         this.ttsIdx++;
+                        console.log("Speaking this: " + sayThis);
                         this.tts.speak(utter);
                     }
                 }
@@ -336,7 +306,6 @@ export class SpeechEngine {
                 // chain reaction every time utterFunc gets called via the 'onend' listener of the
                 // most recently completed utterance
                 utterFunc();
-
             });
         }, 100);
     }
@@ -348,6 +317,10 @@ export class SpeechEngine {
             const interval = 1000;
             // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
             this.ttsTimer = setInterval(() => {
+                // const ast = getAs();
+                // console.log("TTS STATE: paused=" + this.tts.paused + //
+                //     " speaking=" + this.tts.speaking + " running=" + this.ttsRunning + " ast.paused=" + ast.speechPaused +
+                //     " ast.speaking=" + ast.speechSpeaking);
                 if (!this.ttsRunning) return;
                 const ast = getAs();
                 if (ast.speechSpeaking && !ast.speechPaused) {
@@ -408,7 +381,7 @@ export class SpeechEngine {
     }
 
     ttsSupported() {
-        return this.tts && this.voices && this.voices.length > 0;
+        return this.tts; // && this.voices && this.voices.length > 0;
     }
 
     filterVoices() {
@@ -565,42 +538,6 @@ export class SpeechEngine {
         });
     }
 
-    splitByQuotations(text: string): string[] {
-        text = text.replaceAll("“", "\"");
-        text = text.replaceAll("”", "\"");
-        const quoteCount = S.util.countChars(text, "\"");
-
-        let ret: string[] = null;
-        if (quoteCount % 2 === 0) {
-            ret = [];
-            let inQuote = false;
-
-            // Split by quote char, and also return the delimiters (using lookback).
-            const chunk = text.split(/(?=["]+)|(?<=["]+)/g);
-            chunk?.forEach(frag => {
-                if (frag === "\"") {
-                    // finishing a quote
-                    if (inQuote) {
-                        inQuote = false;
-                        // wrap previous string in quotes, because this is the correct text AND because the
-                        // engine will be detecting that during playback to use quoted voice.
-                        if (ret.length > 0) {
-                            ret[ret.length - 1] = "\"" + ret[ret.length - 1] + "\"";
-                        }
-                    }
-                    // starting a quote
-                    else {
-                        inQuote = true;
-                    }
-                }
-                else {
-                    ret.push(frag);
-                }
-            });
-        }
-        return ret;
-    }
-
     // The Chrome Speech engine will stop working unless you send it relatively short chunks of
     // text. It's basically a time related thing where if it speaks for more than about 10 seconds
     // at a time it hangs. See the setInterval function in this class for more on the
@@ -634,7 +571,7 @@ export class SpeechEngine {
 
             // if this sentence itself is short enough just add to queue
             if (sentence.length < maxChars) {
-                this.pushTextToQueue(sentence);
+                this.queuedSpeech.push(sentence);
             }
             // Otherwise we have to break the sentence apart, so we break by commas first
             else {
@@ -643,56 +580,36 @@ export class SpeechEngine {
         });
     }
 
-    // We have this push function basically so we can split up quotations. This splitting is what
-    // allows us to switch voices if we went to (for quotations) but is also a way to keep the
-    // utterances as short ass possible, which is needed to help Chrome not hang.
-    pushTextToQueue(text: string) {
-        if (!this.USE_VOICE2) {
-            this.queuedSpeech.push(text);
-            return;
-        }
-
-        const textWithQuotes = this.splitByQuotations(text);
-        if (textWithQuotes) {
-            this.queuedSpeech = this.queuedSpeech.concat(textWithQuotes)
-        }
-        else {
-            this.queuedSpeech.push(text);
-        }
-    }
-
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
     // states correct, because TRUST ME at least on Chrome the states are unreliable. If you know
     // you're about to speak some new text you can pass in that text to update screen ASAP
     async stopSpeaking() {
+        console.log("Stopping speaking.");
         if (!this.tts) return;
         this.ttsRunning = false;
-        if (this.utter) {
-            this.utter.volume = 0;
-        }
-
         this.ttsSpeakingTime = 0;
+        this.tts.cancel();
 
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
         });
-        this.tts.cancel();
     }
 
     // Using "tts.cancel()" instead of "tts.pause()" to work around Chrome Bug
     _pauseSpeaking = async () => {
+        console.log("Pause speaking.");
         if (!this.tts) return;
         this.ttsRunning = false;
-
+        this.tts.cancel();
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = true;
         });
-        this.tts.cancel();
     }
 
     // Using "jumpToIdx()" instead of "tts.resume()" to work around Chrome Bug
     _resumeSpeaking = async () => {
+        console.log("Resuming speaking.");
         // we use ttsIdx-1 as out starting point because this index is always kind of 'pre-advanced'
         // to the next utterance once a given utterance is stated.
         this.jumpToIdx(this.ttsIdx - 1);
