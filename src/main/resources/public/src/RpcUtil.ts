@@ -272,6 +272,10 @@ export class RpcUtil {
                         console.log("reject: res: " + S.util.prettyPrint(res) + " PATH=" + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                         reject({ response: res });
                     }
+                    else if (res.status === C.RESPONSE_CODE_SEE_OTHER) {
+                        console.error("Message Error: " + postName + " RES: " + res);
+                        reject({ response: res });
+                    }
                     else {
                         return res.text();
                     }
@@ -314,14 +318,19 @@ export class RpcUtil {
             }
 
             if (res.code === C.RESPONSE_CODE_UNAUTHORIZED) {
-                console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + res);
+                console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + S.util.prettyPrint(res));
                 this.authFail();
                 return;
             }
 
             if (res.code === C.RESPONSE_CODE_FORBIDDEN) {
-                console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + res);
+                console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + S.util.prettyPrint(res));
                 S.util.showMessage("Content not visible to you.", "Message");
+                return;
+            }
+
+            if (res.code === C.RESPONSE_CODE_SEE_OTHER) {
+                console.error("Warning: " + postName + " RES: " + S.util.prettyPrint(res));
                 return;
             }
 
@@ -387,6 +396,8 @@ export class RpcUtil {
                 case C.RESPONSE_CODE_FORBIDDEN:
                     console.error("FORBIDDEN (403) error");
                     S.util.showMessage("Content not visible to you.", "Message");
+                    return;
+                case C.RESPONSE_CODE_SEE_OTHER:
                     return;
                 case C.RESPONSE_CODE_SERVER_TOO_BUSY:
                     S.util.showMessage("Server too busy (503). Try again later.", "Warning", true);

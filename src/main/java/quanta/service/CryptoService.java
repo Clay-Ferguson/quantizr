@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.SignatureException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.Jwk;
 import quanta.model.client.Attachment;
@@ -600,7 +601,7 @@ public class CryptoService extends ServiceBase {
                 sc.getUserName().getBytes(StandardCharsets.UTF_8));
 
         if (!verified) {
-            throw new RuntimeEx(
+            throw new SignatureException(
                     "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
         }
     }
