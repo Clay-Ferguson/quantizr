@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# TO Reinstall the Conda Environment from scratch run these commands before first...
+# TO Reinstall the Conda Environment from scratch run these commands...
 #    conda deactivate
-#    conda remove --name quanta_agent --all
-#    conda create --name quanta_agent python=3.12.3
-#    conda activate quanta_agent
+#    conda remove --name quanta_gradio --all
+#    conda create --name quanta_gradio python=3.12.3
+#    conda activate quanta_gradio
+#    ./install_modules.sh
 
 source ./conda_init.sh
 
@@ -24,6 +25,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
       langchain-anthropic \
       langchain_google_genai \
       langchain-openai \
+      langchain-xai \
       langchain-community \
       langchain-core \
       langchain-text-splitters \

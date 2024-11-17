@@ -4,6 +4,7 @@ from langchain.schema import BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_xai import ChatXAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from QuantaAgent.app_config import AppConfig
 from common.python.agent.app_agent import QuantaAgent
@@ -76,6 +77,13 @@ class AIUtils:
                     api_key=cfg.gemini_api_key,
                     timeout=timeout
             )
+            elif cfg.ai_service == AIService.XAI.value:
+                llm = ChatXAI(
+                    model=cfg.xai_model,
+                    temperature=temperature,
+                    api_key=cfg.xai_api_key,
+                    timeout=timeout
+                )
             else:
                 raise Exception(f"Invalid AI Service: {cfg.ai_service}")
             return llm

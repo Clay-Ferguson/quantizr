@@ -18,6 +18,7 @@ class AIService(Enum):
     OPENAI = "openai"
     ANTHROPIC = "anth"
     GEMINI = "gemini"
+    XAI = "xai"
 
 class RefactorMode(Enum):
     REFACTOR = "refactor"

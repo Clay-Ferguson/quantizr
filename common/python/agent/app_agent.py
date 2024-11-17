@@ -9,10 +9,10 @@ from .project_mutator import ProjectMutator
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
-from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
+from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
-from ..utils import RefactorMode, Utils
+from ..utils import RefactorMode
 from .refactoring_tools import (
     UpdateBlockTool,
     CreateFileTool,
