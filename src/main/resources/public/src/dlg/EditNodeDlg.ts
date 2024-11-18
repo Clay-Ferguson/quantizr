@@ -353,7 +353,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection float-right" }, [
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection -float-right" }, [
             this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this._removeTag, this._selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
@@ -782,6 +782,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Add Property"
             }, null, "fa-circle-plus") : null,
 
+            // &&&
             !this.tagsState.getValue() ? new Button("", this._selectTags, {
                 title: "Select Hashtags"
             }, null, "fa-tag fa-lg") : null,

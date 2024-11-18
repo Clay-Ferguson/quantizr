@@ -65,7 +65,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         const topChildren: Comp[] = [
-            new Div(null, { className: "float-right" }, [
+            new Div(null, { className: "-float-right" }, [
                 new FlexRowLayout([
                     //  newItems,
                     ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
