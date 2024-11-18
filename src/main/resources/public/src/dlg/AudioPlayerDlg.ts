@@ -31,7 +31,7 @@ export class AudioPlayerDlg extends DialogBase {
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
                     className: "audioPlayer",
-                    onEnded: this.onEnded,
+                    onEnded: this._onEnded,
                     controls: "controls",
                     autoPlay: "autoplay",
                     preload: "auto",
@@ -57,8 +57,8 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
-                        new Button("Close", this.destroyPlayer, null, "float-right")
-                    ], "align-items-end"),
+                        new Button("Close", this._destroyPlayer)
+                    ]),
                 ])
             ])
         ];
@@ -82,20 +82,20 @@ export class AudioPlayerDlg extends DialogBase {
 
     updatePlayButton = () => {
         if (!this.player) return;
-        this.updatePlayingState();
+        this._updatePlayingState();
 
         this.playButton.onMount((elm: HTMLElement) => {
-            this.updatePlayingState();
+            this._updatePlayingState();
             elm.style.display = !S.quanta.audioPlaying ? "inline-block" : "none";
         });
 
         this.pauseButton.onMount((elm: HTMLElement) => {
-            this.updatePlayingState();
+            this._updatePlayingState();
             elm.style.display = S.quanta.audioPlaying ? "inline-block" : "none";
         });
     }
 
-    updatePlayingState = () => {
+    _updatePlayingState = () => {
         S.quanta.audioPlaying = !this.player.paused && !this.player.ended;
     }
 
@@ -108,7 +108,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    destroyPlayer = () => {
+    _destroyPlayer = () => {
         S.quanta.audioPlaying = false;
         if (this.player) {
             this.player.pause();
@@ -116,7 +116,7 @@ export class AudioPlayerDlg extends DialogBase {
         this.cancel();
     }
 
-    onEnded = () => {
+    _onEnded = () => {
         if (this.player) {
             this.player.currentTime = 0;
             this.player.pause();

@@ -1034,21 +1034,21 @@ export class EditNodeDlg extends DialogBase {
 
         editItems.push(new ButtonBar([
             new Icon({
-                className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-microphone editorIcon"),
+                className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-lg fa-microphone editorIcon"),
                 title: "Toggle on/off Speech Recognition to input text",
-                onClick: () => this.utl.toggleRecognition()
+                onClick: this.utl._toggleRecognition
             }),
 
             new Icon({
                 className: "fa fa-lg fa-face-smile editorIcon",
                 title: "Insert emoji at cursor",
-                onClick: () => this.utl.insertEmoji()
+                onClick: this.utl._insertEmoji
             }),
 
             new Icon({
                 className: "fa fa-lg fa-user editorIcon",
                 title: "Insert Username(s) at cursor",
-                onClick: () => this.utl.insertUserNames()
+                onClick: this.utl._insertUserNames
             }),
 
             new Selection(null, null, [

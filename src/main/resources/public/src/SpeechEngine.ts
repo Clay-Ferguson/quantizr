@@ -52,17 +52,22 @@ export class SpeechEngine {
 
         if (typeof SpeechRecognition === "function") {
             this.recognition = new SpeechRecognition();
+            // console.log("Speech recognition initialized (a).");
         }
         else if (webkitSpeechRecognition) {
             // todo-2: fix linter rule to make this cleaner (the first letter upper case is the issue here)
             const WebkitSpeechRecognition = webkitSpeechRecognition;
             this.recognition = new WebkitSpeechRecognition();
+            // console.log("Speech recognition initialized (b).");
         }
 
         if (!this.recognition) {
+            console.log("Speech recognition failed to initialize.");
             S.util.showMessage("Speech recognition not available in your browser.", "Warning");
             return;
         }
+
+        this.recognition.lang = 'en-US';
 
         // This runs when the speech recognition service starts
         this.recognition.onstart = () => {
@@ -75,7 +80,14 @@ export class SpeechEngine {
         this.recognition.onend = () => {
             // console.log("speech onEnd.");
             if (this.speechActive) {
-                setTimeout(() => this.recognition.start(), 250);
+                setTimeout(() => {
+                    try {
+                        this.recognition.start();
+                    } catch (e) {
+                        console.error('Failed to restart recognition:', e);
+                        this.speechActive = false;
+                    }
+                }, 500);  // Increased timeout
             }
         };
 
@@ -85,6 +97,7 @@ export class SpeechEngine {
 
         // This runs when the speech recognition service returns result
         this.recognition.onresult = (event: any) => {
+            // console.log("speech onResult.");
             const transcript = event.results[0][0].transcript;
             // const confidence = event.results[0][0].confidence;
 

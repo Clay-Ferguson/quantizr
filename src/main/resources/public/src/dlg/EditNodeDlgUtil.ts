@@ -399,7 +399,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    toggleRecognition() {
+    _toggleRecognition = () => {
         S.speech.setListenerCallback((transcript: string) => {
             if (this.dlg.contentEditor && transcript) {
                 this.dlg.contentEditor.insertTextAtCursor(transcript + " ");
@@ -489,7 +489,7 @@ export class EditNodeDlgUtil {
         this.dlg.contentEditor?.setValue(content);
     }
 
-    async insertEmoji() {
+    _insertEmoji = async () => {
         if (!this.dlg.contentEditor) return;
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus
         // will make us also loose the cursor position.
@@ -501,7 +501,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    async insertUserNames() {
+    _insertUserNames = async () => {
         if (!this.dlg.contentEditor) return;
         // get the selStart immediately or it can be wrong, after renders.
         const selStart = this.dlg.contentEditor.getSelStart();

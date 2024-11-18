@@ -191,7 +191,7 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording || !this.continuable ? null : new Button("Play", this._play),
                     (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this._save),
                     new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "float-right")
-                ]),
+                ], "mt-3"),
                 this.videoMode ? this.videoPlayer : null,
                 new Div(null, { className: "mt-3" }, [audioSelect, videoSelect])
             ])
@@ -212,7 +212,7 @@ export class MediaRecorderDlg extends DialogBase {
                 constraints.video = { deviceId: state.videoInput };
             }
 
-            this.closeStream();
+            this._closeStream();
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
             if (this.videoMode) {
@@ -307,12 +307,12 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cleanup = () => {
+    _cleanup = () => {
         this.blob = null;
         this.recorder = null;
     }
 
-    closeStream = () => {
+    _closeStream = () => {
         this.stream?.getTracks().forEach((track: any) => track.stop());
     }
 
@@ -338,8 +338,8 @@ export class MediaRecorderDlg extends DialogBase {
     stopAndCleanupVideo() {
         this.cancelTimer();
         this._stop();
-        this.closeStream();
-        this.cleanup();
+        this._closeStream();
+        this._cleanup();
     }
 
     cancelImmediate() {
@@ -349,7 +349,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     _save = () => {
         this._stop();
-        this.closeStream();
+        this._closeStream();
         this.cancelTimer();
         this.uploadRequested = true;
         this.close();

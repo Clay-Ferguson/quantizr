@@ -29,7 +29,6 @@ export class VideoPlayerDlg extends DialogBase {
                     // "preload": "auto"
                 })
             ])
-
         ];
     }
 
