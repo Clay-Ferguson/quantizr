@@ -637,7 +637,7 @@ export class Render {
         return new Div(null, {
             title: "Click to copy to clipboard",
             onClick: () => S.util.copyToClipboard(node.tags),
-            className: "cursor-pointer float-right " + moreClasses
+            className: "cursor-pointer -float-right " + moreClasses
         }, spans);
     }
 
