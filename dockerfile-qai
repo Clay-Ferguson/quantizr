@@ -2,19 +2,21 @@
 FROM python:3.12.3-slim AS builder
 WORKDIR /app/QuantaAI
 
+#ai-model
 RUN pip install --no-cache-dir -U \
     uvicorn \
     fastapi \
     langchain \
     langchain-anthropic \
-    langchain_google_genai \
+    langchain-google-genai \
     langchain-openai \
+    langchain-xai \
     langchain-community \
     langchain-core \
     langchain-text-splitters \
     langgraph \
     pydantic \
-    pydantic_core \
+    pydantic-core \
     gradio
 
 # Final stage

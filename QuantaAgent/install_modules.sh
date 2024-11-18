@@ -16,8 +16,9 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_agent" ]]; then
   read -p "Press ENTER. To install modules."
   pip install \
     langchain \
-    langchain_openai \
-    langchain_anthropic \
+    langchain-openai \
+    langchain-xai \
+    langchain-anthropic \
     langchain-google-genai \
     configargparse \
     langgraph \

@@ -123,10 +123,12 @@ public class NodeRenderService extends ServiceBase {
         config.setBrandingAppName(svc_prop.getConfigText("brandingAppName"));
         config.setPaymentLink(svc_prop.getStripePaymentLink());
         config.setRequireCrypto(svc_prop.isRequireCrypto());
+        // #ai-model
         config.setUseOpenAi(!StringUtils.isEmpty(svc_prop.getOpenAiKey()));
         config.setUsePplxAi(!StringUtils.isEmpty(svc_prop.getPplxAiKey()));
         config.setUseGeminiAi(!StringUtils.isEmpty(svc_prop.getGeminiAiKey()));
         config.setUseAnthAi(!StringUtils.isEmpty(svc_prop.getAnthAiKey()));
+        config.setUseXAi(!StringUtils.isEmpty(svc_prop.getXAiKey()));
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);

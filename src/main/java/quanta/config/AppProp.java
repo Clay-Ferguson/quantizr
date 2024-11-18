@@ -23,7 +23,7 @@ import quanta.util.Util;
  * WARNING: Don't put this in ServiceBase with other singletons, because this one needs to be
  * accessible immediately to be used by other beans before all are fully initialized.
  */
-@Component 
+@Component
 public class AppProp {
     private static Logger log = LoggerFactory.getLogger(AppProp.class);
 
@@ -225,6 +225,7 @@ public class AppProp {
         return env.getProperty("mongoPassword");
     }
 
+    // #ai-model
     public String getOpenAiKey() {
         return env.getProperty("OPENAI_API_KEY");
     }
@@ -239,6 +240,10 @@ public class AppProp {
 
     public String getGeminiAiKey() {
         return env.getProperty("GEMINI_API_KEY");
+    }
+
+    public String getXAiKey() {
+        return env.getProperty("XAI_API_KEY");
     }
 
     public String getDevEmail() {

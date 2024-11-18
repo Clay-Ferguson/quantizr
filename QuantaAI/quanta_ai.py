@@ -7,6 +7,7 @@ from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
+from langchain_xai import ChatXAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
 from typing import List, Optional, Set
@@ -31,6 +32,7 @@ PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" 
 GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
 GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
+XAI_MODEL_COMPLETION_CHAT = "grok-beta"
 
 app = FastAPI()
 
@@ -181,6 +183,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     llm: BaseChatModel | None = None
     timeout = 120  # timeout in seconds
     
+    #ai-model
     if req.service == "anthropic":
         llm = ChatAnthropic(
             model=req.model, # type: ignore
@@ -213,6 +216,14 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
             timeout=timeout,
             api_key=api_key,
         )
+    elif req.service == "xai":
+        llm = ChatXAI(
+            model=req.model,
+            temperature=req.temperature,
+            max_tokens=req.maxTokens,
+            timeout=timeout,
+            api_key=api_key
+        )
     else:
         raise ValueError(f"Unsupported service: {req.service}")
     return llm # type: ignore
@@ -237,6 +248,11 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
     elif model == OPENAI_MODEL_COMPLETION_MINI:
         input_ppm = 0.15
         output_ppm = 0.6
+
+    elif XAI_MODEL_COMPLETION_CHAT:
+        # (todo-0: this is not true Grok pricing, they're still beta with no pricing model)
+        input_ppm = 15.0
+        output_ppm = 60.0
 
     elif OPENAI_MODEL_COMPLETION_O1_PREVIEW:
         # Not a typo! These are in dollars!

@@ -248,11 +248,13 @@ services:
             
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"
-            devEmail: "${devEmail}"            
+            devEmail: "${devEmail}"    
+            #ai-model        
             OPENAI_API_KEY: "${OPENAI_API_KEY}"
             PPLX_API_KEY: "${PPLX_API_KEY}"
             ANTH_API_KEY: "${ANTH_API_KEY}"
             GEMINI_API_KEY: "${GEMINI_API_KEY}"
+            XAI_API_KEY: "${XAI_API_KEY}"
             mongoSecurity: "true"
             rssPreCacheEnabled: "false"
             aiAgentEnabled: "true"

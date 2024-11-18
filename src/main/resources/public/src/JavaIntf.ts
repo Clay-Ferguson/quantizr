@@ -31,6 +31,7 @@ export interface ClientConfig {
     usePplxAi: boolean;
     useGeminiAi: boolean;
     useAnthAi: boolean;
+    useXAi: boolean;
     userMsg: string;
     displayUserProfileId: string;
     initialNodeId: string;
@@ -1122,6 +1123,7 @@ export const enum AIModel {
     ANTH_SONNET = "anthAi_sonnet",
     GEMINI = "geminiAi",
     GEMINI_FLASH = "geminiFlashAi",
+    XAI = "XAi",
 }
 
 export const enum Constant {

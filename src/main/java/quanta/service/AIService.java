@@ -127,6 +127,7 @@ public class AIService extends ServiceBase {
         return aiRes;
     }
 
+    // #ai-model
     private String getApiKey(String service) {
         switch (service) {
             case "anthropic":
@@ -137,6 +138,8 @@ public class AIService extends ServiceBase {
                 return svc_prop.getPplxAiKey();
             case "gemini":
                 return svc_prop.getGeminiAiKey();
+            case "xai":
+                return svc_prop.getXAiKey();
             default:
                 throw new RuntimeEx("Unknown service: " + service);
         }

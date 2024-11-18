@@ -23,7 +23,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
       gradio \
       langchain \
       langchain-anthropic \
-      langchain_google_genai \
+      langchain-google-genai \
       langchain-openai \
       langchain-xai \
       langchain-community \
@@ -31,7 +31,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
       langchain-text-splitters \
       langgraph \
       pydantic \
-      pydantic_core 
+      pydantic-core 
 else
   echo "Failed to set Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s

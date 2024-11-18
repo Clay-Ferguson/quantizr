@@ -56,6 +56,7 @@ class AIUtils:
             print("Creating LLM: "+cfg.ai_service)
             timeout = 120  # timeout in seconds
             
+            #ai-model
             if cfg.ai_service == AIService.OPENAI.value:
                 llm = ChatOpenAI(
                     model=cfg.openai_model,

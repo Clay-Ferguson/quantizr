@@ -7,10 +7,12 @@ public class ClientConfig {
     private HashMap<String, Object> config;
     private String brandingAppName;
     private boolean requireCrypto;
+    // #ai-model
     private boolean useOpenAi;
     private boolean usePplxAi;
     private boolean useGeminiAi;
     private boolean useAnthAi;
+    private boolean useXAi;
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
@@ -86,6 +88,14 @@ public class ClientConfig {
 
     public void setUseAnthAi(boolean useAnthAi) {
         this.useAnthAi = useAnthAi;
+    }
+
+    public boolean isUseXAi() {
+        return useXAi;
+    }
+
+    public void setUseXAi(boolean useXAi) {
+        this.useXAi = useXAi;
     }
 
     public String getUserMsg() {

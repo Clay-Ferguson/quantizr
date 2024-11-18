@@ -46,13 +46,17 @@ class AppConfig:
             is_config_file=True,
             help="config file path",
         )
+        
+        #ai-model
         p.add_argument("--openai_api_key", required=True, help="API key for OpenAI")
         p.add_argument("--anth_api_key", required=True, help="API key for Anthropic")
         p.add_argument("--gemini_api_key", required=True, help="API key for Gemini")
+        p.add_argument("--xai_api_key", required=True, help="API key for XAI")
         
         p.add_argument("--openai_model", required=True, help="OpenAI model name")
         p.add_argument("--anth_model", required=True, help="Anthropic model name")
         p.add_argument("--gemini_model", required=True, help="Anthropic model name")
+        p.add_argument("--xai_model", required=True, help="XAI model name")
 
         p.add_argument("--ai_service", required=True, help="AI Service")
         p.add_argument("--ok_hal", required=True, help="OK HAL Delimiter line")

@@ -24,7 +24,9 @@ public enum AIModel {
             200_000), // Sonnet
 
     GEMINI("geminiAi", "gemini", "gemini-1.5-pro", "Google: Gemini 1.5 Pro", "GEM", true, 2_000_000), //
-    GEMINI_FLASH("geminiFlashAi", "gemini", "gemini-1.5-flash", "Google: Gemini 1.5 Flash", "GFL", true, 1_000_000);
+    GEMINI_FLASH("geminiFlashAi", "gemini", "gemini-1.5-flash", "Google: Gemini 1.5 Flash", "GFL", true, 1_000_000), //
+
+    XAI("XAi", "xai", "grok-beta", "XAI: Grok", "XAI", true, 130_000);
 
     @JsonValue
     private final String value;

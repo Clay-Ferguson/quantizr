@@ -100,6 +100,14 @@ export class AIUtil {
                     longDescription: "Perplexity's AI which has access to the latest news and content from from the web (127K context, max $1/megatoken)"
                 });
         }
+
+        if (S.quanta.config.useXAi) {
+            this.aiServices.push({
+                name: J.AIModel.XAI,
+                description: "XAI: Grok",
+                longDescription: "XAI Grok Beta from the company formerly known as Twitter (128K context, max $15/megatoken)"
+            });
+        }
     }
 
     getActiveService(): AIService {
