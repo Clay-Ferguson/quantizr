@@ -6,6 +6,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,9 @@ public class ExportServicePDF extends ServiceBase {
     private ExportRequest req;
     private int baseSlashCount = 0;
 
+    private HashMap<String, TreeNode> treeItemsByNodeName = new HashMap<>();
+    private int figNumStart = 1;
+
     /*
      * Exports the node specified in the req. If the node specified is "/", or the repository root, then
      * we don't expect a filename, because we will generate a timestamped one.
@@ -69,6 +74,8 @@ public class ExportServicePDF extends ServiceBase {
 
         TreeNode rootNode = req.isThreadAsPDF() ? svc_mongoRead.getThreadGraphTree(nodeId) : //
                 svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
+
+        prePocessTree(rootNode);
 
         SubNode exportNode = rootNode.node;
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), exportNode);
@@ -106,10 +113,33 @@ public class ExportServicePDF extends ServiceBase {
         }
     }
 
+    private void prePocessTree(TreeNode root) {
+        if (root.node.getAttachments() != null && root.node.getAttachments().size() > 0) {
+            root.figNumStart = figNumStart;
+            figNumStart += root.node.getAttachments().size();
+        }
+
+        String nodeName = root.node.getName();
+        if (nodeName != null) {
+            if (treeItemsByNodeName.containsKey(nodeName)) {
+                log.warn("Duplicate node name: " + nodeName + " on nodeId " + root.node.getIdStr());
+            } else {
+                treeItemsByNodeName.put(nodeName, root);
+            }
+        }
+
+        if (root.children == null)
+            return;
+
+        for (TreeNode c : root.children) {
+            prePocessTree(c);
+        }
+    }
+
     private void recurseNode(TreeNode tn, int level) {
         if (tn.node == null)
             return;
-        processNode(tn.node);
+        processNode(tn);
 
         if (level == 0 && req.isIncludeToc()) {
             markdown.append("[TOC]");
@@ -128,12 +158,12 @@ public class ExportServicePDF extends ServiceBase {
         }
     }
 
-    private void processNode(SubNode node) {
+    private void processNode(TreeNode tn) {
         String nodeMarkdown = req.isDividerLine() ? "\n----\n" : "\n";
 
-        String id = req.isIncludeIDs() ? (" (id:" + node.getIdStr() + ")") : "";
+        String id = req.isIncludeIDs() ? (" (id:" + tn.node.getIdStr() + ")") : "";
         if (req.isIncludeOwners()) {
-            AccountNode accntNode = svc_user.getAccountNode(node.getOwner());
+            AccountNode accntNode = svc_user.getAccountNode(tn.node.getOwner());
             if (accntNode != null) {
                 nodeMarkdown += "Owner: " + accntNode.getStr(NodeProp.USER) + id + "\n";
             }
@@ -143,25 +173,47 @@ public class ExportServicePDF extends ServiceBase {
         }
         nodeMarkdown += "\n";
 
-        String content = node.getContent();
-        TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
+        String content = tn.node.getContent();
+        TypeBase plugin = svc_typeMgr.getPluginByType(tn.node.getType());
         if (plugin != null) {
-            content = plugin.formatExportText("pdf", node);
+            content = plugin.formatExportText("pdf", tn.node);
         }
 
         if (content != null && req.isUpdateHeadings()) {
             content = content.trim();
-            int slashCount = StringUtils.countMatches(node.getPath(), "/");
+            int slashCount = StringUtils.countMatches(tn.node.getPath(), "/");
             int lev = slashCount - baseSlashCount; // top level node comes here with lev=0
             if (lev > 6)
                 lev = 6;
             content = svc_edit.translateHeadingsForLevel(content, lev);
         }
 
-        content = insertPropertySubstitutions(content, node);
+        content = insertPropertySubstitutions(content, tn.node);
+        content = injectFigureLinks(content);
         nodeMarkdown += content + "\n";
-        nodeMarkdown = writeImages(node, nodeMarkdown);
+        nodeMarkdown = writeImages(tn, nodeMarkdown);
         markdown.append(nodeMarkdown);
+    }
+
+    private String injectFigureLinks(String content) {
+        // using regex we find the pattern {{figure:[node_name]}} and iterate over all of them where the
+        // [node_name]
+        // is a variable that we need to have during iteration
+        String regex = "\\{\\{figure:([^\\}]+)\\}\\}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            String nodeName = matcher.group(1);
+            log.debug("FIGURE: " + nodeName);
+            TreeNode tn = treeItemsByNodeName.get(nodeName);
+            if (tn == null) {
+                // needs to be a reported error that makes it's way to the screen.
+                log.warn("Figure node not found: " + nodeName);
+                continue;
+            }
+            content = content.replace("{{figure:" + nodeName + "}}", "Fig. " + tn.figNumStart);
+        }
+        return content;
     }
 
     private String insertPropertySubstitutions(String content, SubNode node) {
@@ -177,13 +229,15 @@ public class ExportServicePDF extends ServiceBase {
         return content;
     }
 
-    private String writeImages(SubNode node, String content) {
-        List<Attachment> atts = node.getOrderedAttachments();
+    private String writeImages(TreeNode tn, String content) {
+        List<Attachment> atts = tn.node.getOrderedAttachments();
         if (atts == null)
             return content;
 
+        int figNum = tn.figNumStart - 1;
         // process all attachments specifically to embed the image ones
         for (Attachment att : atts) {
+            figNum++;
             // Since GIFs are really only ever used for animated GIFs nowadays, and since PDF files cannot
             // render them we just always ignore GIF files when generating PDFs.
             if (att.getFileName() != null && att.getFileName().toLowerCase().endsWith(".gif")) {
@@ -218,7 +272,7 @@ public class ExportServicePDF extends ServiceBase {
 
             String src = null;
             if (bin != null) {
-                String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
+                String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + tn.node.getIdStr() + "&token="
                         + URLEncoder.encode(TL.getSC().getUserToken(), StandardCharsets.UTF_8);
                 src = svc_prop.getProtocolHostAndPort() + path;
             } //
@@ -229,6 +283,10 @@ public class ExportServicePDF extends ServiceBase {
                 continue;
 
             String imgHtml = "\n<img src='" + src + "' " + style + "/>\n";
+
+            if (figNum > 0) {
+                imgHtml = "<figure>\n" + imgHtml + "<figcaption>Fig. " + figNum + "</figcaption>\n</figure>\n";
+            }
 
             if ("ft".equals(att.getPosition())) {
                 content = content.replace("{{" + att.getFileName() + "}}", imgHtml);

@@ -97,6 +97,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     // markdown links keyed by link url
     private HashMap<String, MarkdownLink> markdownLinks = new HashMap<>();
+    private HashMap<String, TreeNode> treeItemsByNodeName = new HashMap<>();
+    private int figNumStart = 1;
 
     private SubNode node;
     private SubNode parentSiteNode;
@@ -145,6 +147,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
 
         TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, criteria, null, null);
+        prePocessTree(rootNode);
         node = rootNode.node;
         baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
@@ -183,6 +186,30 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (!success && !publishing) {
                 FileUtils.deleteFile(fullFileName);
             }
+        }
+    }
+
+    private void prePocessTree(TreeNode root) {
+
+        if (root.node.getAttachments() != null && root.node.getAttachments().size() > 0) {
+            root.figNumStart = figNumStart;
+            figNumStart += root.node.getAttachments().size();
+        }
+
+        String nodeName = root.node.getName();
+        if (nodeName != null) {
+            if (treeItemsByNodeName.containsKey(nodeName)) {
+                log.warn("Duplicate node name: " + nodeName + " on nodeId " + root.node.getIdStr());
+            } else {
+                treeItemsByNodeName.put(nodeName, root);
+            }
+        }
+
+        if (root.children == null)
+            return;
+
+        for (TreeNode c : root.children) {
+            prePocessTree(c);
         }
     }
 
@@ -409,6 +436,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             String content = node.getContent() != null ? node.getContent() : "";
             parseMarkdownLinks(content);
+            content = injectFigureLinks(content);
             content = content.trim();
 
             if (updateHeadings) {
@@ -443,12 +471,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             // Process all attachments just to insert File Tags into content
             if (atts != null) {
+                int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
                     // Process File Tag type attachments here first
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att);
+                    handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att, figNum);
+                    figNum++;
                 }
             }
 
@@ -471,12 +501,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     // special handling for htmlContent we have to do this File Tag injection AFTER
                     // the html escaping and processing that's done in the line above
                     if (atts != null) {
+                        int figNum = tn.figNumStart;
                         for (Attachment att : atts) {
                             // Process File Tag type attachments here first
                             if (!"ft".equals(att.getPosition())) {
                                 continue;
                             }
-                            handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att);
+                            handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att, figNum);
+                            figNum++;
                         }
                     }
 
@@ -498,13 +530,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             if (atts != null) {
+                int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
                     // Skip File Tag type attachments because they'll already have been processed
                     // above
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, false, null, deeperPath, targetFolder, writeFile, att);
+                    handleAttachment(node, false, null, deeperPath, targetFolder, writeFile, att, figNum);
+                    figNum++;
                 }
             }
 
@@ -522,6 +556,27 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw new RuntimeEx(ex);
         }
         return ret;
+    }
+
+    private String injectFigureLinks(String content) {
+        // using regex we find the pattern {{figure:[node_name]}} and iterate over all of them where the
+        // [node_name]
+        // is a variable that we need to have during iteration
+        String regex = "\\{\\{figure:([^\\}]+)\\}\\}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            String nodeName = matcher.group(1);
+            log.debug("FIGURE: " + nodeName);
+            TreeNode tn = treeItemsByNodeName.get(nodeName);
+            if (tn == null) {
+                // needs to be a reported error that makes it's way to the screen.
+                log.warn("Figure node not found: " + nodeName);
+                continue;
+            }
+            content = content.replace("{{figure:" + nodeName + "}}", "Fig. " + tn.figNumStart);
+        }
+        return content;
     }
 
     private String getTitleFromContent(String content) {
@@ -780,7 +835,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * content and return the content
      */
     private void handleAttachment(SubNode node, boolean injectingTag, Val<String> content, String deeperPath,
-            String parentFolder, boolean writeFile, Attachment att) {
+            String parentFolder, boolean writeFile, Attachment att, int figNum) {
         String nodeId = node.getIdStr();
 
         String af = getAttachmentFileName(att, node);
@@ -845,6 +900,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     // mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
                     String domId = "img_" + nodeId + "_" + att.getKey();
                     mdLink = "<img id='%s' src='%s' %s/>\n\n".formatted(domId, fullUrl, sizePart);
+
+                    if (figNum > 0) {
+                        mdLink = "<figure>\n" + mdLink + "<figcaption>Fig. " + figNum + "</figcaption>\n</figure>\n";
+                    }
+
                     processMdAtt(injectingTag, content, att, mdLink);
                     break;
                 default:
