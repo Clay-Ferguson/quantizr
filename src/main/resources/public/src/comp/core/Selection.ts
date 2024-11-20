@@ -6,6 +6,7 @@ import { Label } from "./Label";
 import { Select } from "./Select";
 export class Selection extends Comp {
 
+    // todo-0: moreClasses is no longer being used. Remove it.
     constructor(attribs: any, private label: string = null, public selectionOptions: any[] = null, public moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
         super(attribs, (valueIntf?.getState ? valueIntf?.getState() : null) || new State<any>(null));
     }

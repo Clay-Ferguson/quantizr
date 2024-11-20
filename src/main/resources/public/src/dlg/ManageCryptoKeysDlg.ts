@@ -30,7 +30,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
 
                 // currently not sing SYMKEY for anything.
                 // { key: "sym", val: this.getKeyTypeName("sym") } // STORE_SYMKEY
-            ], "selectKeyTypeDropDown", null, {
+            ], null, "selectKeyTypeDropDown", {
                 setValue: (val: string) => {
                     this.mergeState<LS>({ keyType: val, keyJson: "Loading..." });
                     setTimeout(() => { this.preLoad(); }, 500);
