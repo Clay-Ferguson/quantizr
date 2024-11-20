@@ -30,6 +30,7 @@ import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;
 import quanta.service.AclService;
 import quanta.service.AppController;
+import quanta.util.ExportUtil;
 import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.StreamUtil;
@@ -147,7 +148,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
 
         TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, criteria, null, null);
-        prePocessTree(rootNode);
+        figNumStart = ExportUtil.prePocessTree(treeItemsByNodeName, figNumStart, rootNode);
         node = rootNode.node;
         baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
@@ -186,30 +187,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (!success && !publishing) {
                 FileUtils.deleteFile(fullFileName);
             }
-        }
-    }
-
-    private void prePocessTree(TreeNode root) {
-
-        if (root.node.getAttachments() != null && root.node.getAttachments().size() > 0) {
-            root.figNumStart = figNumStart;
-            figNumStart += root.node.getAttachments().size();
-        }
-
-        String nodeName = root.node.getName();
-        if (nodeName != null) {
-            if (treeItemsByNodeName.containsKey(nodeName)) {
-                log.warn("Duplicate node name: " + nodeName + " on nodeId " + root.node.getIdStr());
-            } else {
-                treeItemsByNodeName.put(nodeName, root);
-            }
-        }
-
-        if (root.children == null)
-            return;
-
-        for (TreeNode c : root.children) {
-            prePocessTree(c);
         }
     }
 
@@ -436,7 +413,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             String content = node.getContent() != null ? node.getContent() : "";
             parseMarkdownLinks(content);
-            content = injectFigureLinks(content);
+            content = ExportUtil.injectFigureLinks(treeItemsByNodeName, content);
             content = content.trim();
 
             if (updateHeadings) {
@@ -556,27 +533,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw new RuntimeEx(ex);
         }
         return ret;
-    }
-
-    private String injectFigureLinks(String content) {
-        // using regex we find the pattern {{figure:[node_name]}} and iterate over all of them where the
-        // [node_name]
-        // is a variable that we need to have during iteration
-        String regex = "\\{\\{figure:([^\\}]+)\\}\\}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            String nodeName = matcher.group(1);
-            log.debug("FIGURE: " + nodeName);
-            TreeNode tn = treeItemsByNodeName.get(nodeName);
-            if (tn == null) {
-                // needs to be a reported error that makes it's way to the screen.
-                log.warn("Figure node not found: " + nodeName);
-                continue;
-            }
-            content = content.replace("{{figure:" + nodeName + "}}", "Fig. " + tn.figNumStart);
-        }
-        return content;
     }
 
     private String getTitleFromContent(String content) {

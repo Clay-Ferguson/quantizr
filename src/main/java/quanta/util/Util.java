@@ -1,12 +1,8 @@
 package quanta.util;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Date;
 import java.util.Random;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

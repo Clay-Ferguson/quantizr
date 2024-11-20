@@ -71,6 +71,7 @@ export class Edit {
         // when we're expanding a node that's already on the page. Ditto for newNodeTargetOffset.
         await S.edit.saveNodeResponse(res.node, res, S.quanta.newNodeTargetId, S.quanta.newNodeTargetOffset);
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
+        return true;
     }
 
     async toggleUserExpansion(node: NodeInfo) {
