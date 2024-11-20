@@ -18,15 +18,36 @@ public class ExportUtil {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            String nodeName = matcher.group(1);
-            log.debug("FIGURE: " + nodeName);
+            String groupMatch = matcher.group(1);
+            String nodeName = groupMatch;
+
+            // if nodeName contains a comma, we split off what is to the right of the comma into a string called
+            // offset, and then set nodeName to be the left part of the comma.
+            String offset = "";
+            int intOffset = 0;
+            if (nodeName.contains(",")) {
+                String[] parts = nodeName.split(",");
+                nodeName = parts[0];
+                offset = parts[1];
+            }
+            // if offset is not empty, we add it to the figNumStart of the node.
+            if (!offset.isEmpty()) {
+                intOffset = Integer.parseInt(offset.trim());
+                if (intOffset < 0) {
+                    intOffset = 0;
+                } else if (intOffset > 0) {
+                    intOffset--;
+                }
+            }
+
             TreeNode tn = treeItemsByNodeName.get(nodeName);
             if (tn == null) {
                 // needs to be a reported error that makes it's way to the screen.
                 log.warn("Figure node not found: " + nodeName);
                 continue;
             }
-            content = content.replace("{{figure:" + nodeName + "}}", "Fig. " + tn.figNumStart);
+            content = content.replace("{{figure:" + groupMatch + "}}",
+                    "Fig. " + String.valueOf(tn.figNumStart + intOffset));
         }
         return content;
     }
