@@ -96,8 +96,8 @@ export class EditNodeDlgUtil {
         }
 
         this.dlg.resetAutoSaver();
-        await S.edit.saveNode(editNode, true);
-        return true;
+        const ret = await S.edit.saveNode(editNode, true);
+        return ret;
     }
 
     // Takes all the propStates values and converts them into node properties on the node
