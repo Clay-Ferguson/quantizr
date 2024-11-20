@@ -498,44 +498,6 @@ export class EditNodeDlg extends DialogBase {
         }
 
         this.attribs[C.NODE_ID_ATTR] = ast.editNode.id;
-        // Allows user to drag-n-drop files onto editor to upload
-        S.domUtil.setDropHandler(this.attribs, async (evt: DragEvent) => {
-            const files: File[] = [...evt.dataTransfer.files];
-            let hasEmail = false;
-            files.forEach((file: File) => {
-                const name = file.name;
-                const lcName = name.toLowerCase();
-                if (lcName.endsWith(".eml")) {
-                    hasEmail = true;
-                }
-            });
-
-            if (hasEmail) {
-                const ret: J.UploadResponse = await S.domUtil.parseFiles(files);
-                let val = this.contentEditorState.getValue();
-                ret.payloads?.forEach((payload: any) => {
-                    val += "\n" + payload;
-                });
-                this.contentEditorState.setValue(val);
-            }
-            else {
-                this.immediateUploadFiles(files);
-            }
-        });
-
-        // -------------------------
-        // DO NOT DELETE:
-        // This kind of code pattern *might* be needed at some point again.
-        // S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
-        //     for (const item of evt.dataTransfer.items) {
-        //         if (item.kind === "file") {
-        //             const file = item.getAsFile();
-        //             this.utl.upload(file, this);
-        //             return;
-        //         }
-        //     }
-        // });
-        // -------------------------
 
         propEditFieldContainer.children = [editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
             propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()];
