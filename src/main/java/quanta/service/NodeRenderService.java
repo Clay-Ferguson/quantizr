@@ -536,7 +536,7 @@ public class NodeRenderService extends ServiceBase {
         for (SubNode n : svc_mongoRead.getCalendar(node)) {
             CalendarItem item = new CalendarItem();
             String content = n.getContent();
-            content = svc_render.getFirstLineAbbreviation(content, 25);
+            content = svc_render.getFirstLineAbbreviation(content, 50);
             item.setTitle(content);
             item.setId(n.getIdStr());
             item.setStart(n.getInt(NodeProp.DATE));
