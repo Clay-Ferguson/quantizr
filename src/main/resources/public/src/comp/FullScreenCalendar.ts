@@ -84,7 +84,8 @@ export class FullScreenCalendar extends Main {
                 }
             })
         ];
-        return this.reactNode("div");
+
+        return this.reactNode("div", this.children);
     }
 
     dateClick = (dateClick: DateClickArg): void => {

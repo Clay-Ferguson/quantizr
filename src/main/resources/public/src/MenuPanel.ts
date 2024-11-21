@@ -207,6 +207,15 @@ export class MenuPanel extends Comp {
                         new MenuItem("Non-Recursive", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true),
                     ], null, null, null, true)
                 ], null, null, null, true),
+                ast.isAnonUser ? null : new Menu("Calendar", [
+                    new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
+                    new MenuItemSeparator(), //
+                    new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
+                    new MenuItem("Overdue", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
+                    new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
+                    new MenuItem("Today", MenuPanel.calendarToday, onMainTab && !!hltNode, null, true),
+                    new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
+                ], null, null, null, true),
                 new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
                 new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
@@ -334,18 +343,6 @@ export class MenuPanel extends Comp {
                 onMainTab && !ast.isAnonUser && !!hltNode, null, true));
 
             children.push(new Menu("Create", createMenuItems, null, null, "ui-menu-create"));
-        }
-
-        if (!ast.isAnonUser) {
-            children.push(new Menu("Calendar", [
-                new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
-                new MenuItemSeparator(), //
-                new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
-                new MenuItem("Overdue", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
-                new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
-                new MenuItem("Today", MenuPanel.calendarToday, onMainTab && !!hltNode, null, true),
-                new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
-            ]));
         }
 
         if (!ast.isAnonUser) {

@@ -1246,7 +1246,6 @@ export const enum NodeType {
     BOOKMARK_LIST = "sn:bookmarkList",
     EXPORTS = "sn:exports",
     CALCULATOR = "sn:calculator",
-    CALENDAR = "sn:calendar",
     COMMENT = "sn:comment",
     AI_QUERY = "sn:aiQuery",
     AI_ANSWER = "sn:aiAns",

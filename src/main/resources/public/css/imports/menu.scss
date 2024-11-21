@@ -5,7 +5,7 @@
 }
 
 .menuPanelItems {
-    border-left: 2px solid $secondary;
+    border-left: 3px solid $secondary;
     border-radius: 0px !important;
 }
 
@@ -74,7 +74,6 @@
 .menu {
     border: none;
     background-color: transparent;
-    margin: 4px 0 4px 4px;
 }
 
 .menuItem {
@@ -104,9 +103,8 @@
 
 .subMenuItem {
     cursor: pointer;
-    background-color: transparent;
-    padding: 5px 5px 5px 5px;
-    border: 1px 1px 1px 1px solid transparent;
+    padding: 5px 5px 5px 10px;
+    border-bottom: 3px solid transparent;
 }
 
 .subMenuItem:hover {
@@ -116,9 +114,8 @@
 
 .subMenuItemExpanded {
     @extend .subMenuItem;
-    background-color: $secondary;
-    padding: 5px 5px 5px 15px;
-    border: 1px 1px 1px 5px solid gray;
+    padding: 5px 5px 5px 10px;
+    border-bottom: 3px solid gray;
 }
 
 .mobileMenuText {

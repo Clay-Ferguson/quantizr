@@ -6,7 +6,6 @@ import { BlockedUsersType } from "./plugins/BlockedUsersType";
 import { BookmarkListType } from "./plugins/BookmarkListType";
 import { BookmarkType } from "./plugins/BookmarkType";
 import { CalcType } from "./plugins/CalcType";
-import { CalendarType } from "./plugins/CalendarType";
 import { CommentType } from "./plugins/CommentType";
 import { ExportsType } from "./plugins/ExportsType";
 import { FriendsListType } from "./plugins/FriendsListType";
@@ -70,7 +69,6 @@ export class PluginMgr {
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new AIQueryType());
         this.addType(ordinal++, new CalcType());
-        this.addType(ordinal++, new CalendarType());
         this.addType(ordinal++, new RepoRootType());
         this.addType(ordinal++, new AccountType());
         this.addType(ordinal++, new PostsType());

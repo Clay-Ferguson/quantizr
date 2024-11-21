@@ -51,7 +51,6 @@ import quanta.service.imports.ImportService;
 import quanta.test.TestUtil;
 import quanta.types.AIAnswerType;
 import quanta.types.BookmarkType;
-import quanta.types.CalendarType;
 import quanta.types.FriendType;
 import quanta.types.RssFeedType;
 import quanta.types.TypePluginMgr;
@@ -133,7 +132,6 @@ public class ServiceBase {
     public static MimeUtil svc_mimeUtil;
     public static MongoAppConfig svc_mac;
     public static BookmarkType svc_bookmarkType;
-    public static CalendarType svc_calendarType;
     public static AIAnswerType svc_aiAnswerType;
     public static FriendType svc_friendType;
     public static RssFeedType svc_rssType;
@@ -217,7 +215,6 @@ public class ServiceBase {
             svc_fileUtil = getBean(ctx, FileUtils.class);
             svc_mimeUtil = getBean(ctx, MimeUtil.class);
             svc_bookmarkType = getBean(ctx, BookmarkType.class);
-            svc_calendarType = getBean(ctx, CalendarType.class);
             svc_aiAnswerType = getBean(ctx, AIAnswerType.class);
             svc_friendType = getBean(ctx, FriendType.class);
             svc_rssType = getBean(ctx, RssFeedType.class);

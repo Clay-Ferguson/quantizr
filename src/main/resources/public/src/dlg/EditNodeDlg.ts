@@ -744,7 +744,6 @@ export class EditNodeDlg extends DialogBase {
                 title: "Add Property"
             }, null, "fa-circle-plus") : null,
 
-            // &&&
             !this.tagsState.getValue() ? new Button("", this._selectTags, {
                 title: "Select Hashtags"
             }, null, "fa-tag fa-lg") : null,
@@ -758,7 +757,7 @@ export class EditNodeDlg extends DialogBase {
 
             // show Calendar Entry button only if this node is not a Calendar Entry nor CALENDAR type.
             // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
-            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ?
+            advancedButtons && !datePropExists ?
                 new Button(null, this.utl._addDateProperty, {
                     title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 }, null, "fa-calendar-plus") : null,
