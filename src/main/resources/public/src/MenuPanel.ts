@@ -207,7 +207,7 @@ export class MenuPanel extends Comp {
                         new MenuItem("Non-Recursive", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true),
                     ], null, null, null, true)
                 ], null, null, null, true),
-                ast.isAnonUser ? null : new Menu("Calendar", [
+                new Menu("Calendar", [
                     new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
                     new MenuItemSeparator(), //
                     new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
@@ -281,11 +281,16 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
+                new Menu("Move", [
+                    new MenuItem("Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
+                    new MenuItem("Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
+                    new MenuItemSeparator(), //
+                    new MenuItem("To Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
+                    new MenuItem("To Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
+                ], null, null, null, true),
                 ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
-
-                new MenuItem("Clear Selections", S.nodeUtil._clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
@@ -299,16 +304,7 @@ export class MenuPanel extends Comp {
                 new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Undo Copy/Cut", S.edit._undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
-            ], null));
-        }
-
-        if (!ast.isAnonUser) {
-            children.push(new Menu("Move", [
-                new MenuItem("Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
-                new MenuItem("Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
-                new MenuItemSeparator(), //
-                new MenuItem("To Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
-                new MenuItem("To Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
+                new MenuItem("Clear Selections", S.nodeUtil._clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
             ], null));
         }
 
