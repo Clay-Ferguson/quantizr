@@ -284,7 +284,7 @@ export class EditNodeDlg extends DialogBase {
         let propEditFieldContainer: Div = null;
 
         const children = [
-            S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", Tailwind.alertPrimary) : null,
+            S.stt.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", Tailwind.alertPrimary) : null,
             new Div(null, null, [
                 new Div(null, {
                 }, [
@@ -783,7 +783,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     override close = () => {
-        setTimeout(() => S.speech.stopListening(), 100);
+        setTimeout(S.stt._stopListening, 100);
         super.close();
 
         dispatch("endEditing", s => {
@@ -996,7 +996,7 @@ export class EditNodeDlg extends DialogBase {
 
         editItems.push(new ButtonBar([
             new Icon({
-                className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-lg fa-microphone editorIcon"),
+                className: (S.stt.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-lg fa-microphone editorIcon"),
                 title: "Toggle on/off Speech Recognition to input text",
                 onClick: this.utl._toggleRecognition
             }),

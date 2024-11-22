@@ -107,9 +107,9 @@ export class RightNavPanel extends Comp {
             });
         }
 
-        const textToSpeech = !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
+        const textToSpeech = !ast.isAnonUser && !ast.mobileMode && S.tts.ttsSupported() ? new Icon({
             className: "fa fa-volume-high fa-lg mr-3 cursor-pointer",
-            onClick: S.speech._speakClipboard,
+            onClick: S.tts._speakClipboard,
             title: "Text-to-Speech: Speak clipboard content"
         }) : null;
 
@@ -118,7 +118,7 @@ export class RightNavPanel extends Comp {
                 for (const item of evt.dataTransfer.items) {
                     // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
                     if (item.kind === "string") {
-                        item.getAsString(s => S.speech.speakText(s, true));
+                        item.getAsString(s => S.tts.speakText(s, true));
                         return;
                     }
                 }

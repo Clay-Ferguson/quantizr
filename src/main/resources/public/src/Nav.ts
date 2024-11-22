@@ -584,7 +584,7 @@ export class Nav {
         const content = elm ? elm.textContent : null;
 
         if (content) {
-            S.speech.speakText(content, true);
+            S.tts.speakText(content, true);
         }
     }
 

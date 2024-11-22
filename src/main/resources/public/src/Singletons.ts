@@ -11,7 +11,7 @@ import type { Render } from "./Render";
 import { RpcUtil } from "./RpcUtil";
 import type { Search } from "./Search";
 import type { ServerPush } from "./ServerPush";
-import type { SpeechEngine } from "./SpeechEngine";
+import type { TTS } from "./TTS";
 import type { TabUtil } from "./TabUtil";
 import type { User } from "./User";
 import type { Util } from "./Util";
@@ -19,6 +19,7 @@ import type { View } from "./View";
 import { HistoryUtil } from "./HistoryUtil";
 import { Attach } from "./Attach";
 import { AIUtil } from "./AIUtil";
+import { STT } from "./STT";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and
 guaranteed not to result in any circular-references during load time, because they instantiate only
@@ -47,7 +48,8 @@ export interface Singletons {
     user: User;
     view: View;
     localDB: LocalDB;
-    speech: SpeechEngine;
+    tts: TTS;
+    stt: STT;
 }
 
 const S: Singletons = {} as any;

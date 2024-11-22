@@ -344,7 +344,7 @@ export class MenuPanel extends Comp {
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
                 new MenuItem("Set Headings", S.edit._setHeadings, onMainTab && selNodeIsMine, null, true), //
-                !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
+                !ast.isAnonUser && !ast.mobileMode && S.tts.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
 

@@ -104,7 +104,7 @@ export class NodeCompRowHeader extends Comp {
                     // for now let's not have tts on mobile.
                 }
                 else {
-                    if (S.speech.ttsSupported()) {
+                    if (S.tts.ttsSupported()) {
                         children.push(new Icon({
                             className: "fa fa-volume-high fa-lg rowHeaderIcon",
                             title: "Text-to-Speech (Read Aloud)",

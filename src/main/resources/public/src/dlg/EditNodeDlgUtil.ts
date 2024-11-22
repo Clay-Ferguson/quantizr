@@ -400,7 +400,7 @@ export class EditNodeDlgUtil {
     }
 
     _toggleRecognition = () => {
-        S.speech.setListenerCallback((transcript: string) => {
+        S.stt.setListenerCallback((transcript: string) => {
             if (this.dlg.contentEditor && transcript) {
                 this.dlg.contentEditor.insertTextAtCursor(transcript + " ");
             }
@@ -408,10 +408,10 @@ export class EditNodeDlgUtil {
 
         const speechActive = !this.dlg.getState<EditNodeDlgState>().speechActive;
         if (speechActive) {
-            S.speech.startListening();
+            S.stt._startListening();
         }
         else {
-            S.speech.stopListening();
+            S.stt._stopListening();
         }
         this.dlg.mergeState<EditNodeDlgState>({ speechActive });
 

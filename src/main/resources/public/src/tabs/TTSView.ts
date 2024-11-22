@@ -32,7 +32,7 @@ export class TTSView extends AppTab<any, TTSView> {
             clickId = clickId.substring(3);
             const idx = parseInt(clickId);
             if (idx >= 0) {
-                S.speech.jumpToIdx(idx);
+                S.tts.jumpToIdx(idx);
             }
         }
     }
@@ -45,15 +45,15 @@ export class TTSView extends AppTab<any, TTSView> {
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
                 if (item.kind === "string") {
-                    item.getAsString(s => S.speech.speakText(s, true));
+                    item.getAsString(s => S.tts.speakText(s, true));
                     return;
                 }
             }
         });
 
-        const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
+        const speakAgainBtn = ast.ttsRan && S.tts.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
             className: "fa fa-refresh fa-2x mr-6 cursor-pointer",
-            onClick: () => S.speech.speakText(null, false, 0),
+            onClick: () => S.tts.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
@@ -65,25 +65,25 @@ export class TTSView extends AppTab<any, TTSView> {
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-pause fa-2x mr-6 cursor-pointer",
-            onClick: S.speech._pauseSpeaking,
+            onClick: S.tts._pauseSpeaking,
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-play fa-2x mr-6 cursor-pointer",
-            onClick: S.speech._resumeSpeaking,
+            onClick: S.tts._resumeSpeaking,
             title: "Resume Speaking Text"
         }) : null;
 
         let paraComps: Comp[];
-        if (S.speech.queuedSpeech?.length > 0) {
+        if (S.tts.queuedSpeech?.length > 0) {
             paraComps = [];
             let curDiv = new Div(null, { className: "ttsPara" });
 
             let idx = 0;
             const hltIdx = TTSView.ttsHighlightIdx;
             // scan each utterance
-            S.speech.queuedSpeech.forEach(utter => {
+            S.tts.queuedSpeech.forEach(utter => {
                 // if we hit a paragraph break
                 if (utter === C.TTS_BREAK) {
                     if (curDiv.hasChildren()) {
@@ -109,7 +109,7 @@ export class TTSView extends AppTab<any, TTSView> {
             }
         }
 
-        if (S.speech.ttsSupported()) {
+        if (S.tts.ttsSupported()) {
             this.children = [
                 this.headingBar = new TabHeading([
                     new Div("Text-to-Speech", { className: "tabTitle" }),
@@ -133,7 +133,7 @@ export class TTSView extends AppTab<any, TTSView> {
     makeVoiceChooser(voiceKey: string): Selection {
         const data: any[] = [];
         let idx = 0;
-        S.speech.voices?.forEach(voice => {
+        S.tts.voices?.forEach(voice => {
             data.push({ key: "" + idx, val: voice.name });
             idx++;
         });

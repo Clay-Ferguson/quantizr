@@ -3,10 +3,7 @@ import { Constants as C } from "./Constants";
 import { S } from "./Singletons";
 import { TTSView } from "./tabs/TTSView";
 
-declare let webkitSpeechRecognition: any;
-declare let SpeechRecognition: any;
-
-export class SpeechEngine {
+export class TTS {
     // we keep this array here and not in AppState, because changes to this will never need to
     // directly trigger a DOM change.
     public queuedSpeech: string[] = null;
@@ -23,9 +20,6 @@ export class SpeechEngine {
     // (UPDATE: Seems to now run smoothly with 1000 chars, whereas 250 was what we used for a long time.)
     MAX_UTTERANCE_CHARS: number = 1000; //250
 
-    // add type-safety here (TS can find type easily)
-    recognition: any = null;
-
     tts: SpeechSynthesis = window.speechSynthesis;
     ttsTimer: any = null;
     ttsIdx: number = 0;
@@ -36,99 +30,9 @@ export class SpeechEngine {
     ttsSpeakingTime: number = 0;
     utter: SpeechSynthesisUtterance = null;
 
-    speechActive: boolean = false;
-    private callback: (text: string) => void;
-
     constructor() {
         this.getVoices();
     }
-
-    // --------------------------------------------------------------
-    // Speech Recognition
-    // --------------------------------------------------------------
-    initRecognition() {
-        // already initialized, then return
-        if (this.recognition) return;
-
-        if (typeof SpeechRecognition === "function") {
-            this.recognition = new SpeechRecognition();
-            // console.log("Speech recognition initialized (a).");
-        }
-        else if (webkitSpeechRecognition) {
-            // todo-2: fix linter rule to make this cleaner (the first letter upper case is the issue here)
-            const WebkitSpeechRecognition = webkitSpeechRecognition;
-            this.recognition = new WebkitSpeechRecognition();
-            // console.log("Speech recognition initialized (b).");
-        }
-
-        if (!this.recognition) {
-            console.log("Speech recognition failed to initialize.");
-            S.util.showMessage("Speech recognition not available in your browser.", "Warning");
-            return;
-        }
-
-        this.recognition.lang = 'en-US';
-
-        // This runs when the speech recognition service starts
-        this.recognition.onstart = () => {
-            // console.log("speech onStart.");
-        };
-
-        // This gets called basically at the end of every sentence as you're dictating content, and
-        // paused between sentences, so we have to call start() again in here to start recording
-        // another sentence
-        this.recognition.onend = () => {
-            // console.log("speech onEnd.");
-            if (this.speechActive) {
-                setTimeout(() => {
-                    try {
-                        this.recognition.start();
-                    } catch (e) {
-                        console.error('Failed to restart recognition:', e);
-                        this.speechActive = false;
-                    }
-                }, 500);  // Increased timeout
-            }
-        };
-
-        this.recognition.onspeechend = () => {
-            // console.log("speech onSpeechEnd.");
-        };
-
-        // This runs when the speech recognition service returns result
-        this.recognition.onresult = (event: any) => {
-            // console.log("speech onResult.");
-            const transcript = event.results[0][0].transcript;
-            // const confidence = event.results[0][0].confidence;
-
-            if (this.callback) {
-                this.callback(transcript);
-            }
-        };
-    }
-
-    stopListening() {
-        // if never initialized just return
-        if (!this.recognition) return;
-        this.initRecognition();
-        this.callback = null;
-        this.recognition.stop();
-        this.speechActive = false;
-    }
-
-    startListening() {
-        this.initRecognition();
-        this.recognition.start();
-        this.speechActive = true;
-    }
-
-    setListenerCallback = (callback: (val: string) => void) => {
-        this.callback = callback;
-    }
-
-    // --------------------------------------------------------------
-    // Text to Speech
-    // --------------------------------------------------------------
 
     // called directly by button on main top right corner.
     _speakClipboard = async () => {
