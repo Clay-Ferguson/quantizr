@@ -230,7 +230,7 @@ export class MenuPanel extends Comp {
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
                 //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-                new Menu("Shared Nodes", [
+                new Menu("My Shared Nodes", [
                     new MenuItem("All", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
                     new MenuItem("Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
                     new MenuItem("Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),

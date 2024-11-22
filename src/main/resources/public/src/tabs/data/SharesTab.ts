@@ -8,7 +8,7 @@ import { S } from "../../Singletons";
 import { SharedNodesResultSetView } from "../SharedNodesResultSetView";
 
 export class SharesTab extends TabBase<SharesRSInfo> {
-    name = "Shared Nodes";
+    name = "My Shared Nodes";
     tooltip = "Shows all the Shared nodes made accessible to other users";
     id = C.TAB_SHARES;
     isVisible = () => S.tabUtil.resultSetHasData(C.TAB_SHARES);
@@ -16,7 +16,7 @@ export class SharesTab extends TabBase<SharesRSInfo> {
     getTabSubOptions = (): Div => { return null; };
     props = new SharesRSInfo();
     static inst: SharesTab = null;
-    
+
     constructor() {
         super();
         SharesTab.inst = this;
