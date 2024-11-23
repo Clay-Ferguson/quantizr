@@ -16,7 +16,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
 
         // turn the top more button off for infinite scrolling
         this.allowTopMoreButton = false;
-        this.pagingContainerClass = "float-right";
+        this.pagingContainerClass = "-float-right";
     }
 
     override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {

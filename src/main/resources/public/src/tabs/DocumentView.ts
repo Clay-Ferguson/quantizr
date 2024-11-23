@@ -20,7 +20,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
-    pagingContainerClass: string = "mb-3 mt-3";
+    pagingContainerClass: string = "-float-right mb-3 mt-3";
 
     constructor(data: TabBase<PT, TT>) {
         super(data);
@@ -147,10 +147,10 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         }
 
         children.push(
-            new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "ml-3 float-right" }),
-            new ButtonBar(buttonBarComps, this.pagingContainerClass));
-
-        children.push(new Clearfix());
+            new Div(null, { className: this.pagingContainerClass }, [
+                new ButtonBar(buttonBarComps),
+                new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "ml-3" })
+            ]));
     }
 
     // not used (document handing is special, see above)

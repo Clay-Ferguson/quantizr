@@ -199,8 +199,10 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
 
         children.push(
-            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-right" }) : null,
-            new ButtonBar(buttonBarComps, this.pagingContainerClass));
+            new Div(null, { className: this.pagingContainerClass }, [
+                new ButtonBar(buttonBarComps),
+                this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "ml-3" }) : null,
+            ]));
 
         children.push(new Clearfix());
     }
