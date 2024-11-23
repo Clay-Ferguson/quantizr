@@ -261,7 +261,7 @@ export class MenuPanel extends Comp {
             if (bookmarkItems.length > 0) {
                 bookmarkItems.push(new MenuItemSeparator());
             }
-            bookmarkItems.push(new MenuItem("Add Bookmark", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
+            bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
@@ -281,6 +281,7 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
+                ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 new Menu("Move", [
                     new MenuItem("Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
                     new MenuItem("Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
@@ -288,9 +289,6 @@ export class MenuPanel extends Comp {
                     new MenuItem("To Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
                     new MenuItem("To Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
                 ], null, null, null, true),
-                ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
-                ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
-                ast.editNode ? new MenuItemSeparator() : null, //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
@@ -299,6 +297,7 @@ export class MenuPanel extends Comp {
                     new MenuItem("Join", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
                     new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
                 ], null, null, null, true),
+                ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
                 new MenuItem("Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
                 new MenuItemSeparator(), //
                 new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
@@ -354,7 +353,7 @@ export class MenuPanel extends Comp {
                 new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
                 new MenuItemSeparator(), //
 
-                new Menu("Import From...", [
+                new Menu("Import From", [
                     new MenuItem("Archive", S.edit._openImportDlg, onMainTab && importFeatureEnabled, null, true),
                     new MenuItem("JSON", MenuPanel.importJson, onMainTab && selNodeIsMine, null, true), //
                     new MenuItem("ToC", MenuPanel.importToC, onMainTab && selNodeIsMine, null, true), //
