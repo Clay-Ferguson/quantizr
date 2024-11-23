@@ -151,9 +151,9 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchDefinition: {
                 searchText, sortDir, sortField, searchProp: prop, fuzzy, caseSensitive,
-                recursive, requirePriority: false,
-                requireAttachment: false,
-                requireDate: false
+                recursive, requirePriority,
+                requireAttachment,
+                requireDate
             },
             searchRoot,
             page,

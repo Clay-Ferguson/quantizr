@@ -18,7 +18,7 @@ import quanta.rest.response.base.ResponseBase;
 @Component
 public class CallProcessor extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
-    private static boolean logRequests = true; // todo-2: make these flags able to be set by admin at runtime.
+    private static boolean logRequests = false; // todo-2: make these flags able to be set by admin at runtime.
     private static boolean logResponses = false;
 
     /*
