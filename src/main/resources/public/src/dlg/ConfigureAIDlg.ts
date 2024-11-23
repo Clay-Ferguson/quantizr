@@ -33,7 +33,7 @@ export class ConfigureAgentDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new FlexLayout([
-                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "mb-3 mr-6", ConfigureAgentDlg.aiServiceState),
+                    new Selection(null, "AI Service", aiOptions, "mb-3 mr-6", ConfigureAgentDlg.aiServiceState),
                 ]),
                 new TextArea("System Prompt", {
                     rows: 7,

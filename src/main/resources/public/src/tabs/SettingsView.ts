@@ -79,7 +79,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     { key: "6", val: "Medium" },
                     { key: "7", val: "Wide" },
                     { key: "8", val: "Very Wide" }
-                ], "contentWidthSelection", "ml-6 mt-6 mb-6", {
+                ], "ml-6 mt-6 mb-6", {
                     setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),

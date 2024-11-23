@@ -55,7 +55,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
             friendsTagDropDown = new Selection(null, null, // "Filter By Tag",
                 items,
-                null, "friendsTagPickerOnView", {
+                "friendsTagPickerOnView", {
                 setValue: (val: string) => {
                     this.data.props.friendsTagSearch = val;
                     S.srch._refreshFeed();

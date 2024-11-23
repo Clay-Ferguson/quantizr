@@ -259,7 +259,7 @@ export class EditAttachmentsPanel extends Comp {
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" }
         ];
-        return new Selection(null, label, options, null, extraClasses, valueIntf);
+        return new Selection(null, label, options, extraClasses, valueIntf);
     }
 
     createImgPositionSelection(label: string, extraClasses: string, valueIntf: ValueIntf): Selection {
@@ -270,6 +270,6 @@ export class EditAttachmentsPanel extends Comp {
             { key: "ur", val: "Top Right" },
             { key: "ft", val: "File Tag" }
         ];
-        return new Selection(null, label, options, null, extraClasses, valueIntf);
+        return new Selection(null, label, options, extraClasses, valueIntf);
     }
 }

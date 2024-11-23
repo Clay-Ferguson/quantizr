@@ -139,14 +139,12 @@ export class TTSView extends AppTab<any, TTSView> {
         });
 
         return new Selection(null, "Voice",
-            data, null, "selectVoiceDropDown", {
+            data, "selectVoiceDropDown", {
             setValue: (val: string) => {
                 const voiceInt = parseInt(val);
                 S.localDB.setVal(voiceKey, voiceInt);
                 dispatch("ChangeSpeechVoice", s => {
-
                     s.speechVoice = voiceInt;
-
                 })
             },
             getValue: (): string => "" + getAs().speechVoice
@@ -163,7 +161,7 @@ export class TTSView extends AppTab<any, TTSView> {
             { key: "faster", val: "Faster" },
             { key: "faster_1", val: "Faster +1" },
             { key: "fastest", val: "Fastest" }
-        ], null, "rateChooserDropDown", {
+        ], "rateChooserDropDown", {
             setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_VOICE_RATE, val);
                 dispatch("ChangeSpeechRate", s => {

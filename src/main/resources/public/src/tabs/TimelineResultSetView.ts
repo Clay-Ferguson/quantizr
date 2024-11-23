@@ -43,7 +43,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
                 { key: "true", val: "Chronological" },
                 { key: "false", val: "Rev. Chron" },
             ],
-                null, "timelineChronoOrder", {
+                "timelineChronoOrder", {
                 setValue: (val: string) => {
                     dispatch("TimelineReversedOrder", (s) => {
                         s.timelineReversedOrder = val === "true";

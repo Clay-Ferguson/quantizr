@@ -168,7 +168,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 cols" },
             { key: "c5", val: "5 cols" },
             { key: "c6", val: "6 cols" }
-        ], null, "layoutSelection inline-flex", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
+        ], "layoutSelection inline-flex", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -182,7 +182,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "4", val: "P4" },
             { key: "5", val: "P5" },
             { key: "6", val: "P6" }
-        ], null, Tailwind.col_3, new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
+        ], Tailwind.col_3, new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
     }
 
     override getTitleIconComp(): Comp {
@@ -1021,7 +1021,7 @@ export class EditNodeDlg extends DialogBase {
                 { key: "h4", val: "H4" },
                 { key: "h5", val: "H5" },
                 { key: "h6", val: "H6" }
-            ], "compactFormSelect", "headingDropDown", {
+            ], "headingDropDown", {
                 setValue: (val: string) => {
                     this.utl.setHeadingLevel(val);
                 },

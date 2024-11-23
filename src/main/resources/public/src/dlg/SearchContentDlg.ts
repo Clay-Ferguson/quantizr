@@ -155,7 +155,7 @@ export class SearchContentDlg extends DialogBase {
                     new Selection(null, "Search in", [
                         { key: J.Constant.SEARCH_CUR_NODE, val: "Current Node" },
                         { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
-                    ], null, "searchDlgSearchRoot", {
+                    ], "searchDlgSearchRoot", {
                         setValue: (val: string) => {
                             SearchContentDlg.dlgState.searchRoot = val;
                             this.mergeState<LS>({
@@ -168,7 +168,7 @@ export class SearchContentDlg extends DialogBase {
                         { key: "list", val: "List" },
                         { key: "doc", val: "Document" },
                         { key: "graph", val: "Graph" }
-                    ], null, "searchDlgDisplayLayout", {
+                    ], "searchDlgDisplayLayout", {
                         setValue: (val: string) => {
                             this.mergeState<LS>({
                                 displayLayout: val
@@ -182,7 +182,7 @@ export class SearchContentDlg extends DialogBase {
                         { key: "contentLength", val: "Text Length" },
                         { key: "treeDepth", val: "Tree Depth" },
                         { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
-                    ], null, "searchDlgOrderBy", {
+                    ], "searchDlgOrderBy", {
                         setValue: (val: string) => {
                             let sortDir = "DESC";
                             if (val === J.NodeProp.PRIORITY_FULL) {

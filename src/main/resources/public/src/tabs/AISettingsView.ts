@@ -58,7 +58,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
                 aiOptions?.length ? new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "ml-6 mt-6 mb-6", {
+                        new Selection(null, "AI Service", aiOptions, "ml-6 mt-6 mb-6", {
                             setValue: (val: string) => S.edit.setAiService(val),
                             getValue: (): string => "" + getAs().userPrefs.aiService
                         }),
