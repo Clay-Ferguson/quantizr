@@ -40,6 +40,7 @@ export interface ClientConfig {
     login: string;
     paymentLink: string;
     aiAgentEnabled: boolean;
+    userGuideUrl: string;
 }
 
 export interface NodeLink {

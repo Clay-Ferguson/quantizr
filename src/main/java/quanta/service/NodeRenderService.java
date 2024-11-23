@@ -133,6 +133,7 @@ public class NodeRenderService extends ServiceBase {
         config.setLogin(login);
         config.setUrlView(view);
         config.setAiAgentEnabled(svc_prop.getAiAgentEnabled());
+        config.setUserGuideUrl(svc_prop.getUserGuideUrl());
 
         attrs.put("g_config", config);
         model.addAllAttributes(attrs);

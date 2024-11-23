@@ -21,6 +21,7 @@ public class ClientConfig {
     private String login;
     private String paymentLink;
     private boolean aiAgentEnabled;
+    private String userGuideUrl;
 
     public String getLogin() {
         return login;
@@ -148,6 +149,14 @@ public class ClientConfig {
 
     public void setAiAgentEnabled(boolean aiAgentEnabled) {
         this.aiAgentEnabled = aiAgentEnabled;
+    }
+
+    public String getUserGuideUrl() {
+        return userGuideUrl;
+    }
+
+    public void setUserGuideUrl(String userGuideUrl) {
+        this.userGuideUrl = userGuideUrl;
     }
 
     public ClientConfig() {}

@@ -250,6 +250,10 @@ public class AppProp {
         return env.getProperty("devEmail");
     }
 
+    public String getUserGuideUrl() {
+        return env.getProperty("userGuideUrl");
+    }
+
     public String getAdminPassword() {
         return env.getProperty("adminPassword");
     }

@@ -143,9 +143,8 @@ export class Nav {
     }
 
     async openContentNode(nodePathOrId: string, jumpToRss: boolean) {
-        // todo-0: temporary hack until this is configurable as a property
-        if (nodePathOrId == ":user-guide") {
-            window.open("https://quanta.wiki/pub/user-guide", "_blank");
+        if (nodePathOrId == ":user-guide" && S.quanta.config.userGuideUrl) {
+            window.open(S.quanta.config.userGuideUrl, "_blank");
             return;
         }
 
