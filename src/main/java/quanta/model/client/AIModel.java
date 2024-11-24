@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum AIModel {
     NONE("[null]", null, null, null, null, false, 0), //
 
-    OPENAI("openAi", "openai", "gpt-4o", "OpenAI: ChatGPT-4o", "OAI", true, 128_000), //
+    OPENAI("openAi", "openai", "gpt-4o-2024-11-20", "OpenAI: ChatGPT-4o", "OAI", true, 128_000), //
     OPENAI_MINI("openAiMini", "openai", "gpt-4o-mini", "OpenAI: ChatGPT-4o Mini", "OAM", true, 128_000), //
 
     OPENAI_O1_PREVIEW("openAi_o1Preview", "openai", "o1-preview", "OpenAI: ChatGPT o1-preview", "O1P", true, 128_000), //
