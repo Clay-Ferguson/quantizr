@@ -62,6 +62,7 @@ export class SearchContentDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         const ast = getAs();
+        const state = this.getState<LS>();
         let requirePriorityCheckbox = null;
         if (this.getState<LS>().sortField === J.NodeProp.PRIORITY_FULL) {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
@@ -176,7 +177,8 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): string => this.getState<LS>().displayLayout
                     }),
-                    new Selection(null, "Sort by", [
+                    state.displayLayout == "list" ? new Selection(null, "Sort by", [
+                        { key: "none", val: "n/a" },
                         { key: "mtm", val: "Modify Time" },
                         { key: "ctm", val: "Create Time" },
                         { key: "contentLength", val: "Text Length" },
@@ -201,7 +203,7 @@ export class SearchContentDlg extends DialogBase {
                             this.mergeState<LS>(newState);
                         },
                         getValue: (): string => this.getState<LS>().sortField
-                    }),
+                    }) : null,
                     new Div(null, null, [
                         requirePriorityCheckbox
                     ])
@@ -215,6 +217,18 @@ export class SearchContentDlg extends DialogBase {
                 ], "mt-3")
             ])
         ];
+    }
+
+    // We override so we can make adjustments 
+    mergeState<T extends LS>(moreState: T): void {
+        const state: LS = this.getState<LS>();
+        if (state.displayLayout === "graph" || state.displayLayout === "doc") {
+            SearchContentDlg.dlgState.sortField = "";
+            SearchContentDlg.dlgState.sortDir = "none";
+            moreState.sortField = "";
+            moreState.sortDir = "none";
+        }
+        super.mergeState(moreState);
     }
 
     createSearchFieldIconButtons(): Comp {
