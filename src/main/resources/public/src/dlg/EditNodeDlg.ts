@@ -937,7 +937,6 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (S.crypto.avail) {
-                // console.log("decrypting: " + value);
                 const cipherText = value.substring(J.Constant.ENC_TAG.length);
                 const cipherKey = S.props.getCryptoKey(ast.editNode);
                 if (cipherKey) {

@@ -7,10 +7,12 @@ import { Comp, CompT } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
 import { NodeInfo } from "../../JavaIntf";
 import { UrlInfo } from "../../plugins/base/TypeBase";
+import QuickLRU from 'quick-lru';
+
+const cache = new QuickLRU({ maxSize: 1000 });
 
 interface LS {
     content: string;
-    pendingDecrypt?: string;
 }
 
 export class NodeCompMarkdown extends Comp {
@@ -28,14 +30,9 @@ export class NodeCompMarkdown extends Comp {
     // but is ok named as 'cont'
     cont: string;
 
-    /* This makes the encrypted text visible without editing the node which is important to have
-    on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
-    private autoDecrypting: boolean = true;
-
-    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabBase<any>, urls: Map<string, UrlInfo>) {
+    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabBase<any>, private urls: Map<string, UrlInfo>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
-        const ast = getAs();
         this.attribs.nodeId = node.id; // this 'nodeId' is needed to track expand collapse of code blocks.
         this.attribs.className = "mkCont";
 
@@ -43,33 +40,16 @@ export class NodeCompMarkdown extends Comp {
             this.attribs.className += " " + extraContainerClass;
         }
 
-        const content = this.cont || "";
-        const state: LS = {
-            content: null
-        };
-
-        /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
-        if (S.props.isEncrypted(node)) {
-            state.content = "[Encrypted]";
-
-            if (!ast.isAnonUser) {
-                state.pendingDecrypt = content;
-            }
-        }
-        /* otherwise it's not encrypted and we display the normal way */
-        else {
-            state.content = this.preprocessMarkdown(node, null, urls);
-        }
-
-        this.mergeState<LS>(state);
+        this.mergeState<LS>({
+            content: this.cont || ""
+        });
     }
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
-    preprocessMarkdown(node: NodeInfo, content: string = null, urls: Map<string, UrlInfo>): string {
-        content = content || this.cont || "";
-        let val = "";
-        val = S.render.injectSubstitutions(node, content);
+    preprocessMarkdown(node: NodeInfo, urls: Map<string, UrlInfo>): string {
+        const content = this.cont || "";
+        let val = S.render.injectSubstitutions(node, content);
 
         if (S.props.isMine(node)) {
             val = S.util.makeHtmlCommentsVisible(val);
@@ -103,52 +83,30 @@ export class NodeCompMarkdown extends Comp {
             .replaceAll("\\]", "$$");
     }
 
-    override preRender(): boolean | null {
-        const state: LS = this.getState<LS>();
-
-        if (this.autoDecrypting && state.pendingDecrypt) {
-            let cipherText = null;
-            if (state.pendingDecrypt.startsWith(J.Constant.ENC_TAG)) {
-                cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-            }
-
-            if (!cipherText) {
-                console.log("not decrypting. cipherText was unexpected format: " + cipherText);
-                return;
-            }
-
-            const cipherHash = S.util.hashOfString(cipherText);
-            let clearText = S.quanta.decryptCache.get(cipherHash);
-            // if we have already decrypted this data use the result.
-            if (clearText) {
-                clearText = this.preprocessMarkdown(this.node, clearText, null);
-
-                this.mergeState<LS>({
-                    content: clearText,
-                    pendingDecrypt: null
-                });
-            }
-            else {
-                setTimeout(() => {
-                    this.decrypt();
-                }, 10);
-            }
-        }
-        return true;
-    }
-
     override compRender(_children: CompT[]): ReactNode {
         const state = this.getState<LS>();
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 
-        // Process with special markdown if there is any.
-        const sections = this.processSpecialMarkdown(state.content);
-        if (sections) {
-            return sections;
+        if (state.content?.indexOf(J.Constant.ENC_TAG) === 0) {
+            return createElement(ReactMarkdownComp as any, this.attribs, "[Encrypted]");
         }
-        return createElement(ReactMarkdownComp as any, this.attribs, state.content);
+
+        const key = this.attribs.key + "_" + state.content;
+        let ret: any = cache.get(key);
+        if (ret) {
+            return cache.get(key) as ReactNode;
+        }
+
+        const content = this.preprocessMarkdown(this.node, this.urls);
+        // Process with special markdown if there is any.
+        ret = this.processSpecialMarkdown(content);
+        if (!ret) {
+            ret = createElement(ReactMarkdownComp as any, this.attribs, content);
+        }
+        cache.set(key, ret);
+        return ret;
     }
 
     /* When any markdown content contains something like "-**My Section Title**-" that will be
@@ -271,32 +229,5 @@ export class NodeCompMarkdown extends Comp {
             attribs.className = attribs.className + " expandedCollapsible";
             children.push(createElement(ReactMarkdownComp as any, attribs, curBuf));
         }
-    }
-
-    async decrypt() {
-        if (!S.crypto.avail) return;
-        const state: LS = this.getState<LS>();
-        if (!state.pendingDecrypt) return;
-        let clearText = null;
-        // console.log("decrypting (in NodeCompMarkdown): " + state.pendingDecrypt);
-
-        if (state.pendingDecrypt.startsWith(J.Constant.ENC_TAG)) {
-            const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-            const cipherKey = S.props.getCryptoKey(this.node);
-            if (cipherKey) {
-                // console.log("CIPHERKEY " + cipherKey);
-                clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
-            }
-        }
-
-        // console.log("Decrypted to " + clearText);
-        // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
-        clearText = clearText !== null ? clearText : "[Decrypt Failed]";
-        clearText = this.preprocessMarkdown(this.node, clearText, null);
-
-        this.mergeState<LS>({
-            content: clearText,
-            pendingDecrypt: null
-        });
     }
 }

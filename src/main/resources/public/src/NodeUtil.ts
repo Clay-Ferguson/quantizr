@@ -365,6 +365,7 @@ export class NodeUtil {
                 }
             }
         }
+        S.crypto.queueDecrypt(node);
 
         if (node.children) {
             this.processInboundNodes(node.children);

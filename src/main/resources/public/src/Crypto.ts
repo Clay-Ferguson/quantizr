@@ -3,6 +3,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Constants as C } from "./Constants";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
+import { dispatch } from "./AppContext";
 
 /*
 SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
@@ -81,6 +82,13 @@ export class Crypto {
     asymEncKey: string = null;
     userSignature: string = null;
 
+    // Set of nodeId to NodeInfo of all nodes pending decryption. Don't be tempted to make this a map with perhaps nodeId
+    // as key becasue we can have various different NodeInfo objects that are the same node, so we need to use the NodeInfo
+    // object itself. Also we already have a clearTextCache so performance is not an issue.
+    pendingDecrypt: Set<NodeInfo> = new Set<NodeInfo>();
+
+    clearTextCache: Map<string, string> = new Map<string, string>();
+
     constructor() {
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https)
         web address plus also localhost */
@@ -102,6 +110,53 @@ export class Crypto {
         */
         // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
+    }
+
+    queueDecrypt(node: NodeInfo) {
+        if (S.props.isEncrypted(node)) {
+            // if we have already decrypted this content then just use the decrypted content
+            const content = this.clearTextCache.get(node.content);
+            if (content) {
+                node.content = content;
+                return;
+            }
+            // else we add to pending decrypts
+            this.pendingDecrypt.add(node);
+        }
+    }
+
+    async decryptAll() {
+        if (this.pendingDecrypt.size === 0) return;
+        for (const node of this.pendingDecrypt) {
+            await this.decryptNode(node);
+        }
+        this.pendingDecrypt.clear();
+        dispatch("afterDecryptAll", _s => { });
+    }
+
+    async decryptNode(node: NodeInfo) {
+        if (!this.avail) return;
+        let clearText = null;
+
+        if (node.content.startsWith(J.Constant.ENC_TAG)) {
+            // check if we have decrypted this content before
+            clearText = this.clearTextCache.get(node.content);
+
+            // if now, then decrypt it now
+            if (!clearText) {
+                const cipherText = node.content.substring(J.Constant.ENC_TAG.length);
+                const cipherKey = S.props.getCryptoKey(node);
+                if (cipherKey) {
+                    clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
+                    this.clearTextCache.set(node.content, clearText);
+                }
+            }
+        }
+
+        // console.log("Decrypted to " + clearText);
+        // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
+        clearText = clearText !== null ? clearText : "[Decrypt Failed]";
+        node.content = clearText;
     }
 
     invalidateKeys() {
@@ -704,16 +759,6 @@ export class Crypto {
 
     /* Inverse of encryptSharableString() function */
     async decryptSharableString(privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> {
-        // get hash of the encrypted data
-        const cipherHash: string = S.util.hashOfString(skpd.cipherText);
-
-        let ret = S.quanta.decryptCache.get(cipherHash);
-        // if we have already decrypted this data return the result.
-        if (ret) {
-            // decryption cache hit
-            return ret;
-        }
-
         try {
             // console.log("decrypting [" + skpd.cipherText + "] with cipherKey: " + skpd.cipherKey);
             privateKey = privateKey || await this.getPrivateEncKey();
@@ -731,8 +776,7 @@ export class Crypto {
 
             const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
             const symKey = await crypto.subtle.importKey("jwk", symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
-            ret = await this.symDecryptString(symKey, skpd.cipherText);
-            S.quanta.decryptCache.set(cipherHash, ret);
+            const ret = await this.symDecryptString(symKey, skpd.cipherText);
             return ret;
         }
         catch (ex) {
@@ -835,7 +879,7 @@ export class Crypto {
 
         let path: string = node.path;
         // convert any 'pending (p)' path to a final version of the path (no '/p/')
-        if (path.startsWith("/r/p/")) { 
+        if (path.startsWith("/r/p/")) {
             path = "/r/" + path.substring(5);
         }
 

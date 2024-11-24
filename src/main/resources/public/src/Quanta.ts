@@ -71,10 +71,6 @@ export class Quanta {
     ctrlKey: boolean;
     ctrlKeyTime: number;
 
-    // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
-    // decryption code twice.
-    decryptCache: Map<string, string> = new Map<string, string>();
-
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, J.OpenGraph> = new Map<string, J.OpenGraph>();
     imageUrls: Set<string> = new Set<string>();
@@ -220,6 +216,7 @@ export class Quanta {
             window.onpopstate = this._onPopState;
 
             this.addPageLevelEventListeners();
+            this.setDecryptionTimer();
             Log.log("initConstants");
             S.props.initConstants();
 
@@ -378,6 +375,14 @@ export class Quanta {
     // landscape v.s. portrait
     isLandscapeOrientation() {
         return window.innerWidth > window.innerHeight;
+    }
+
+    setDecryptionTimer() {
+        setInterval(() => {
+            if (S.crypto.pendingDecrypt.size > 0) {
+                S.crypto.decryptAll();
+            }
+        }, 2000);
     }
 
     addPageLevelEventListeners() {
