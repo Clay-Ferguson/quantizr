@@ -5,7 +5,7 @@ import { Anchor } from "./comp/core/Anchor";
 import { VerticalLayout } from "./comp/core/VerticalLayout";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
-import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
+import { AskAboutSubgraphDlg } from "./dlg/AskAboutSubgraphDlg";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { ConfigureAgentDlg } from "./dlg/ConfigureAIDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
