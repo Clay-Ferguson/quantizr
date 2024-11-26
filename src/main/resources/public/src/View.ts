@@ -378,25 +378,29 @@ export class View {
         });
 
         if (res.messages) {
+            let message = dlgDescription ? dlgDescription + "\n\n" : "";
             res.messages.forEach(m => {
-                /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
-              there are other commands that exist also */
-                if (command === "getServerInfo") {
-                    m.message += "\nBrowser Memory: " + S.util.getBrowserMemoryInfo() + "\n";
-                    m.message += "Build Time: " + BUILDTIME + "\n";
-                }
+                message += m.message;
+            });
 
-                if (dlgDescription) {
-                    m.message = dlgDescription + "\n\n" + m.message;
-                }
+            /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+          there are other commands that exist also */
+            if (command === "getServerInfo") {
+                message += "\n## Browser Memory\n```\n" + S.util.getBrowserMemoryInfo() + "\n```\n";
+                message += "Build Time: " + BUILDTIME + "\n";
+            }
 
-                dispatch("showServerInfo", s => {
-                    S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO);
-                    s.activeTab = C.TAB_SERVERINFO;
-                    s.serverInfoText = m.message;
-                    s.serverInfoCommand = command;
-                    s.serverInfoTitle = dlgTitle;
-                });
+            if (dlgDescription) {
+                message = dlgDescription + "\n\n" + message;
+            }
+
+            dispatch("showServerInfo", s => {
+                S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO);
+                s.activeTab = C.TAB_SERVERINFO;
+                s.serverInfoText = message;
+                s.serverInfoFormat = res.format;
+                s.serverInfoCommand = command;
+                s.serverInfoTitle = dlgTitle;
             });
         }
     }

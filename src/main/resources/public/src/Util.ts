@@ -609,9 +609,9 @@ export class Util {
         // todo-2: research this. According to TypeScript typings there shouldn't even be a 'memory' attribute so this
         // must be some undocumented feature of Chrome?
         if ((performance as any).memory) {
-            return "<br>HeapSizeLimit: " + this.formatMemory((performance as any).memory.jsHeapSizeLimit) +
-                "<br>TotalHeapSize: " + this.formatMemory((performance as any).memory.totalJSHeapSize) +
-                "<br>UsedHeapSize: " + this.formatMemory((performance as any).memory.usedJSHeapSize);
+            return "HeapSizeLimit: " + this.formatMemory((performance as any).memory.jsHeapSizeLimit) +
+                "\nTotalHeapSize: " + this.formatMemory((performance as any).memory.totalJSHeapSize) +
+                "\nUsedHeapSize: " + this.formatMemory((performance as any).memory.usedJSHeapSize);
         }
         return null;
     }

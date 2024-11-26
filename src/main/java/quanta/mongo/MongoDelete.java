@@ -158,7 +158,8 @@ public class MongoDelete extends ServiceBase {
      * This version of deleteNodeOrphans will run slower than the one below, but uses essentially no
      * memory
      */
-    public void deleteNodeOrphans() {
+    public String deleteNodeOrphans() {
+        String msg = "## Orphan Nodes Cleanup\n";
         MongoTranMgr.ensureTran();
         Val<BulkOperations> bops = new Val<>(null);
         LongVal totalDeleted = new LongVal();
@@ -222,7 +223,8 @@ public class MongoDelete extends ServiceBase {
                 break;
             }
         }
-        log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
+        msg += "\n```\nTOTAL DELETED=" + totalDeleted.getVal() + "\n```\n";
+        return msg;
     }
 
     /*
@@ -323,7 +325,7 @@ public class MongoDelete extends ServiceBase {
             }
             log.debug("Deletes in Pass: " + deletesInPass.getVal());
         }
-        log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
+        log.debug("TOTAL DELETED: " + totalDeleted.getVal());
     }
 
     public DeleteNodesResponse preDeleteCheck(List<String> nodeIds) {

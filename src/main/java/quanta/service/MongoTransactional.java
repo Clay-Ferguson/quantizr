@@ -116,8 +116,8 @@ public class MongoTransactional extends ServiceBase {
         return svc_crypto.signSubGraph(req);
     }
 
-    public void deleteNodeOrphans() {
-        svc_mongoDelete.deleteNodeOrphans();
+    public String deleteNodeOrphans() {
+        return svc_mongoDelete.deleteNodeOrphans();
     }
 
     public Object cm_removeSignatures(RemoveSignaturesRequest req) {

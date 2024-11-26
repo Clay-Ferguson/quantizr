@@ -908,8 +908,9 @@ public class AttachmentService extends ServiceBase {
                 log.debug("verifyAllAttachments() first run, skipping.");
                 return "";
             }
-            log.debug("verifyAllAttachments()");
             StringBuilder sb = new StringBuilder();
+            sb.append("\n## Attachments\n");
+            sb.append("\n```\n");
             IntVal nodesFound = new IntVal(0);
             List<String> nodesIdsMissingBins = new ArrayList<>();
 
@@ -933,9 +934,8 @@ public class AttachmentService extends ServiceBase {
             });
 
             verifyAllAttachments_runCount++;
-            sb.append("GridFS Attachment Verification (run=" + verifyAllAttachments_runCount + ")\n");
-            sb.append("  Binaries In Use: " + nodesFound.getVal() + "\n");
-            sb.append("  Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
+            sb.append("Binaries In Use: " + nodesFound.getVal() + "\n");
+            sb.append("Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
             nodesIdsMissingBins.forEach(id -> {
                 sb.append("    " + id + "\n");
             });
@@ -943,7 +943,7 @@ public class AttachmentService extends ServiceBase {
             if (nodesIdsMissingBins.size() > 0) {
                 svc_email.sendDevEmail("Missing Attachments", sb.toString());
             }
-            sb.append("\n\n");
+            sb.append("\n```\n");
             return sb.toString();
         });
     }
@@ -960,9 +960,10 @@ public class AttachmentService extends ServiceBase {
      */
     public String gridMaintenanceScan() {
         MongoTranMgr.ensureTran();
-        log.debug("gridMaintenanceScan()");
         return svc_arun.run(() -> {
             StringBuilder report = new StringBuilder();
+            report.append("## Grid Maintenance\n");
+            report.append("\n```\n");
             int delCount = 0;
             HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
@@ -1076,7 +1077,8 @@ public class AttachmentService extends ServiceBase {
                     statsMap.put(accntNode.getOwner(), stats);
                 }
             }
-            report.append(String.valueOf(delCount) + " grid orphans found.\n\n");
+            report.append(String.valueOf(delCount) + " grid orphans found.");
+            report.append("\n```\n");
             String ret = report.toString();
             log.debug(ret);
             svc_user.writeUserStats(statsMap);

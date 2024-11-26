@@ -84,11 +84,11 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.sectionTitle("Utils"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                         this.settingsLink("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
                         this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
                     ]),
                     new Div(null, { className: settingsCol }, [
+                        this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                         this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
                     ])
                 ], horzClass),
@@ -98,12 +98,11 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                         this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
-                        this.settingsLink("DB Cleanup", () => S.view.runServerCommand("compactDb", null, "DB Cleanup Response", null)), //
                     ]),
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //
+                        this.settingsLink("DB Cleanup", () => S.view.runServerCommand("cleanupDb", null, "DB Cleanup Response", null)), //
+                        // this.settingsLink("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //
                         this.settingsLink("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null)), //
-                        this.settingsLink("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)), //
                     ])
                 ], horzClass),
             ])

@@ -59,17 +59,6 @@ public class SystemService extends ServiceBase {
         return "success.";
     }
 
-    /*
-     * This was created to make it easier to test the orphan handling functions, so we can intentionally
-     * create orphans by deleting a node and expecting all it's orphans to stay there and we can test if
-     * our orphan deleter can delete them.
-     */
-    public String deleteLeavingOrphans(String nodeId) {
-        SubNode node = svc_mongoRead.getNode(nodeId);
-        svc_mongoDelete.delete(node);
-        return "Success.";
-    }
-
     public String runConversion() {
         String ret = "";
         try {
@@ -99,17 +88,19 @@ public class SystemService extends ServiceBase {
         });
     }
 
-    public String compactDb() {
-        String ret = "";
+    // Returns markdown text with results of cleanup operations
+    public String cleanupDb() {
+        String ret = "`Remember to Rebuild Indexes!`\n\n";
         try {
             svc_prop.setDaemonsEnabled(false);
-            svc_mongoTrans.deleteNodeOrphans();
+            ret += svc_mongoTrans.deleteNodeOrphans();
             ret += svc_mongoTrans.gridMaintenanceScan();
             ret += svc_attach.verifyAllAttachments();
 
+            ret += "\n## MongoDB Compact: nodes collection\n";
             ret += runMongoDbCommand(MongoAppConfig.databaseName,
                     new Document("compact", "nodes").append("force", true));
-            ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
+
         } finally {
             svc_prop.setDaemonsEnabled(true);
         }
@@ -132,12 +123,13 @@ public class SystemService extends ServiceBase {
 
         // Note: we get an error message with repair=true (commented out above), which I think is because
         // we're now in a replica set mode.
-        String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
+        String ret = "\n## Validate DB\n" + runMongoDbCommand(MongoAppConfig.databaseName,
                 new Document("validate", "nodes").append("full", true));
 
-        ret += "\n\ndbStats: "
+        ret += "\n## DB Statistics\n"
                 + runMongoDbCommand(MongoAppConfig.databaseName, new Document("dbStats", 1).append("scale", 1024));
-        ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
+
+        ret += "\n## DB Users Info\n" + runMongoDbCommand("admin", new Document("usersInfo", 1));
         return ret;
     }
 
@@ -150,7 +142,7 @@ public class SystemService extends ServiceBase {
         // NOTE: Use "admin" as databse name to run admin commands like changeUserPassword
         MongoDatabase database = svc_mdbf.getMongoDatabase(dbName);
         Document result = database.runCommand(doc);
-        return XString.prettyPrint(result);
+        return "\n```json\n" + XString.prettyPrint(result) + "\n```\n";
     }
 
     public String getJson(String nodeId) {
@@ -165,38 +157,50 @@ public class SystemService extends ServiceBase {
 
     public String getSystemInfo() {
         StringBuilder sb = new StringBuilder();
+
+        sb.append("## Server Config\n");
+        sb.append("\n```\n");
         sb.append("Ver: " + svc_prop.getAppVersion() + "\n");
         sb.append("Replica ID: " + SystemService.replicaId + "\n");
         sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(svc_prop.isDaemonsEnabled()) + "\n");
+        sb.append("\n```\n");
 
         if (svc_prop.isRequireCrypto()) {
             sb.append(getFailedSigInfo());
         }
 
         sb.append(getRedisReport());
-        sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
 
         Runtime runtime = Runtime.getRuntime();
         runtime.gc();
         long freeMem = runtime.freeMemory() / Const.ONE_MB;
-        sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
 
+        sb.append("## Server Stats\n");
+        sb.append("\n```\n");
+        sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
         sb.append("Node Count: " + svc_mongoRead.getNodeCount() + "\n");
         sb.append("Binary Grid Item Count: " + svc_attach.getGridItemCount() + "\n");
+        sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
+        sb.append("\n```\n");
+
         sb.append(svc_user.getUserAccountsReport());
 
+        sb.append("## VM Args\n");
+        sb.append("\n```\n");
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();
-        sb.append("\nJava VM args:\n");
         for (String arg : arguments) {
             sb.append(arg + "\n");
         }
+        sb.append("\n```\n");
 
-        sb.append("\nRSS Feed Status: " + svc_rssFeed.getFeedStatus() + "\n");
+        sb.append("## RSS Feed Status\n```\n" + svc_rssFeed.getFeedStatus() + "\n```\n");
 
-        sb.append("\nEnvironment Vars:\n");
+        sb.append("## Environment Vars\n");
+        sb.append("\n```\n");
         sb.append(getEnvironment());
+        sb.append("\n```\n");
 
         // Run command inside container
         // sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
@@ -205,12 +209,13 @@ public class SystemService extends ServiceBase {
 
     public String getRedisReport() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nUser Sessions (Redis): \n");
+        sb.append("## User Sessions (Redis)\n");
+        sb.append("\n```\n");
         List<SessionContext> list = svc_redis.query("*");
         for (SessionContext sc : list) {
-            sb.append("    " + sc.getUserName() + " " + sc.getUserToken() + "\n");
+            sb.append(sc.getUserName() + " " + sc.getUserToken() + "\n");
         }
-        sb.append("\n");
+        sb.append("\n```\n");
         return sb.toString();
     }
 
@@ -245,6 +250,8 @@ public class SystemService extends ServiceBase {
 
     public String getFailedSigInfo() {
         StringBuilder sb = new StringBuilder();
+        sb.append("## Signature Node Problems\n");
+        sb.append("\n```\n");
 
         if (!svc_crypto.getFailedSigNodes().isEmpty()) {
             sb.append("\n ********** Failed Signature Node IDs ********** \n");
@@ -269,6 +276,8 @@ public class SystemService extends ServiceBase {
                 }
             }
         }
+        sb.append("\n```\n");
+
         return sb.toString();
     }
 
@@ -330,6 +339,7 @@ public class SystemService extends ServiceBase {
 
     public Object cm_getServerInfo(GetServerInfoRequest req) {
         GetServerInfoResponse res = new GetServerInfoResponse();
+        res.setFormat("txt"); // default to plain text format
         res.setMessages(new LinkedList<>());
         if (req.getCommand().equalsIgnoreCase("getJson")) {
         } else { // allow this one if user owns node.
@@ -349,24 +359,25 @@ public class SystemService extends ServiceBase {
                 res.getMessages().add(new InfoMessage(svc_system.redisPubSubTest(), null));
                 break;
             case "performanceReport":
+                res.setFormat("html");
                 res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
                 break;
             case "transactionsReport":
+                res.setFormat("html");
                 res.getMessages().add(new InfoMessage(svc_financialReport.getReport(), null));
                 break;
             case "clearPerformanceData":
                 res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));
                 break;
-            case "compactDb":
-                res.getMessages().add(new InfoMessage(svc_system.compactDb(), null));
+            case "cleanupDb":
+                res.setFormat("md");
+                res.getMessages().add(new InfoMessage(svc_system.cleanupDb(), null));
                 break;
             case "runConversion":
                 res.getMessages().add(new InfoMessage(svc_system.runConversion(), null));
                 break;
-            case "deleteLeavingOrphans":
-                res.getMessages().add(new InfoMessage(svc_system.deleteLeavingOrphans(req.getNodeId()), null));
-                break;
             case "validateDb":
+                res.setFormat("md");
                 res.getMessages().add(new InfoMessage(svc_system.validateDb(), null));
                 break;
             case "repairDb":
@@ -387,6 +398,7 @@ public class SystemService extends ServiceBase {
                 res.getMessages().add(new InfoMessage(svc_system.getSystemInfo(), null));
                 break;
             case "getServerInfo":
+                res.setFormat("md");
                 res.getMessages().add(new InfoMessage(svc_system.getSystemInfo(), null));
                 break;
             case "getJson":

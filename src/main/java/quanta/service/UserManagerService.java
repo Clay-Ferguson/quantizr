@@ -1213,8 +1213,11 @@ public class UserManagerService extends ServiceBase {
 
     public String getUserAccountsReport() {
         StringBuilder sb = new StringBuilder();
+        sb.append("## User Accounts\n");
+        sb.append("\n```\n");
         long localUserCount = svc_user.getAccountNodeCount(null);
         sb.append("User Count: " + localUserCount + "\n");
+        sb.append("\n```\n");
         return sb.toString();
     }
 

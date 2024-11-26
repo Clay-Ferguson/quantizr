@@ -768,6 +768,7 @@ export interface GetSchemaOrgTypesResponse extends ResponseBase {
 
 export interface GetServerInfoResponse extends ResponseBase {
     messages: InfoMessage[];
+    format: string;
 }
 
 export interface GetSharedNodesResponse extends ResponseBase {

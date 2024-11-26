@@ -140,6 +140,9 @@ public class RSSFeedService extends ServiceBase {
                 ret += "    " + urls + "\n";
             }
         }
+        if (ret.length() == 0) {
+            ret = "No feed issues.";
+        }
         return ret;
     }
 
@@ -357,12 +360,11 @@ public class RSSFeedService extends ServiceBase {
                             .block();
                 } catch (WebClientResponseException e) {
                     // This exception is thrown for HTTP status code errors
-                    throw new RuntimeEx("Error while calling the RSS feed service: " + e.getMessage()
-                            + " Status Code: " + e.getStatusCode(), e);
+                    throw new RuntimeEx("Error while calling the RSS feed service: " + e.getMessage() + " Status Code: "
+                            + e.getStatusCode(), e);
                 } catch (WebClientRequestException e) {
                     // This exception is thrown for errors while making the request (e.g., connectivity issues)
-                    throw new RuntimeEx("Request error while calling the RSS feed service: " + e.getMessage(),
-                            e);
+                    throw new RuntimeEx("Request error while calling the RSS feed service: " + e.getMessage(), e);
                 } catch (Exception e) {
                     /*
                      * Note: A common failure scenario here happens when servers opt to return HTML that does a redirect
@@ -373,8 +375,7 @@ public class RSSFeedService extends ServiceBase {
                      * First known example of this tactic for me was: https://defence-blog.com/feed
                      */
                     // This is a generic exception handler for other exceptions
-                    throw new RuntimeEx("General error while calling the RSS feed service: " + e.getMessage(),
-                            e);
+                    throw new RuntimeEx("General error while calling the RSS feed service: " + e.getMessage(), e);
                 }
 
                 if (redirectUrl.hasVal()) {

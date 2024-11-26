@@ -179,6 +179,7 @@ export class AppState {
     editShowJumpButton: boolean;
     editEncrypt: boolean;
     serverInfoText: string = null;
+    serverInfoFormat: string = "txt"; // txt, md, html
     showNodeLinksInGraph: boolean = true;
     attractionLinksInGraph: boolean = true;
 

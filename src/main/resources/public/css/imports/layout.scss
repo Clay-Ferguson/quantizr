@@ -339,3 +339,11 @@ ol {
     text-align: center;
     margin-right: $bigGap;
 }
+
+.infoSectionTitle {
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+    font-size: large;
+}
