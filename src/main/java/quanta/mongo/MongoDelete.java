@@ -159,6 +159,7 @@ public class MongoDelete extends ServiceBase {
      * memory
      */
     public void deleteNodeOrphans() {
+        MongoTranMgr.ensureTran();
         Val<BulkOperations> bops = new Val<>(null);
         LongVal totalDeleted = new LongVal();
         LongVal opsPending = new LongVal();
@@ -175,10 +176,12 @@ public class MongoDelete extends ServiceBase {
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
                     return;
+
                 // if this node's parent is root, also ignore it.
                 String parentPath = node.getParentPath();
                 if (NodePath.ROOT_PATH.equals(parentPath))
                     return;
+
                 // query to see if node's parent exists.
                 Query q = new Query();
                 q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
@@ -213,6 +216,7 @@ public class MongoDelete extends ServiceBase {
                 bops.setVal(null);
                 opsPending.setVal(0L);
             }
+
             if (deletesInPass.getVal() == 0L) {
                 log.debug("no orphans found in last pass. done.");
                 break;

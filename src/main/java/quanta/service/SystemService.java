@@ -103,7 +103,7 @@ public class SystemService extends ServiceBase {
         String ret = "";
         try {
             svc_prop.setDaemonsEnabled(false);
-            svc_mongoDelete.deleteNodeOrphans();
+            svc_mongoTrans.deleteNodeOrphans();
             ret += svc_mongoTrans.gridMaintenanceScan();
             ret += svc_attach.verifyAllAttachments();
 

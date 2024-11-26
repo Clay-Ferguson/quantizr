@@ -98,7 +98,7 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                         this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
-                        this.settingsLink("Compact MongoDB", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null)), //
+                        this.settingsLink("DB Cleanup", () => S.view.runServerCommand("compactDb", null, "DB Cleanup Response", null)), //
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //

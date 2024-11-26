@@ -913,7 +913,6 @@ public class AttachmentService extends ServiceBase {
             IntVal nodesFound = new IntVal(0);
             List<String> nodesIdsMissingBins = new ArrayList<>();
 
-            // iterate stream of all nodes
             // get all nodes that have attachments
             Criteria crit = Criteria.where(SubNode.ATTACHMENTS).exists(true);
             Query query = new Query();

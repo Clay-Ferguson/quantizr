@@ -63,7 +63,7 @@ import quanta.rest.response.base.ResponseBase;
  * This service is a pure wrapper layer where all MongoDB Transactions are done. We need this
  * because of the ugly design of Spring where calling a transactional method from another class is
  * the ONLY way to guarantee the call will go thru the Spring Proxy. In other words if you call a
- * "@Transactional" method from the same class, it will not go thru the Spring Proxy and the
+ * "@Transactional" method from the same class, it WILL NOT go thru the Spring Proxy and the
  * transaction will not be started.
  * 
  * Note: Putting @Transactional on this class makes all public methods transactional.
@@ -114,6 +114,10 @@ public class MongoTransactional extends ServiceBase {
 
     public Object cm_signSubGraph(SignSubGraphRequest req) {
         return svc_crypto.signSubGraph(req);
+    }
+
+    public void deleteNodeOrphans() {
+        svc_mongoDelete.deleteNodeOrphans();
     }
 
     public Object cm_removeSignatures(RemoveSignaturesRequest req) {
