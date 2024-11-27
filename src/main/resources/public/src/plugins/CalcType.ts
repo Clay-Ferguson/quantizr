@@ -94,7 +94,7 @@ export class CalcType extends TypeBase {
     override ensureDefaultProperties(_node: NodeInfo) {
         // this has the unintended behavior of when the user tries to clear out the text it comes back in realtime.
         // if (!node.content) {
-        //     node.content = "qc.a=23;\nqc.b=19;\n\nq.log('Answer=' + (qc.a + qc.b));";
+        //     node.content = "q.a=23;\a.b=19;\n\q.log('Answer=' + (q.a + q.b));";
         // }
     }
 }

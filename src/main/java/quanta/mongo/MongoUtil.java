@@ -73,8 +73,7 @@ public class MongoUtil extends ServiceBase {
         // Extra protection to be sure accounts and repo root can't have any sharing
         if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
             if (node.getAc() != null) {
-                throw new RuntimeEx(
-                        "Node of type " + node.getType() + " cannot have any sharing: " + node.getIdStr());
+                throw new RuntimeEx("Node of type " + node.getType() + " cannot have any sharing: " + node.getIdStr());
             }
         }
 
@@ -410,7 +409,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("Ensuring partial index named: " + name);
         svc_auth.requireAdmin();
         try {
-            // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
+            // Ensures unique values for 'property' (but allows duplicates of nodes missing the property)
             svc_ops.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).named(name)
@@ -428,7 +427,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("Ensuring unique partial index named: " + name);
         svc_auth.requireAdmin();
         try {
-            // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
+            // Ensures unique values for 'property' (but allows duplicates of nodes missing the property)
             svc_ops.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name)
@@ -443,7 +442,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("Ensuring unique partial index (for type) named: " + name);
         svc_auth.requireAdmin();
         try {
-            // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
+            // Ensures unique values for 'property' (but allows duplicates of nodes missing the property)
             svc_ops.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of( //
@@ -579,8 +578,8 @@ public class MongoUtil extends ServiceBase {
     public void createPublicNodes() {
         log.debug("creating Public Nodes");
         Val<Boolean> created = new Val<>(Boolean.FALSE);
-        SubNode publicNode =
-                svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.PUBLIC, "Public", null, null, true, null, created);
+        SubNode publicNode = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.PUBLIC, "Public", null, null,
+                true, null, created);
         if (created.getVal()) {
             svc_acl.addPrivilege(null, publicNode, PrincipalName.PUBLIC.s(), null,
                     Arrays.asList(PrivilegeType.READ.s()), null);

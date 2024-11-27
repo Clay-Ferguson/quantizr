@@ -41,10 +41,11 @@ export class EditPropertyDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         const type = S.plugin.getType(this.editNode.type);
-        const showSchemaOrg = getAs().showSchemaOrgProps;
+        const ast = getAs();
+        const showSchemaOrg = ast.showSchemaOrgProps;
         let textField: TextField = null;
         const ret = [
-            !getAs().showSchemaOrgProps
+            !ast.showSchemaOrgProps
                 ? new Div(null, { className: "mb-3" }, [
                     textField = new TextField({
                         label: "Name",
@@ -54,7 +55,7 @@ export class EditPropertyDlg extends DialogBase {
 
             type?.schemaOrg?.props ? new Checkbox("Schema.org Props", { className: "mr-3" }, {
                 setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
-                getValue: (): boolean => getAs().showSchemaOrgProps
+                getValue: (): boolean => ast.showSchemaOrgProps
             }) : null,
 
             showSchemaOrg && type?.schemaOrg?.props ? new SchemaOrgPropsTable(type.schemaOrg.props, this) : null,

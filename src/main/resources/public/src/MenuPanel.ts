@@ -1,4 +1,4 @@
-import { asyncDispatch, getAs, promiseDispatch } from "./AppContext";
+import { asyncDispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
@@ -318,7 +318,7 @@ export class MenuPanel extends Comp {
                     return;
                 }
                 typesAdded = true;
-                if (ast.isAdminUser || type.getAllowUserSelect()) {
+                if (type.getAllowUserSelect()) {
                     createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, null), //
                         onMainTab && !ast.isAnonUser && !!hltNode, null, true));
                 }
@@ -327,8 +327,7 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser) {
             if (typesAdded) createMenuItems.push(new MenuItemSeparator());
-            createMenuItems.push(new MenuItem("Choose Type...", async () => {
-                await promiseDispatch("chooseType", s => s.showSchemaOrgProps = true);
+            createMenuItems.push(new MenuItem("More...", async () => {
                 const dlg = new PickNodeTypeDlg(null);
                 await dlg.open();
                 if (dlg.chosenType) {

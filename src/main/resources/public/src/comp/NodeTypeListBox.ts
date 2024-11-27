@@ -28,7 +28,7 @@ export class NodeTypeListBox extends ListBox {
                 return;
             }
             if (!this.searchText || type.getName().toLowerCase().indexOf(lcSearchText) !== -1) {
-                if (ast.isAdminUser || type.getAllowUserSelect()) {
+                if (type.getAllowUserSelect()) {
                     children.push(new NodeTypeListBoxRow(type, () => {
                         this.updateVal(type.getTypeName());
                     }, this.valueIntf.getValue() === type.getTypeName()));
