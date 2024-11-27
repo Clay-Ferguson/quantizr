@@ -14,7 +14,10 @@ import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Markdown } from "../comp/core/Markdown";
+import { RadioButton } from "../comp/core/RadioButton";
+import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { Selection } from "../comp/core/Selection";
+import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
@@ -31,6 +34,7 @@ interface LS { // Local State
     requireAttachment?: boolean;
     requireDate?: boolean;
     displayLayout?: string; // doc, list, graph
+    searchType?: string; // node.content, node.name, node.id
 }
 
 export class SearchContentDlg extends DialogBase {
@@ -45,7 +49,8 @@ export class SearchContentDlg extends DialogBase {
         sortDir: "desc",
         requirePriority: false,
         requireAttachment: false,
-        requireDate: false
+        requireDate: false,
+        searchType: "node.content"
     };
 
     searchTextField: TextField;
@@ -61,6 +66,55 @@ export class SearchContentDlg extends DialogBase {
     }
 
     renderDlg(): Comp[] {
+        let mainDiv = null;
+        switch (this.getState<LS>().searchType) {
+            case "node.content":
+                mainDiv = this.buildContentSearch();
+                break;
+            case "node.name":
+                mainDiv = this.buildNameSearch();
+                break;
+            case "node.id":
+                mainDiv = this.buildIdSearch();
+                break;
+            default:
+                break;
+        }
+        return [
+            new RadioButtonGroup([
+                this.searchTypeRadioButton("All Content", "node.content"),
+                this.searchTypeRadioButton("Node Name", "node.name"),
+                this.searchTypeRadioButton("Node ID", "node.id"),
+            ], "radioButtonsBar mt-3"),
+            mainDiv,
+            new ButtonBar([
+                new Button("Search", () => this.search(false), null, "-primary"),
+                // todo-2: this is currently not implemented on the server.
+                // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "-danger") : null,
+                new Button("Cancel", this._close, null, "float-right")
+            ], "mt-3")
+        ];
+    }
+
+    buildNameSearch(): Comp {
+        this.searchTextField = new TextField({
+            label: "Node Name",
+            enter: () => this.searchByNodeName(),
+            val: this.searchTextState
+        })
+        return this.searchTextField;
+    }
+
+    buildIdSearch(): Comp {
+        this.searchTextField = new TextField({
+            label: "Node ID",
+            enter: () => this.searchByNodeId(),
+            val: this.searchTextState
+        })
+        return this.searchTextField;
+    }
+
+    buildContentSearch(): Comp {
         const ast = getAs();
         const state = this.getState<LS>();
         let requirePriorityCheckbox = null;
@@ -74,149 +128,180 @@ export class SearchContentDlg extends DialogBase {
             }, "ml-3");
         }
 
-        return [
+        return new Div(null, null, [
             new Div(null, null, [
-                new Div(null, null, [
-                    this.searchTextField = new TextField({
-                        label: "Enter Search Text",
-                        enter: () => this.search(false),
-                        val: this.searchTextState
-                    }),
-                    new CollapsiblePanel("Show Tips", "Hide Tips", null, [
-                        new Markdown(`
+                this.searchTextField = new TextField({
+                    label: "Enter Search Text",
+                    enter: () => this.search(false),
+                    val: this.searchTextState
+                }),
+                new CollapsiblePanel("Show Tips", "Hide Tips", null, [
+                    new Markdown(`
 * Use quotes to search for exact phrases or hashtags. 
-   - Example: \`"hello world" "#hashtag"\`
+- Example: \`"hello world" "#hashtag"\`
 * \`and\` and \`or\` can be used between quoted phrases. ANDing is the default if you don't put and/or between terms.`, {
-                            className: "expandedPanel"
-                        })
-                    ], true, (exp: boolean) => {
-                        dispatch("ExpandAttachment", s => s.searchTipsExpanded = exp);
-                    }, getAs().searchTipsExpanded, null, "mt-3", "mt-3")
-                ]),
-                this.createSearchFieldIconButtons(),
-                new Clearfix(),
+                        className: "expandedPanel"
+                    })
+                ], true, (exp: boolean) => {
+                    dispatch("ExpandAttachment", s => s.searchTipsExpanded = exp);
+                }, getAs().searchTipsExpanded, null, "mt-3", "mt-3")
+            ]),
+            this.createSearchFieldIconButtons(),
+            new Clearfix(),
 
-                new FlexRowLayout([
-                    ast.userProfile?.blockedWords ? new Checkbox("Blocked Words", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.blockedWords = checked;
-                            this.mergeState<LS>({ blockedWords: checked });
-                            if (checked) {
-                                let words = ast.userProfile.blockedWords;
-                                words = words.replaceAll("\n", " ");
-                                words = words.replaceAll("\r", " ");
-                                words = words.replaceAll("\t", " ");
+            new FlexRowLayout([
+                ast.userProfile?.blockedWords ? new Checkbox("Blocked Words", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.blockedWords = checked;
+                        this.mergeState<LS>({ blockedWords: checked });
+                        if (checked) {
+                            let words = ast.userProfile.blockedWords;
+                            words = words.replaceAll("\n", " ");
+                            words = words.replaceAll("\r", " ");
+                            words = words.replaceAll("\t", " ");
 
-                                this.searchTextState.setValue(words);
-                            }
-                            else {
-                                this.searchTextState.setValue("");
-                            }
-                        },
-                        getValue: (): boolean => this.getState<LS>().blockedWords
-                    }, "mt-3") : null,
-                    new Checkbox("Regex", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.fuzzy = checked;
-                            this.mergeState<LS>({ fuzzy: checked });
-                        },
-                        getValue: (): boolean => this.getState<LS>().fuzzy
-                    }, "mt-3"),
-                    new Checkbox("Case Sensitive", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.caseSensitive = checked;
-                            this.mergeState<LS>({ caseSensitive: checked });
-                        },
-                        getValue: (): boolean => this.getState<LS>().caseSensitive
-                    }, "mt-3"),
-                    new Checkbox("Recursive", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.recursive = checked;
-                            this.mergeState<LS>({ recursive: checked });
-                        },
-                        getValue: (): boolean => this.getState<LS>().recursive
-                    }, "mt-3"),
-                    new Checkbox("Has Attachment", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.requireAttachment = checked;
-                            this.mergeState<LS>({ requireAttachment: checked });
-                        },
-                        getValue: (): boolean => this.getState<LS>().requireAttachment
-                    }, "mt-3"),
-                    new Checkbox("Has Date", null, {
-                        setValue: (checked: boolean) => {
-                            SearchContentDlg.dlgState.requireDate = checked;
-                            this.mergeState<LS>({ requireDate: checked });
-                        },
-                        getValue: (): boolean => this.getState<LS>().requireDate
-                    }, "mt-3")
-                ], "mb-3"),
+                            this.searchTextState.setValue(words);
+                        }
+                        else {
+                            this.searchTextState.setValue("");
+                        }
+                    },
+                    getValue: (): boolean => this.getState<LS>().blockedWords
+                }, "mt-3") : null,
+                new Checkbox("Regex", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.fuzzy = checked;
+                        this.mergeState<LS>({ fuzzy: checked });
+                    },
+                    getValue: (): boolean => this.getState<LS>().fuzzy
+                }, "mt-3"),
+                new Checkbox("Case Sensitive", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.caseSensitive = checked;
+                        this.mergeState<LS>({ caseSensitive: checked });
+                    },
+                    getValue: (): boolean => this.getState<LS>().caseSensitive
+                }, "mt-3"),
+                new Checkbox("Recursive", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.recursive = checked;
+                        this.mergeState<LS>({ recursive: checked });
+                    },
+                    getValue: (): boolean => this.getState<LS>().recursive
+                }, "mt-3"),
+                new Checkbox("Has Attachment", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.requireAttachment = checked;
+                        this.mergeState<LS>({ requireAttachment: checked });
+                    },
+                    getValue: (): boolean => this.getState<LS>().requireAttachment
+                }, "mt-3"),
+                new Checkbox("Has Date", null, {
+                    setValue: (checked: boolean) => {
+                        SearchContentDlg.dlgState.requireDate = checked;
+                        this.mergeState<LS>({ requireDate: checked });
+                    },
+                    getValue: (): boolean => this.getState<LS>().requireDate
+                }, "mt-3")
+            ], "mb-3"),
 
-                new FlexRowLayout([
-                    new Selection(null, "Search in", [
-                        { key: J.Constant.SEARCH_CUR_NODE, val: "Current Node" },
-                        { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
-                    ], "searchDlgSearchRoot", {
-                        setValue: (val: string) => {
-                            SearchContentDlg.dlgState.searchRoot = val;
-                            this.mergeState<LS>({
-                                searchRoot: val
-                            });
-                        },
-                        getValue: (): string => this.getState<LS>().searchRoot
-                    }),
-                    new Selection(null, "Display Layout", [
-                        { key: "list", val: "List" },
-                        { key: "doc", val: "Document" },
-                        { key: "graph", val: "Graph" }
-                    ], "searchDlgDisplayLayout", {
-                        setValue: (val: string) => {
-                            this.mergeState<LS>({
-                                displayLayout: val
-                            });
-                        },
-                        getValue: (): string => this.getState<LS>().displayLayout
-                    }),
-                    state.displayLayout == "list" ? new Selection(null, "Sort by", [
-                        { key: "none", val: "n/a" },
-                        { key: "mtm", val: "Modify Time" },
-                        { key: "ctm", val: "Create Time" },
-                        { key: "contentLength", val: "Text Length" },
-                        { key: "treeDepth", val: "Tree Depth" },
-                        { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
-                    ], "searchDlgOrderBy", {
-                        setValue: (val: string) => {
-                            let sortDir = "DESC";
-                            if (val === J.NodeProp.PRIORITY_FULL) {
-                                sortDir = "asc";
-                            }
-                            SearchContentDlg.dlgState.sortField = val;
-                            SearchContentDlg.dlgState.sortDir = sortDir;
+            new FlexRowLayout([
+                new Selection(null, "Search in", [
+                    { key: J.Constant.SEARCH_CUR_NODE, val: "Current Node" },
+                    { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
+                ], "searchDlgSearchRoot", {
+                    setValue: (val: string) => {
+                        SearchContentDlg.dlgState.searchRoot = val;
+                        this.mergeState<LS>({
+                            searchRoot: val
+                        });
+                    },
+                    getValue: (): string => this.getState<LS>().searchRoot
+                }),
+                new Selection(null, "Display Layout", [
+                    { key: "list", val: "List" },
+                    { key: "doc", val: "Document" },
+                    { key: "graph", val: "Graph" }
+                ], "searchDlgDisplayLayout", {
+                    setValue: (val: string) => {
+                        this.mergeState<LS>({
+                            displayLayout: val
+                        });
+                    },
+                    getValue: (): string => this.getState<LS>().displayLayout
+                }),
+                state.displayLayout == "list" ? new Selection(null, "Sort by", [
+                    { key: "none", val: "n/a" },
+                    { key: "mtm", val: "Modify Time" },
+                    { key: "ctm", val: "Create Time" },
+                    { key: "contentLength", val: "Text Length" },
+                    { key: "treeDepth", val: "Tree Depth" },
+                    { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
+                ], "searchDlgOrderBy", {
+                    setValue: (val: string) => {
+                        let sortDir = "DESC";
+                        if (val === J.NodeProp.PRIORITY_FULL) {
+                            sortDir = "asc";
+                        }
+                        SearchContentDlg.dlgState.sortField = val;
+                        SearchContentDlg.dlgState.sortDir = sortDir;
 
-                            const newState: LS = {
-                                sortField: val,
-                                sortDir
-                            }
-                            if (val === J.NodeProp.PRIORITY_FULL) {
-                                newState.requirePriority = true;
-                            }
-                            this.mergeState<LS>(newState);
-                        },
-                        getValue: (): string => this.getState<LS>().sortField
-                    }) : null,
-                    new Div(null, null, [
-                        requirePriorityCheckbox
-                    ])
-                ], "mb-6 mt-6"),
+                        const newState: LS = {
+                            sortField: val,
+                            sortDir
+                        }
+                        if (val === J.NodeProp.PRIORITY_FULL) {
+                            newState.requirePriority = true;
+                        }
+                        this.mergeState<LS>(newState);
+                    },
+                    getValue: (): string => this.getState<LS>().sortField
+                }) : null,
+                new Div(null, null, [
+                    requirePriorityCheckbox
+                ])
+            ], "mb-6 mt-6")
+        ])
+    }
 
-                new ButtonBar([
-                    new Button("Search", () => this.search(false), null, "-primary"),
-                    // todo-2: this is currently not implemented on the server.
-                    // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "-danger") : null,
-                    new Button("Cancel", this._close, null, "float-right")
-                ], "mt-3")
-            ])
-        ];
+    async searchByNodeName() {
+        if (!this.validate()) {
+            return;
+        }
+
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
+        const desc = "Node Name: " + SearchContentDlg.defaultSearchText;
+        const success = await S.srch.search(null, "node.name", SearchContentDlg.defaultSearchText, null, desc, null, false,
+            false, 0, true, "mtm", "DESC", false, false, false, false, false);
+        if (success) {
+            this.close();
+        }
+    }
+
+    async searchByNodeId() {
+        if (!this.validate()) {
+            return;
+        }
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
+        const desc = "Node ID: " + SearchContentDlg.defaultSearchText;
+        const success = await S.srch.search(null, "node.id", SearchContentDlg.defaultSearchText, null, desc, null, false,
+            false, 0, true, null, null, false, false, false, false, false);
+        if (success) {
+            this.close();
+        }
+    }
+
+    searchTypeRadioButton(name: string, searchType: string) {
+        return new Span(null, null, [
+            new RadioButton(name, false, "searchTypeGroup", null, {
+                setValue: (checked: boolean) => {
+                    if (checked) {
+                        this.mergeState<LS>({ searchType });
+                    }
+                },
+                getValue: (): boolean => this.getState<LS>().searchType === searchType
+            }, "mr-3 inlineBlock")
+        ]);
     }
 
     // We override so we can make adjustments 
@@ -299,15 +384,27 @@ export class SearchContentDlg extends DialogBase {
     }
 
     async search(deleteMatches: boolean) {
-        switch (this.getState<LS>().displayLayout) {
-            case "list":
-                await this.searchListLayout(deleteMatches);
+        switch (this.getState<LS>().searchType) {
+            case "node.content":
+                switch (this.getState<LS>().displayLayout) {
+                    case "list":
+                        await this.searchListLayout(deleteMatches);
+                        break;
+                    case "doc":
+                        await this.searchDocLayout();
+                        break;
+                    case "graph":
+                        this._searchGraphLayout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
-            case "doc":
-                await this.searchDocLayout();
+            case "node.name":
+                await this.searchByNodeName();
                 break;
-            case "graph":
-                this._searchGraphLayout();
+            case "node.id":
+                await this.searchByNodeId();
                 break;
             default:
                 break;

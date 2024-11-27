@@ -8,8 +8,6 @@ import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
-import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
-import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SendFeedbackDlg } from "./dlg/SendFeedbackDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
@@ -78,8 +76,6 @@ export class MenuPanel extends Comp {
     static showPublicWritableShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null); }
-    static searchByName = () => { new SearchByNameDlg().open(); }
-    static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreatedRecursive = () => S.srch.timelineWithOptions("ctm", true);
@@ -222,9 +218,7 @@ export class MenuPanel extends Comp {
             ], null));
 
             children.push(new Menu("Search", [
-                new MenuItem("By Content", S.srch._openSearchDlg, onMainTab && !!hltNode, null, true), //
-                new MenuItem("By Node Name", MenuPanel.searchByName), //
-                new MenuItem("By Node ID", MenuPanel.searchById), //
+                new MenuItem("New Search", S.srch._openSearchDlg, onMainTab && !!hltNode, null, true), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
