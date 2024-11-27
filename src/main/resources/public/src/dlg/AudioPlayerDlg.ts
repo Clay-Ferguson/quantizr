@@ -37,7 +37,6 @@ export class AudioPlayerDlg extends DialogBase {
                     preload: "auto",
                     controlsList: "nodownload"
                 }),
-
                 new Div(null, { className: "playerButtonsContainer" }, [
                     this.playButton = new Icon({
                         className: "playerButton fa fa-play fa-3x",

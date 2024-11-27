@@ -27,7 +27,6 @@ export class EditNodeDlgUtil {
         if (type) {
             type.ensureDefaultProperties(ast.editNode);
         }
-
         let numPropsShowing: number = 0;
 
         // This loop creates all the editor input fields for all the properties
@@ -35,7 +34,6 @@ export class EditNodeDlgUtil {
             if (!this.dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
                 return;
             }
-
             if (this.dlg.allowEditAllProps || (
                 !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
@@ -68,7 +66,6 @@ export class EditNodeDlgUtil {
         if (content) {
             content = content.trim();
         }
-
         if (clearText) {
             clearText = clearText.trim();
         }
@@ -188,7 +185,6 @@ export class EditNodeDlgUtil {
         if (S.props.getProp(J.NodeProp.DATE, ast.editNode)) {
             return;
         }
-
         await promiseDispatch("setPropsPanelExpanded", s => { s.propsPanelExpanded = true; });
 
         ast.editNode.properties.push({
@@ -203,7 +199,6 @@ export class EditNodeDlgUtil {
         if (!tags || tags.indexOf("due") === -1) {
             this.dlg.tagsState.setValue(tags ? (tags + " #due") : "#due");
         }
-
         this.dlg.mergeState<EditNodeDlgState>(state);
     }
 
@@ -215,7 +210,6 @@ export class EditNodeDlgUtil {
 
     async upload(file: File) {
         const ast = getAs();
-
         const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", file, false, true, async () => {
             await S.edit.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
@@ -306,7 +300,6 @@ export class EditNodeDlgUtil {
                         }
                     }
                 }
-
                 this.dlg.mergeState<EditNodeDlgState>(state);
             }
             finally {
@@ -318,12 +311,10 @@ export class EditNodeDlgUtil {
     _cutUploads = async () => {
         const attSet = this.dlg.getState<EditNodeDlgState>().selectedAttachments;
         if (!attSet || attSet.size === 0) return;
-
         dispatch("cutAttachments", (s: AppState) => {
             s.cutAttachmentsFromId = s.editNode.id;
             s.cutAttachments = new Set(attSet);
         });
-
         this.dlg.mergeState<EditNodeDlgState>({
             selectedAttachments: new Set<string>()
         });
@@ -341,7 +332,6 @@ export class EditNodeDlgUtil {
         let delAttKeys = "";
         this.dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
             delete ast.editNode.attachments[prop];
-
             if (delAttKeys) {
                 delAttKeys += ",";
             }
@@ -405,7 +395,6 @@ export class EditNodeDlgUtil {
                 this.dlg.contentEditor.insertTextAtCursor(transcript + " ");
             }
         });
-
         const speechActive = !this.dlg.getState<EditNodeDlgState>().speechActive;
         if (speechActive) {
             S.stt._startListening();
@@ -445,7 +434,6 @@ export class EditNodeDlgUtil {
         if (type) {
             type.ensureDefaultProperties(node);
         }
-
         if (node.properties) {
             node.properties.forEach(prop => {
                 if (!this.dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name)) {

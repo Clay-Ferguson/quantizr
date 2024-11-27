@@ -293,13 +293,11 @@ export class EditNodeDlg extends DialogBase {
                 ])
             ])
         ];
-
         const advFlowPanel: Div = new Div(null, { className: "d-flex flex-row flex-wrap mt-3" });
 
         if (ast.editNode.hasChildren) {
             advFlowPanel.addChild(this.createLayoutSelection());
         }
-
         advFlowPanel.addChildren(this.makeCheckboxesRow(editorOpts));
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
@@ -340,14 +338,13 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsVisible: boolean = false;
-        if (allowContentEdit /* && !type.schemaOrg (I like having content even on schemaOrg types */) {
+        if (allowContentEdit) {
             let rows = "1";
 
             // only take some number of default rows greater than 1 if this is a non-schemaOrg type
             if (!type?.schemaOrg) {
                 rows = getAs().mobileMode ? "8" : "10";
             }
-
             mainPropsTable.addChild(this.makeContentEditor(rows, type?.schemaOrg ? 1 : 3));
             this.contentEditor.setWordWrap(isWordWrap);
             propsVisible = true;
@@ -606,7 +603,6 @@ export class EditNodeDlg extends DialogBase {
                 newTags += tag;
             }
         });
-
         this.tagsState.setValue(newTags);
         this.mergeState({});
     }
@@ -638,7 +634,6 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxesRow(advancedOpts: EditorOptions): Comp[] {
         const ast = getAs();
-
         const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.encKeyOk()) {
@@ -897,7 +892,6 @@ export class EditNodeDlg extends DialogBase {
             valEditor.attribs.readOnly = "readOnly";
             valEditor.attribs.disabled = "disabled";
         }
-
         editItems.push(valEditor as any as Comp);
         tableRow.children = editItems;
         tableRow.ordinal = ordinal;
@@ -999,19 +993,16 @@ export class EditNodeDlg extends DialogBase {
                 title: "Toggle on/off Speech Recognition to input text",
                 onClick: this.utl._toggleRecognition
             }),
-
             new Icon({
                 className: "fa fa-lg fa-face-smile editorIcon",
                 title: "Insert emoji at cursor",
                 onClick: this.utl._insertEmoji
             }),
-
             new Icon({
                 className: "fa fa-lg fa-user editorIcon",
                 title: "Insert Username(s) at cursor",
                 onClick: this.utl._insertUserNames
             }),
-
             new Selection(null, null, [
                 { key: "h0", val: "" },
                 { key: "h1", val: "H1" },
@@ -1028,7 +1019,6 @@ export class EditNodeDlg extends DialogBase {
             })
         ], "float-right mb-1"));
         editItems.push(this.contentEditor as any as Comp);
-
         return new Div(null, { className: "contentEditor" }, editItems);
     }
 }
