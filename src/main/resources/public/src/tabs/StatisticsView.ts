@@ -9,7 +9,7 @@ import { Span } from "../comp/core/Span";
 import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
-import { SearchContentDlg } from "../dlg/SearchContentDlg";
+import { SearchDlg } from "../dlg/SearchDlg";
 import { TabBase } from "../intf/TabBase";
 import { Tailwind } from "../Tailwind";
 
@@ -88,7 +88,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
             word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         }
         if (!word) return;
-        SearchContentDlg.defaultSearchText = word;
-        new SearchContentDlg().open();
+        SearchDlg.defaultSearchText = word;
+        new SearchDlg().open();
     }
 }

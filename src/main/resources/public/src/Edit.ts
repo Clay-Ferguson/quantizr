@@ -47,6 +47,21 @@ export class Edit {
         }
     }
 
+    async deleteBookmark(id: string, name: string) {
+        const dlg = new ConfirmDlg("Confirm Delete Bookmark: " + name, "Warning");
+        await dlg.open();
+        if (dlg.yes) {
+            await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                nodeIds: [id],
+                childrenOnly: false,
+                bulkDelete: false,
+                jumpToParentOf: null,
+                force: true
+            });
+            setTimeout(S.util._loadBookmarks, 100);
+        }
+    }
+
     async saveNode(node: NodeInfo, returnInlineChildren: boolean) {
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node,

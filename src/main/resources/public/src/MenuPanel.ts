@@ -1,5 +1,6 @@
 import { asyncDispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
+import { Tag } from "./comp/core/Tag";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -39,11 +40,6 @@ export class MenuPanel extends Comp {
 
     // leaving for reference how to open this.
     static editFriends = () => { new FriendsDlg("Following", null, true, true).open(); };
-
-    static openBookmarksNode = () => {
-        S.util.setUserPreferences(true);
-        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST, false);
-    };
 
     static continueEditing = () => {
         const ast = getAs();
@@ -242,8 +238,12 @@ export class MenuPanel extends Comp {
             if (ast.bookmarks) {
                 ast.bookmarks.forEach(bookmark => {
                     const nodeId = bookmark.id || bookmark.selfId;
-                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null);
-
+                    const floatRightComp = new Tag("i", {
+                        className: "fa fa-trash fa-lg",
+                        title: "Delete",
+                        onClick: () => S.edit.deleteBookmark(bookmark.selfId, bookmark.name)
+                    })
+                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComp);
                     if (!ast.mobileMode) {
                         S.domUtil.makeDropTarget(mi.attribs, nodeId);
                     }
@@ -256,7 +256,6 @@ export class MenuPanel extends Comp {
                 bookmarkItems.push(new MenuItemSeparator());
             }
             bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
-            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));

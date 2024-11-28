@@ -7,7 +7,7 @@ import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { SearchDlg } from "./dlg/SearchDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
@@ -29,7 +29,7 @@ import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
     _openSearchDlg = () => {
-        new SearchContentDlg().open();
+        new SearchDlg().open();
     }
 
     async findSharedNodes(node: NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) {

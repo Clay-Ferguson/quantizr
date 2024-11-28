@@ -14,7 +14,7 @@ interface LS { // Local State
 export class MenuItem extends Comp {
 
     constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
-        private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null) {
+        private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null, private floatRightComp: Comp = null) {
         super({ key: name });
         this.mergeState({ visible: true, enabled });
     }
@@ -22,7 +22,6 @@ export class MenuItem extends Comp {
     override preRender(): boolean | null {
         const state: LS = this.getState<LS>();
         const enablementClass = state.enabled ? " mainMenuItemEnabled" : " disabled mainMenuItemDisabled";
-
         let innerSpan: Comp;
         let innerClazz: string;
         if (this.stateFunc) {
@@ -47,10 +46,13 @@ export class MenuItem extends Comp {
 
         this.children = [
             innerSpan,
-            this.treeOp ? new Tag("i", {
-                className: "fa fa-caret-right fa-lg float-right " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
-                title: "Operates on the selected Tree Nodes(s)",
-            }) : null
+            this.treeOp || this.floatRightComp ? new Span(null, { className: "float-right" }, [
+                this.floatRightComp,
+                this.treeOp ? new Tag("i", {
+                    className: "fa fa-caret-right fa-lg  " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
+                    title: "Operates on the selected Tree Nodes(s)",
+                }) : null
+            ]) : null,
         ];
 
         if (state.enabled) {

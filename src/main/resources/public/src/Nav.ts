@@ -10,7 +10,7 @@ import { AskForEmail } from "./dlg/AskForEmailDlg";
 import { AskForPhoneNumber } from "./dlg/AskForPhoneNumber";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { SearchDlg } from "./dlg/SearchDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
@@ -336,7 +336,7 @@ export class Nav {
         const node = S.nodeUtil.findNode(id);
         if (!node) return;
         setTimeout(() => {
-            new SearchContentDlg(node).open();
+            new SearchDlg(node).open();
         }, 10);
     }
 
