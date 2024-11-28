@@ -51,7 +51,7 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;
-        const success = await S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
+        const success = await S.srch.search(null, null, "", SearchUsersDlg.defaultSearchText,
             J.Constant.SEARCH_TYPE_USERS,
             desc,
             null,

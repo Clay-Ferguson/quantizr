@@ -14,7 +14,7 @@ export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     async searchUnderId(id: string, text: string) {
-        await S.srch.search(id, null, text, null, "Content: " + text,
+        await S.srch.search(null, id, null, text, null, "Content: " + text,
             null,
             false,
             false, // case sens 

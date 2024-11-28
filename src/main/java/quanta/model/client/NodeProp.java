@@ -9,139 +9,147 @@ public enum NodeProp {
      * encrypted with the public key of the user it's being shared to so that user can use their private
      * key to decrypt this key and gain access to the actual data.
      */
-    ENC_KEY("sn:encKey"), //
-    CRYPTO_SIG("sn:sig"), //
+    ENC_KEY("sn:encKey", null), //
+    CRYPTO_SIG("sn:sig", null), //
 
     // stands for "[r]ecursive SHA256" of all children of node.
-    SUBGRAPH_HASH("sn:rSHA256"), //
+    SUBGRAPH_HASH("sn:rSHA256", null), //
 
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc"), //
-    AUDIO_URL("sn:audioUrl"), //
+    RSS_FEED_SRC("sn:rssFeedSrc", null), //
+    AUDIO_URL("sn:audioUrl", null), //
 
-    USER_PREF_PUBLIC_KEY("sn:publicKey"), //
-    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //
+    USER_PREF_PUBLIC_KEY("sn:publicKey", null), //
+    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey", null), //
 
-    USER_PREF_EDIT_MODE("sn:editMode"), //
-    USER_PREF_AI_MODE("sn:aiMode"), //
-    USER_PREF_SHOW_METADATA("sn:showMetaData"), //
-    USER_PREF_SHOW_PROPS("sn:showProps"), //
-    USER_PREF_AUTO_REFRESH_FEED("sn:autoRefreshFeed"), // #add-prop
-    USER_PREF_SHOW_REPLIES("sn:showReplies"), //
-    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
-    USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly"), //
-    USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols"), //
-    USER_PREF_AI_SERVICE("sn:aiService"), //
-    USER_PREF_AI_FILE_EXTENSIONS("sn:aiAgentFileExtensions"), //
-    USER_PREF_AI_FOLDERS_TO_INCLUDE("sn:aiAgentFoldersToInclude"), //
-    USER_PREF_AI_FOLDERS_TO_EXCLUDE("sn:aiAgentFoldersToExclude"), //
-    USER_PREF_AI_MAX_WORDS("sn:aiMaxWords"), //
-    USER_PREF_AI_TEMPERATURE("sn:aiTemp"), //
-    SIGNUP_PENDING("sn:signupPending"), //
+    USER_PREF_EDIT_MODE("sn:editMode", null), //
+    USER_PREF_AI_MODE("sn:aiMode", null), //
+    USER_PREF_SHOW_METADATA("sn:showMetaData", null), //
+    USER_PREF_SHOW_PROPS("sn:showProps", null), //
+    USER_PREF_AUTO_REFRESH_FEED("sn:autoRefreshFeed", null), // #add-prop
+    USER_PREF_SHOW_REPLIES("sn:showReplies", null), //
+    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", null), //
+    USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", null), //
+    USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols", null), //
+    USER_PREF_AI_SERVICE("sn:aiService", null), //
+    USER_PREF_AI_FILE_EXTENSIONS("sn:aiAgentFileExtensions", null), //
+    USER_PREF_AI_FOLDERS_TO_INCLUDE("sn:aiAgentFoldersToInclude", null), //
+    USER_PREF_AI_FOLDERS_TO_EXCLUDE("sn:aiAgentFoldersToExclude", null), //
+    USER_PREF_AI_MAX_WORDS("sn:aiMaxWords", null), //
+    USER_PREF_AI_TEMPERATURE("sn:aiTemp", null), //
+    SIGNUP_PENDING("sn:signupPending", null), //
 
-    EMAIL_CONTENT("sn:content"), //
-    EMAIL_RECIP("sn:recip"), //
-    EMAIL_SUBJECT("sn:subject"), //
+    EMAIL_CONTENT("sn:content", null), //
+    EMAIL_RECIP("sn:recip", null), //
+    EMAIL_SUBJECT("sn:subject", null), //
 
     /*
      * when a node id pointing to some other node, we set it's target id to the node it points to. For
      * now used only for inbox to point to nodes
      */
-    TARGET_ID("sn:target_id"), //
-    BOOKMARK_SEARCH_TEXT("search"), //
+    TARGET_ID("sn:target_id", null), //
+    BOOKMARK_SEARCH_TEXT("search", null), //
 
     /*
      * WARNING: Only the User Account Root nodes have this property of the actual user name. All other
      * nodes reference their OWNER as an OwnerId that points to these nodes.
      */
-    USER("sn:user"), //
-    DISPLAY_NAME("sn:displayName"), //
-    USER_BIO("sn:userBio"), //
+    USER("sn:user", null), //
+    DISPLAY_NAME("sn:displayName", null), //
+    USER_BIO("sn:userBio", null), //
 
     // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their
     // account node.
-    USER_TAGS("sn:tags"), //
-    USER_BLOCK_WORDS("sn:blockWords"), //
-    USER_RECENT_TYPES("sn:recentTypes"), //
+    USER_TAGS("sn:tags", null), //
+    USER_SEACH_DEFINITIONS("sn:searchDefs", SearchDefinition.class), //
+    USER_BLOCK_WORDS("sn:blockWords", null), //
+    USER_RECENT_TYPES("sn:recentTypes", null), //
 
-    PWD_HASH("sn:pwdHash"), //
-    VOTE("vote"), //
+    PWD_HASH("sn:pwdHash", null), //
+    VOTE("vote", null), //
 
-    FILE_SYNC_LINK("fs:link"), //
+    FILE_SYNC_LINK("fs:link", null), //
 
     // Goes on 'Friend' nodes, and is added automatically by server (not user)
-    USER_NODE_ID("sn:userNodeId"), //
-    NAME("sn:name"), //
+    USER_NODE_ID("sn:userNodeId", null), //
+    NAME("sn:name", null), //
 
-    // FS_FILE("fs:file"), //
-    // FS_FOLDER("fs:folder"), //
+    // FS_FILE("fs:file", null), //
+    // FS_FOLDER("fs:folder", null), //
 
-    FS_LINK("fs:link"), //
+    FS_LINK("fs:link", null), //
 
     /*
      * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
      * metadata rendering
      */
-    MIME_EXT("sn:ext"), //
+    MIME_EXT("sn:ext", null), //
 
-    EMAIL("sn:email"), //
-    CODE("sn:code"), //
+    EMAIL("sn:email", null), //
+    CODE("sn:code", null), //
 
-    JSON_FILE_SEARCH_RESULT("sn:json"), //
-    NOWRAP("sn:nowrap"), //
+    JSON_FILE_SEARCH_RESULT("sn:json", null), //
+    NOWRAP("sn:nowrap", null), //
 
-    BIN("bin"), //
-    BIN_WEBSITE("bin-website"), //
+    BIN("bin", null), //
+    BIN_WEBSITE("bin-website", null), //
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot"), //
+    BIN_TOTAL("sn:binTot", null), //
 
     // amount of bytes the user is ALLOWED to save.
-    BIN_QUOTA("sn:binQuota"), //
+    BIN_QUOTA("sn:binQuota", null), //
 
-    LAST_LOGIN_TIME("sn:lastLogin"), //
-    LAST_ACTIVE_TIME("sn:lastActive"), //
+    LAST_LOGIN_TIME("sn:lastLogin", null), //
+    LAST_ACTIVE_TIME("sn:lastActive", null), //
 
-    INLINE_CHILDREN("inlineChildren"), //
-    EXPANSION_BY_USER("expansionByUser"),
+    INLINE_CHILDREN("inlineChildren", null), //
+    EXPANSION_BY_USER("expansionByUser", null), //
 
-    PRIORITY("priority"), //
-    PRIORITY_FULL("p.priority"), //
+    PRIORITY("priority", null), //
+    PRIORITY_FULL("p.priority", null), //
 
-    LAYOUT("layout"), //
-    ORDER_BY("orderBy"), //
-    NO_EXPORT("noexport"), //
+    LAYOUT("layout", null), //
+    ORDER_BY("orderBy", null), //
+    NO_EXPORT("noexport", null), //
 
-    TYPE_LOCK("sn:typLoc"), //
+    TYPE_LOCK("sn:typLoc", null), //
 
-    DATE("date"), //
-    DATE_FULL("p.date"), //
+    DATE("date", null), //
+    DATE_FULL("p.date", null), //
 
-    UNPUBLISHED("unpub"), //
-    WEBSITE("website"), //
-    AI_PROMPT("ai"), //
-    AI_FOLDERS_TO_INCLUDE("aiFolders"), //
-    AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude"), //
-    AI_FILE_EXTENSIONS("aiFileExt"), //
-    AI_SERVICE("aiService"), //
-    AI_QUERY_TEMPLATE("aiTemplate"), //
-    AI_MAX_WORDS("aiMaxWords"), //
-    AI_TEMPERATURE("aiTemp"), //
-    DURATION("duration"), //
-    IN_PENDING_PATH("pendingPath"), //
-    SIG_FAIL("sigFail"), //
+    UNPUBLISHED("unpub", null), //
+    WEBSITE("website", null), //
+    AI_PROMPT("ai", null), //
+    AI_FOLDERS_TO_INCLUDE("aiFolders", null), //
+    AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude", null), //
+    AI_FILE_EXTENSIONS("aiFileExt", null), //
+    AI_SERVICE("aiService", null), //
+    AI_QUERY_TEMPLATE("aiTemplate", null), //
+    AI_MAX_WORDS("aiMaxWords", null), //
+    AI_TEMPERATURE("aiTemp", null), //
+    DURATION("duration", null), //
+    IN_PENDING_PATH("pendingPath", null), //
+    SIG_FAIL("sigFail", null), //
 
-    OPEN_GRAPH("sn:og"), //
-    TRUNCATED("trunc"); //
+    OPEN_GRAPH("sn:og", null), //
+    TRUNCATED("trunc", null); //
 
     @JsonValue
     private final String value;
 
-    private NodeProp(String value) {
+    private final Class<?> arrayOfType;
+
+    public Class<?> getArrayOfType() {
+        return arrayOfType;
+    }
+
+    private NodeProp(String value, Class<?> arrayOfType) {
         this.value = value;
+        this.arrayOfType = arrayOfType;
     }
 
     public String toString() {

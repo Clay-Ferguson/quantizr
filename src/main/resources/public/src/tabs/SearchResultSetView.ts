@@ -17,7 +17,7 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
             page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.search(this.data.props.node.id,
+        S.srch.search(null, this.data.props.node.id,
             this.data.props.prop,
             this.data.props.searchText,
             this.data.props.searchType,

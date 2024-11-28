@@ -9,6 +9,7 @@ import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
+import { SearchDlg } from "./dlg/SearchDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SendFeedbackDlg } from "./dlg/SendFeedbackDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
@@ -213,9 +214,45 @@ export class MenuPanel extends Comp {
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
             ], null));
 
+            const searchDefItems = [];
+            if (!ast.isAnonUser) {
+                if (ast.searchDefs) {
+                    ast.searchDefs.forEach(sd => {
+                        const floatRightComps = [
+                            new Tag("i", {
+                                className: "fa fa-edit fa-lg mr-2",
+                                title: "Open Search",
+                                onClick: (event) => {
+                                    // cancel even because it will also trigger the parent click event
+                                    event.stopPropagation();
+                                    new SearchDlg(null, sd).open();
+                                }
+                            }),
+                            new Tag("i", {
+                                className: "fa fa-trash fa-lg",
+                                title: "Delete",
+                                onClick: (event) => {
+                                    // cancel even because it will also trigger the parent click event
+                                    event.stopPropagation();
+                                    S.srch.deleteSearchDef(sd.name);
+                                }
+                            })
+                        ];
+                        const mi = new MenuItem(sd.name, () => S.srch.runSearchDef(sd), true, null, false, null, null, floatRightComps);
+                        if (searchDefItems.length == 0) {
+                            searchDefItems.push(new MenuItemSeparator());
+                        }
+                        searchDefItems.push(mi);
+                    });
+                }
+                if (searchDefItems.length > 0) {
+                    searchDefItems.push(new MenuItemSeparator());
+                }
+            }
+
             children.push(new Menu("Search", [
                 new MenuItem("New Search", S.srch._openSearchDlg, onMainTab && !!hltNode, null, true), //
-
+                ...searchDefItems,
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
                 //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
@@ -238,12 +275,18 @@ export class MenuPanel extends Comp {
             if (ast.bookmarks) {
                 ast.bookmarks.forEach(bookmark => {
                     const nodeId = bookmark.id || bookmark.selfId;
-                    const floatRightComp = new Tag("i", {
-                        className: "fa fa-trash fa-lg",
-                        title: "Delete",
-                        onClick: () => S.edit.deleteBookmark(bookmark.selfId, bookmark.name)
-                    })
-                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComp);
+                    const floatRightComps = [
+                        new Tag("i", {
+                            className: "fa fa-trash fa-lg",
+                            title: "Delete",
+                            onClick: (event) => {
+                                // cancel even because it will also trigger the parent click event
+                                event.stopPropagation();
+                                S.edit.deleteBookmark(bookmark.selfId, bookmark.name);
+                            }
+                        })
+                    ];
+                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComps);
                     if (!ast.mobileMode) {
                         S.domUtil.makeDropTarget(mi.attribs, nodeId);
                     }

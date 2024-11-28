@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.MergedAnnotations.Search;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -27,19 +26,25 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.SearchDefinition;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
+import quanta.rest.request.DeleteSearchDefRequest;
 import quanta.rest.request.GetBookmarksRequest;
 import quanta.rest.request.GetNodeStatsRequest;
+import quanta.rest.request.GetSearchDefsRequest;
 import quanta.rest.request.GetSharedNodesRequest;
 import quanta.rest.request.NodeSearchRequest;
 import quanta.rest.request.RenderDocumentRequest;
+import quanta.rest.response.DeleteSearchDefResponse;
 import quanta.rest.response.GetBookmarksResponse;
 import quanta.rest.response.GetNodeStatsResponse;
+import quanta.rest.response.GetSearchDefsResponse;
 import quanta.rest.response.GetSharedNodesResponse;
 import quanta.rest.response.NodeSearchResponse;
 import quanta.rest.response.RenderDocumentResponse;
 import quanta.util.ExUtil;
 import quanta.util.TL;
+import quanta.util.XString;
 import quanta.util.val.Val;
 
 /**
@@ -91,6 +96,11 @@ public class NodeSearchService extends ServiceBase {
 
     public NodeSearchResponse cm_search(NodeSearchRequest req) {
         SearchDefinition def = req.getSearchDefinition();
+
+        if (def != null && !StringUtils.isEmpty(def.getName())) {
+            saveSearchDefinition(def);
+        }
+
         NodeSearchResponse res = new NodeSearchResponse();
         String searchText = def.getSearchText();
 
@@ -194,6 +204,41 @@ public class NodeSearchService extends ServiceBase {
             }
         }
         return res;
+    }
+
+    private void saveSearchDefinition(SearchDefinition def) {
+        // lookup user node for the signed in user
+        AccountNode userNode = svc_user.getSessionUserAccount();
+        if (userNode != null) {
+            @SuppressWarnings("unchecked")
+            List<SearchDefinition> searchDefs =
+                    (ArrayList<SearchDefinition>) userNode.getObj(NodeProp.USER_SEACH_DEFINITIONS.s(), ArrayList.class);
+
+            if (searchDefs == null) {
+                searchDefs = new ArrayList<>();
+            }
+
+            // remove nulls from the searchDefs list
+            searchDefs.removeIf(sd -> sd == null);
+
+            // replace the search definition (if one is found by name) with the new one or else add to the array
+            boolean found = false;
+            for (int i = 0; i < searchDefs.size(); i++) {
+                SearchDefinition sd = searchDefs.get(i);
+                String name = sd.getName();
+                if (name != null && name.equals(def.getName())) {
+                    searchDefs.set(i, def);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                log.debug("Saving new search definition: " + XString.prettyPrint(def));
+                searchDefs.add(def);
+            }
+            userNode.set(NodeProp.USER_SEACH_DEFINITIONS.s(), searchDefs);
+            svc_mongoUpdate.save(userNode);
+        }
     }
 
     private void searchLinkedNodes(NodeSearchRequest req, NodeSearchResponse res) {
@@ -315,6 +360,51 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    public DeleteSearchDefResponse cm_deleteSearchDef(DeleteSearchDefRequest req) {
+        DeleteSearchDefResponse res = new DeleteSearchDefResponse();
+        SubNode userNode = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
+        if (userNode != null) {
+            @SuppressWarnings("unchecked")
+            List<SearchDefinition> searchDefs =
+                    (ArrayList<SearchDefinition>) userNode.getObj(NodeProp.USER_SEACH_DEFINITIONS.s(), ArrayList.class);
+
+            if (searchDefs != null) {
+                // remove all nulls from searchDefs list
+                searchDefs.removeIf(sd -> sd == null);
+                // remove the search definition by name
+                searchDefs.removeIf(sd -> sd.getName().equals(req.getSearchDefName()));
+
+                // save back to db
+                userNode.set(NodeProp.USER_SEACH_DEFINITIONS.s(), searchDefs);
+                svc_mongoUpdate.save(userNode);
+
+                // sort bookmarks by name
+                searchDefs.sort((b1, b2) -> b1.getName().compareTo(b2.getName()));
+                res.setSearchDefs(searchDefs);
+            }
+        }
+        return res;
+    }
+
+    public GetSearchDefsResponse cm_getSearchDefs(GetSearchDefsRequest req) {
+        GetSearchDefsResponse res = new GetSearchDefsResponse();
+        SubNode userNode = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
+        if (userNode != null) {
+            @SuppressWarnings("unchecked")
+            List<SearchDefinition> searchDefs =
+                    (ArrayList<SearchDefinition>) userNode.getObj(NodeProp.USER_SEACH_DEFINITIONS.s(), ArrayList.class);
+
+            if (searchDefs != null) {
+                // remove nulls from the serchDefs list
+                searchDefs.removeIf(sd -> sd == null);
+                // sort bookmarks by name
+                searchDefs.sort((b1, b2) -> b1.getName().compareTo(b2.getName()));
+                res.setSearchDefs(searchDefs);
+            }
+        }
+        return res;
+    }
+
     public GetBookmarksResponse cm_getBookmarks(GetBookmarksRequest req) {
         List<Bookmark> bookmarks = new LinkedList<>();
         List<SubNode> bookmarksNode = svc_user.getSpecialNodesList(null, NodeType.BOOKMARK_LIST.s(), null, true, null);
@@ -331,6 +421,10 @@ public class NodeSearchService extends ServiceBase {
                 bookmarks.add(bm);
             }
         }
+
+        // sort bookmarks by name
+        bookmarks.sort((b1, b2) -> b1.getName().compareTo(b2.getName()));
+
         GetBookmarksResponse res = new GetBookmarksResponse();
         res.setBookmarks(bookmarks);
         return res;

@@ -55,21 +55,46 @@ export class SearchDlg extends DialogBase {
 
     searchTextField: TextField;
     searchTextState: Validator = new Validator();
+    searchNameState: Validator = new Validator();
 
-    constructor(private searchRoot: NodeInfo = null) {
+    constructor(private searchRoot: NodeInfo = null, searchDef: J.SearchDefinition = null) {
         super("Search");
         this.onMount(() => {
             this.searchTextField?.focus();
         });
-        this.mergeState<LS>(SearchDlg.dlgState);
-        this.searchTextState.setValue(SearchDlg.defaultSearchText);
+
+        if (searchDef) {
+            this.initFromSearchDef(searchDef);
+        }
+        else {
+            this.mergeState<LS>(SearchDlg.dlgState);
+            this.searchTextState.setValue(SearchDlg.defaultSearchText);
+        }
+    }
+
+    initFromSearchDef(searchDef: J.SearchDefinition) {
+        this.mergeState<LS>({
+            ...SearchDlg.dlgState,
+            sortField: searchDef.sortField,
+            caseSensitive: searchDef.caseSensitive,
+            fuzzy: searchDef.fuzzy,
+            recursive: searchDef.recursive,
+            sortDir: searchDef.sortDir,
+            requirePriority: searchDef.requirePriority,
+            requireAttachment: searchDef.requireAttachment,
+            requireDate: searchDef.requireDate,
+        });
+        this.searchTextState.setValue(searchDef.searchText);
+        this.searchNameState.setValue(searchDef.name);
     }
 
     renderDlg(): Comp[] {
         let mainDiv = null;
-        switch (this.getState<LS>().searchType) {
+        const state = this.getState<LS>();
+        const savableSearch = state.displayLayout === "list";
+        switch (state.searchType) {
             case "node.content":
-                mainDiv = this.buildContentSearch();
+                mainDiv = this.buildContentSearch(savableSearch);
                 break;
             case "node.name":
                 mainDiv = this.buildNameSearch();
@@ -114,7 +139,7 @@ export class SearchDlg extends DialogBase {
         return this.searchTextField;
     }
 
-    buildContentSearch(): Comp {
+    buildContentSearch(savableSearch: boolean): Comp {
         const ast = getAs();
         const state = this.getState<LS>();
         let requirePriorityCheckbox = null;
@@ -138,7 +163,6 @@ export class SearchDlg extends DialogBase {
             ]),
             this.createSearchFieldIconButtons(),
             new Clearfix(),
-
             new FlexRowLayout([
                 ast.userProfile?.blockedWords ? new Checkbox("Blocked Words", null, {
                     setValue: (checked: boolean) => {
@@ -149,7 +173,6 @@ export class SearchDlg extends DialogBase {
                             words = words.replaceAll("\n", " ");
                             words = words.replaceAll("\r", " ");
                             words = words.replaceAll("\t", " ");
-
                             this.searchTextState.setValue(words);
                         }
                         else {
@@ -251,6 +274,10 @@ export class SearchDlg extends DialogBase {
                     requirePriorityCheckbox
                 ])
             ], "mb-6 mt-6"),
+            savableSearch ? new TextField({
+                label: "Search Name (optional)",
+                val: this.searchNameState
+            }) : null,
             new CollapsiblePanel("Show Tips", "Hide Tips", null, [
                 new Markdown(`
 * Use quotes to search for exact phrases or hashtags. 
@@ -271,7 +298,7 @@ export class SearchDlg extends DialogBase {
 
         SearchDlg.defaultSearchText = this.searchTextState.getValue();
         const desc = "Node Name: " + SearchDlg.defaultSearchText;
-        const success = await S.srch.search(null, "node.name", SearchDlg.defaultSearchText, null, desc, null, false,
+        const success = await S.srch.search(null, null, "node.name", SearchDlg.defaultSearchText, null, desc, null, false,
             false, 0, true, "mtm", "DESC", false, false, false, false, false);
         if (success) {
             this.close();
@@ -284,7 +311,7 @@ export class SearchDlg extends DialogBase {
         }
         SearchDlg.defaultSearchText = this.searchTextState.getValue();
         const desc = "Node ID: " + SearchDlg.defaultSearchText;
-        const success = await S.srch.search(null, "node.id", SearchDlg.defaultSearchText, null, desc, null, false,
+        const success = await S.srch.search(null, null, "node.id", SearchDlg.defaultSearchText, null, desc, null, false,
             false, 0, true, null, null, false, false, false, false, false);
         if (success) {
             this.close();
@@ -426,6 +453,7 @@ export class SearchDlg extends DialogBase {
         }
 
         await S.srch.showDocument(node.id, true, {
+            name: null,
             searchText: this.searchTextState.getValue(),
             fuzzy: state.fuzzy,
             caseSensitive: state.caseSensitive,
@@ -462,7 +490,8 @@ export class SearchDlg extends DialogBase {
             return;
         }
 
-        const success = await S.srch.search(node.id, null, SearchDlg.defaultSearchText, null, desc,
+        const success = await S.srch.search(this.searchNameState.getValue(),
+            node.id, null, SearchDlg.defaultSearchText, null, desc,
             state.searchRoot,
             state.fuzzy,
             state.caseSensitive, 0,
@@ -476,6 +505,7 @@ export class SearchDlg extends DialogBase {
             state.requireDate);
         if (success) {
             this.close();
+            S.util._loadSearchDefs();
         }
     }
 }

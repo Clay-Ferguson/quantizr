@@ -200,7 +200,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return databaseName;
     }
 
-     @Override
+    @Override
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new SubNodeConverter());

@@ -131,7 +131,16 @@ public class MongoTemplateWrapper extends ServiceBase {
         SubNode ret = mt.save(node);
         AccountNode dbRoot = svc_mongoRead.getDbRoot();
         if (dbRoot != null && dbRoot.getId().equals(ret.getId())) {
-            svc_mongoRead.setRootNode((AccountNode)ret);
+            /*
+             * If we happen to be saving something that's NOT a SubNode, we don't want to set the root node to
+             * it, here, because types will be different, but what we do is invalidate by setting to null so it
+             * will be reloaded next time it's needed.
+             */
+            if (ret instanceof AccountNode accountNode) {
+                svc_mongoRead.setRootNode(accountNode);
+            } else {
+                svc_mongoRead.setRootNode(null);
+            }
         }
         return ret;
     }

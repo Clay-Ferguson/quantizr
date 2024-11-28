@@ -171,6 +171,7 @@ export class AppState {
     rssNode: NodeInfo = null;
 
     bookmarks: J.Bookmark[];
+    searchDefs: J.SearchDefinition[]
 
     editNode: NodeInfo;
     afterEditJumpToId: string;

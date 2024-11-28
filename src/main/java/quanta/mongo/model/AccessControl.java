@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class AccessControl {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AccessControl.class);
-    
+
     public static final String FIELD_PRVS = "prvs";
     @Field(FIELD_PRVS)
     private String prvs;
@@ -35,11 +35,11 @@ public class AccessControl {
         this.prvs = prvs;
     }
 
-    public AccessControl(org.bson.Document doc) { 
+    public AccessControl(org.bson.Document doc) {
         if (doc.containsKey(AccessControl.FIELD_PRVS)) {
             setPrvs(doc.getString(AccessControl.FIELD_PRVS));
         }
-        
+
         if (doc.containsKey(AccessControl.FIELD_KEY)) {
             setKey(doc.getString(AccessControl.FIELD_KEY));
         }

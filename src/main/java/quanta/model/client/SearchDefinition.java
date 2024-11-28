@@ -1,6 +1,14 @@
 package quanta.model.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_DEFAULT)
+@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class SearchDefinition {
+    private String name;
     private String searchText;
     private String sortDir;
     private String sortField;
@@ -13,6 +21,54 @@ public class SearchDefinition {
     private boolean requirePriority;
     private boolean requireAttachment;
     private boolean requireDate;
+
+    public SearchDefinition() {}
+
+    public SearchDefinition(org.bson.Document doc) {
+        if (doc.containsKey("name")) {
+            setName(doc.getString("name"));
+        }
+
+        if (doc.containsKey("searchText")) {
+            setSearchText(doc.getString("searchText"));
+        }
+
+        if (doc.containsKey("sortDir")) {
+            setSortDir(doc.getString("sortDir"));
+        }
+
+        if (doc.containsKey("sortField")) {
+            setSortField(doc.getString("sortField"));
+        }
+
+        if (doc.containsKey("searchProp")) {
+            setSearchProp(doc.getString("searchProp"));
+        }
+
+        if (doc.containsKey("fuzzy")) {
+            setFuzzy(doc.getBoolean("fuzzy"));
+        }
+
+        if (doc.containsKey("caseSensitive")) {
+            setCaseSensitive(doc.getBoolean("caseSensitive"));
+        }
+
+        if (doc.containsKey("recursive")) {
+            setRecursive(doc.getBoolean("recursive"));
+        }
+
+        if (doc.containsKey("requirePriority")) {
+            setRequirePriority(doc.getBoolean("requirePriority"));
+        }
+
+        if (doc.containsKey("requireAttachment")) {
+            setRequireAttachment(doc.getBoolean("requireAttachment"));
+        }
+
+        if (doc.containsKey("requireDate")) {
+            setRequireDate(doc.getBoolean("requireDate"));
+        }
+    }
 
     public boolean isRecursive() {
         return recursive;
@@ -88,6 +144,14 @@ public class SearchDefinition {
 
     public String getSearchProp() {
         return this.searchProp;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public void setSearchProp(final String searchProp) {

@@ -751,6 +751,16 @@ export class Util {
         }
     }
 
+    _loadSearchDefs = async () => {
+        const ast = getAs();
+        if (!ast.isAnonUser) {
+            const res = await S.rpcUtil.rpc<J.GetSearchDefsRequest, J.GetSearchDefsResponse>("getSearchDefs", null, true);
+            await promiseDispatch("loadSearchDefs", s => {
+                s.searchDefs = res.searchDefs;
+            });
+        }
+    }
+
     // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
     notifyNodeUpdated(_id: string, type: string) {
         if (type === J.NodeType.BOOKMARK) {

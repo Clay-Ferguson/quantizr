@@ -110,6 +110,7 @@ export interface SchemaOrgRange {
 }
 
 export interface SearchDefinition {
+    name: string;
     searchText: string;
     sortDir: string;
     sortField: string;
@@ -238,6 +239,10 @@ export interface DeletePropertyRequest extends RequestBase {
     propNames: string[];
 }
 
+export interface DeleteSearchDefRequest extends RequestBase {
+    searchDefName: string;
+}
+
 export interface DeleteUserTransactionsRequest extends RequestBase {
     userId: string;
 }
@@ -321,6 +326,9 @@ export interface GetRepliesViewRequest extends RequestBase {
 }
 
 export interface GetSchemaOrgTypesRequest extends RequestBase {
+}
+
+export interface GetSearchDefsRequest extends RequestBase {
 }
 
 export interface GetServerInfoRequest extends RequestBase {
@@ -678,6 +686,10 @@ export interface DeleteNodesResponse extends ResponseBase {
 export interface DeletePropertyResponse extends ResponseBase {
 }
 
+export interface DeleteSearchDefResponse extends ResponseBase {
+    searchDefs: SearchDefinition[];
+}
+
 export interface DeleteUserTransactionsResponse extends ResponseBase {
 }
 
@@ -764,6 +776,10 @@ export interface GetRepliesViewResponse extends ResponseBase {
 
 export interface GetSchemaOrgTypesResponse extends ResponseBase {
     classes: SchemaOrgClass[];
+}
+
+export interface GetSearchDefsResponse extends ResponseBase {
+    searchDefs: SearchDefinition[];
 }
 
 export interface GetServerInfoResponse extends ResponseBase {
@@ -1191,6 +1207,7 @@ export const enum NodeProp {
     DISPLAY_NAME = "sn:displayName",
     USER_BIO = "sn:userBio",
     USER_TAGS = "sn:tags",
+    USER_SEACH_DEFINITIONS = "sn:searchDefs",
     USER_BLOCK_WORDS = "sn:blockWords",
     USER_RECENT_TYPES = "sn:recentTypes",
     PWD_HASH = "sn:pwdHash",

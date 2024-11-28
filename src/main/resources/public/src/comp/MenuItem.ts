@@ -14,9 +14,10 @@ interface LS { // Local State
 export class MenuItem extends Comp {
 
     constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
-        private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null, private floatRightComp: Comp = null) {
+        private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null, private floatRightComps: Comp[] = null) {
         super({ key: name });
         this.mergeState({ visible: true, enabled });
+        this.floatRightComps = this.floatRightComps || [];
     }
 
     override preRender(): boolean | null {
@@ -45,14 +46,14 @@ export class MenuItem extends Comp {
         }
 
         this.children = [
-            innerSpan,
-            this.treeOp || this.floatRightComp ? new Span(null, { className: "float-right" }, [
-                this.floatRightComp,
+            this.treeOp || this.floatRightComps ? new Span(null, { className: "float-right" }, [
+                ...this.floatRightComps,
                 this.treeOp ? new Tag("i", {
                     className: "fa fa-caret-right fa-lg  " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
                     title: "Operates on the selected Tree Nodes(s)",
                 }) : null
             ]) : null,
+            innerSpan,
         ];
 
         if (state.enabled) {

@@ -280,6 +280,55 @@ public class Convert extends ServiceBase {
         return props;
     }
 
+    public static HashMap<String, Object> parseNodeProps(org.bson.Document doc) {
+        HashMap<String, Object> props = new HashMap<>();
+        // process each property to load
+        for (String key : doc.keySet()) {
+            Object obj = doc.get(key);
+            // of obj is an array then iterate each array element
+            if (obj instanceof List) {
+                Class<?> clazz = null;
+                if (NodeProp.USER_SEACH_DEFINITIONS.s().equals(key)) {
+                    clazz = NodeProp.USER_SEACH_DEFINITIONS.getArrayOfType();
+                }
+                List<Object> typedList = new ArrayList<>();
+                // make a list to hold the type-safe objects
+                List<?> list = (List<?>) obj;
+                // scan each Document in the list and convert it to the correct type
+                for (int i = 0; i < list.size(); i++) {
+                    Object item = list.get(i);
+                    // if item is a document then get the _class property from it
+                    if (clazz != null && item instanceof org.bson.Document dItem) {
+                        Object ret = null;
+                        try {
+                            ret = clazz.getConstructor(org.bson.Document.class).newInstance(dItem);
+                            typedList.add(ret);
+                        } catch (Exception e) {
+                            ExUtil.error(log, "failed to load property as type " + clazz.getName() + "\nRaw JSON: "
+                                    + XString.prettyPrint(dItem), e);
+                        }
+                    } else {
+                        // need a warning here? Not typesafe, and left as 'Document' instance.
+                        typedList.add(item);
+                    }
+                }
+                props.put(key, typedList);
+            }
+            // else allow the object to be added to the map from a Document (converted) or any other type
+            else {
+                Object val = doc.get(key);
+                if (val instanceof org.bson.Document dItem) {
+                    // props.put(key, Convert.convertToType(dItem));
+                    log.error("Unable to convert to type: " + dItem);
+                } else {
+                    props.put(key, val);
+                }
+            }
+        }
+        return props;
+
+    }
+
     public PropertyInfo toPropInfo(SessionContext sc, SubNode node, String propName, Object prop,
             boolean initNodeEdit) {
         try {

@@ -6,6 +6,7 @@ import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchDlg } from "./dlg/SearchDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
@@ -139,17 +140,45 @@ export class Search {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
-        this.search(node.id, null, null, null, "Priority Listing", null, false, false, 0, true,
+        this.search(null, node.id, null, null, null, "Priority Listing", null, false, false, 0, true,
             J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false, false);
     }
 
-    async search(nodeId: string, prop: string, searchText: string, searchType: string, description: string,
+    async deleteSearchDef(searchDefName: string) {
+        const dlg = new ConfirmDlg("Confirm Delete Search: " + searchDefName, "Warning");
+        await dlg.open();
+        if (dlg.yes) {
+            const res = await S.rpcUtil.rpc<J.DeleteSearchDefRequest, J.DeleteSearchDefResponse>("deleteSearchDef", {
+                searchDefName
+            });
+            if (res.searchDefs) {
+                dispatch("RenderSearchDefs", s => {
+                    s.searchDefs = res.searchDefs;
+                });
+            }
+        }
+    }
+
+    async runSearchDef(searchDef: J.SearchDefinition) {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (!node) {
+            S.util.showMessage("No node is selected to search under.", "Warning");
+            return;
+        }
+        this.search(null, node.id, searchDef.searchProp, searchDef.searchText, "node.content", searchDef.name,
+            node.id, searchDef.fuzzy, searchDef.caseSensitive, 0, searchDef.recursive, searchDef.sortField,
+            searchDef.sortDir, searchDef.requirePriority, searchDef.requireAttachment, false,
+            true, searchDef.requireDate);
+    }
+
+    async search(name: string, nodeId: string, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
         jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> {
 
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchDefinition: {
+                name,
                 searchText, sortDir, sortField, searchProp: prop, fuzzy, caseSensitive,
                 recursive, requirePriority,
                 requireAttachment,
@@ -296,6 +325,7 @@ export class Search {
         // data property because we need it on the client side
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchDefinition: {
+                name: null,
                 searchText: "", sortDir: "DESC", sortField: prop,
                 searchProp: null, fuzzy: false, caseSensitive: false,
                 recursive,
@@ -636,7 +666,7 @@ export class Search {
         dispatch("findRdfSubjects", _s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
-                S.srch.search(node.id, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RDF Subjects", null, false,
+                this.search(null, node.id, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RDF Subjects", null, false,
                     false, 0, true, null, null, false, false, false, false, false);
             }
         });

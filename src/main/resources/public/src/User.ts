@@ -169,6 +169,7 @@ export class User {
                         this.checkMessages();
                     }
                     S.util._loadBookmarks();
+                    S.util._loadSearchDefs();
                     S.histUtil.loadHistoryData();
                 }, 500);
 

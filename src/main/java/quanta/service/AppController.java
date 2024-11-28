@@ -38,6 +38,7 @@ import quanta.rest.request.DeleteAttachmentRequest;
 import quanta.rest.request.DeleteFriendRequest;
 import quanta.rest.request.DeleteNodesRequest;
 import quanta.rest.request.DeletePropertyRequest;
+import quanta.rest.request.DeleteSearchDefRequest;
 import quanta.rest.request.DeleteUserTransactionsRequest;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.request.GenerateBookByAIRequest;
@@ -51,6 +52,7 @@ import quanta.rest.request.GetNodeStatsRequest;
 import quanta.rest.request.GetOpenGraphRequest;
 import quanta.rest.request.GetPeopleRequest;
 import quanta.rest.request.GetSchemaOrgTypesRequest;
+import quanta.rest.request.GetSearchDefsRequest;
 import quanta.rest.request.GetServerInfoRequest;
 import quanta.rest.request.GetSharedNodesRequest;
 import quanta.rest.request.GetThreadViewRequest;
@@ -731,6 +733,18 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
         return svc_callProc.run("getBookmarks", true, true, req, session, () -> svc_search.cm_getBookmarks(req));
+    }
+
+    @RequestMapping(value = API_PATH + "/getSearchDefs", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getSearchDefs(@RequestBody GetSearchDefsRequest req, HttpSession session) {
+        return svc_callProc.run("getSearchDefs", true, true, req, session, () -> svc_search.cm_getSearchDefs(req));
+    }
+
+    @RequestMapping(value = API_PATH + "/deleteSearchDef", method = RequestMethod.POST)
+    @ResponseBody
+    public Object deleteSearchDef(@RequestBody DeleteSearchDefRequest req, HttpSession session) {
+        return svc_callProc.run("deleteSearchDef", true, true, req, session, () -> svc_search.cm_deleteSearchDef(req));
     }
 
     @RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)

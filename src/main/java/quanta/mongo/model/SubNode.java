@@ -31,6 +31,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.util.Convert;
 import quanta.util.ExUtil;
 import quanta.util.TL;
 import quanta.util.Util;
@@ -180,11 +181,9 @@ public class SubNode {
 
         if (doc.containsKey(SubNode.PROPS)) {
             org.bson.Document d = doc.get(SubNode.PROPS, org.bson.Document.class);
+            // if we have PROPS
             if (d != null) {
-                props = new HashMap<>();
-                for (String key : d.keySet()) {
-                    props.put(key, d.get(key));
-                }
+                props = Convert.parseNodeProps(d);
             }
         }
 

@@ -606,6 +606,7 @@ export class Render {
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchDefinition: {
+                name: null,
                 searchText,
                 sortDir: null,
                 sortField: null,
@@ -711,7 +712,7 @@ export class Render {
                         title: "RDF: Click to Find Objects",
                         className: "nodeLink",
                         onClick: () => {
-                            S.srch.search(node.id, null, link.name, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + link.name, null, false,
+                            S.srch.search(null, node.id, null, link.name, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + link.name, null, false,
                                 false, 0, true, null, null, false, false, false, true, false);
                         }
                     }));

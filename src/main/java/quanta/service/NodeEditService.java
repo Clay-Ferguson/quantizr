@@ -1,6 +1,5 @@
 package quanta.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,17 +12,13 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
-import quanta.model.AIResponse;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
-import quanta.model.UserPreferences;
-import quanta.model.client.AIModel;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.SystemConfig;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
@@ -53,7 +48,6 @@ import quanta.util.SubNodeUtil;
 import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
-import quanta.util.val.Val;
 
 /**
  * Service for editing content of nodes. That is, this method updates property values of nodes. As
@@ -568,7 +562,6 @@ public class NodeEditService extends ServiceBase {
         MongoTranMgr.ensureTran();
         SaveNodeJsonResponse res = new SaveNodeJsonResponse();
         TL.requireAdmin();
-
         try {
             SubNode n = Util.simpleMapper.readValue(req.getJson(), SubNode.class);
             svc_arun.run(() -> {
