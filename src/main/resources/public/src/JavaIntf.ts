@@ -36,7 +36,7 @@ export interface ClientConfig {
     displayUserProfileId: string;
     initialNodeId: string;
     urlView: string;
-    search: string; // todo-0: still used? (this was part of doing searches of feed tab which is no longer supported)
+    search: string;
     login: string;
     paymentLink: string;
     aiAgentEnabled: boolean;
