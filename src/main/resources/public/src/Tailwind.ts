@@ -43,9 +43,9 @@ export class Tailwind {
     static alertDanger = "bg-red-400 border border-red-400 text-white px-4 py-3 rounded relative";
     static alertInfo = "bg-blue-400 border border-blue-200 text-white px-4 py-3 rounded relative"
 
-    static formControl = "text-base block w-full bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-2 focus:outline-none focus:ring-1 focus:ring-green-400";
+    static formControl = "text-base block w-full bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-1 focus:outline-none focus:ring-1 focus:ring-green-400";
 
     // same as formControl but withou w-full
-    static formControlFit = "text-base block bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-2 focus:outline-none focus:ring-1 focus:ring-green-400";
+    static formControlFit = "text-base block bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-1 focus:outline-none focus:ring-1 focus:ring-green-400";
 }
 
