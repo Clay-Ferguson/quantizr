@@ -70,7 +70,13 @@ public class NodeSearchService extends ServiceBase {
     private static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
     public RenderDocumentResponse cm_renderDocument(RenderDocumentRequest req) {
+        SearchDefinition def = req.getSearchDefinition();
+        if (def != null && !StringUtils.isEmpty(def.getName())) {
+            saveSearchDefinition(def);
+        }
+
         RenderDocumentResponse res = new RenderDocumentResponse();
+
         List<NodeInfo> results = new LinkedList<>();
         res.setSearchResults(results);
         SubNode node = svc_mongoRead.getNode(req.getRootId());
@@ -96,7 +102,6 @@ public class NodeSearchService extends ServiceBase {
 
     public NodeSearchResponse cm_search(NodeSearchRequest req) {
         SearchDefinition def = req.getSearchDefinition();
-
         if (def != null && !StringUtils.isEmpty(def.getName())) {
             saveSearchDefinition(def);
         }

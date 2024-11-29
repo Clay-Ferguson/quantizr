@@ -616,7 +616,8 @@ export class Render {
                 recursive: true,
                 requirePriority: false,
                 requireAttachment: false,
-                requireDate: false
+                requireDate: false,
+                displayLayout: "doc"
             },
             nodeId: node.id
         });

@@ -121,6 +121,7 @@ export interface SearchDefinition {
     requirePriority: boolean;
     requireAttachment: boolean;
     requireDate: boolean;
+    displayLayout: string;
 }
 
 export interface SystemConfig {

@@ -182,7 +182,8 @@ export class Search {
                 searchText, sortDir, sortField, searchProp: prop, fuzzy, caseSensitive,
                 recursive, requirePriority,
                 requireAttachment,
-                requireDate
+                requireDate,
+                displayLayout: "list"
             },
             searchRoot,
             page,
@@ -331,7 +332,8 @@ export class Search {
                 recursive,
                 requirePriority: false,
                 requireAttachment: false,
-                requireDate: false
+                requireDate: false,
+                displayLayout: "list"
             },
             searchRoot: null,
             page,

@@ -21,6 +21,7 @@ public class SearchDefinition {
     private boolean requirePriority;
     private boolean requireAttachment;
     private boolean requireDate;
+    private String displayLayout; // list, doc, etc
 
     public SearchDefinition() {}
 
@@ -67,6 +68,10 @@ public class SearchDefinition {
 
         if (doc.containsKey("requireDate")) {
             setRequireDate(doc.getBoolean("requireDate"));
+        }
+
+        if (doc.containsKey("displayLayout")) {
+            setDisplayLayout(doc.getString("displayLayout"));
         }
     }
 
@@ -156,5 +161,13 @@ public class SearchDefinition {
 
     public void setSearchProp(final String searchProp) {
         this.searchProp = searchProp;
+    }
+
+    public String getDisplayLayout() {
+        return displayLayout;
+    }
+
+    public void setDisplayLayout(String displayLayout) {
+        this.displayLayout = displayLayout;
     }
 }

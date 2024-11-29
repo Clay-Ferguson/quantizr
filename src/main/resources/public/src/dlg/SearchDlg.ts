@@ -83,6 +83,7 @@ export class SearchDlg extends DialogBase {
             requirePriority: searchDef.requirePriority,
             requireAttachment: searchDef.requireAttachment,
             requireDate: searchDef.requireDate,
+            displayLayout: searchDef.displayLayout,
         });
         this.searchTextState.setValue(searchDef.searchText);
         this.searchNameState.setValue(searchDef.name);
@@ -91,7 +92,7 @@ export class SearchDlg extends DialogBase {
     renderDlg(): Comp[] {
         let mainDiv = null;
         const state = this.getState<LS>();
-        const savableSearch = state.displayLayout === "list";
+        const savableSearch = state.displayLayout === "list" || state.displayLayout === "doc";
         switch (state.searchType) {
             case "node.content":
                 mainDiv = this.buildContentSearch(savableSearch);
@@ -453,7 +454,7 @@ export class SearchDlg extends DialogBase {
         }
 
         await S.srch.showDocument(node.id, true, {
-            name: null,
+            name: this.searchNameState.getValue(),
             searchText: this.searchTextState.getValue(),
             fuzzy: state.fuzzy,
             caseSensitive: state.caseSensitive,
@@ -463,9 +464,13 @@ export class SearchDlg extends DialogBase {
             requirePriority: requirePriority,
             requireAttachment: state.requireAttachment,
             requireDate: state.requireDate,
-            searchProp: null
+            searchProp: null,
+            displayLayout: state.displayLayout
         });
 
+        if (this.searchNameState.getValue()) {
+            S.util._loadSearchDefs();
+        }
         this.close();
     }
 
@@ -505,7 +510,10 @@ export class SearchDlg extends DialogBase {
             state.requireDate);
         if (success) {
             this.close();
-            S.util._loadSearchDefs();
+
+            if (this.searchNameState.getValue()) {
+                S.util._loadSearchDefs();
+            }
         }
     }
 }
