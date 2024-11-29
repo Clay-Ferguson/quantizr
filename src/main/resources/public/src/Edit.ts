@@ -876,23 +876,21 @@ export class Edit {
         S.util.showMessage("Request sumitted. Check the node for property " + J.NodeProp.SUBGRAPH_HASH);
     }
 
-    async joinNodes(joinToParent: boolean = false) {
+    _joinNodes = async () => {
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray();
-        if (!selNodesArray || selNodesArray.length === 0) {
-            S.util.showMessage("Select some nodes to " + (joinToParent ? "append" : "join") + ".", "Warning");
+        if (!selNodesArray || selNodesArray.length < 2) {
+            S.util.showMessage("Select nodes to join.", "Warning");
             return;
         }
 
         const confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        const dlg = new ConfirmDlg(confirmMsg, joinToParent ? "Confirm Append" : "Confirm Join");
+        const dlg = new ConfirmDlg(confirmMsg, "Confirm Join");
         await dlg.open();
         if (dlg.yes) {
             const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
-                nodeIds: selNodesArray,
-                joinToParent
+                nodeIds: selNodesArray
             });
             const ast = getAs();
-
             if (S.util.checkSuccess("Join node", res)) {
                 S.nodeUtil._clearSelNodes();
                 S.view.refreshTree({

@@ -68,8 +68,6 @@ export class MenuPanel extends Comp {
     static subgraphHash = () => { S.edit._subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
-    static joinNodes = () => { S.edit.joinNodes(false); }
-    static joinNodesToParent = () => { S.edit.joinNodes(true); }
     static showPublicWritableShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null); }
@@ -328,13 +326,10 @@ export class MenuPanel extends Comp {
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-                new Menu("Multi-Node", [
-                    new MenuItem("Split", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
-                    new MenuItem("Join", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
-                    new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
-                ], null, null, null, true),
                 ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
                 new MenuItem("Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Split", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Join", S.edit._joinNodes, onMainTab && selNodeIsMine, null, true), //
                 new MenuItemSeparator(), //
                 new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //

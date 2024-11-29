@@ -155,7 +155,10 @@ public class NodeMoveService extends ServiceBase {
 
     /*
      * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
-     * one we keep and join to.
+     * one we keep and join to. If we are joining to a parent, we merge all the NodeIds onto the parent.
+     * We automatically detect the case where all the nodes are already under the same parent, and the
+     * parent has been sent as one of the nodes to join, and in that case we join all the nodes to the
+     * parent.
      * 
      * If join to parent is true, that means we merge all the NodeIds onto their parent.
      */
@@ -164,64 +167,99 @@ public class NodeMoveService extends ServiceBase {
         LinkedList<String> delIds = new LinkedList<>();
         // add to list because we will sort
         ArrayList<SubNode> nodes = new ArrayList<SubNode>();
-        String parentPath = null;
 
-        // scan all nodes to verify we own them all, and they're all under same parent, and load all into
-        // 'nodes'
+        String parentPath1 = null;
+        SubNode node1 = null;
+        String parentPath2 = null;
+        SubNode node2 = null;
+        boolean joinToParent = false;
+
+        // first load all nodes and make sure we own all.
         for (String nodeId : req.getNodeIds()) {
             SubNode node = svc_mongoRead.getNode(nodeId);
-            if (parentPath == null) {
-                parentPath = node.getParentPath();
-            } //
-            else if (!req.isJoinToParent() && !parentPath.equals(node.getParentPath())) {
-                res.error("Failed: All nodes must be under the same parent node.");
-                return res;
-            }
             svc_auth.ownerAuth(node);
-            if (svc_mongoRead.hasChildren(node)) {
-                res.error("Failed. Nodes to be joined cannot have any children/subnodes");
-                return res;
-            }
             nodes.add(node);
         }
 
-        nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
-        StringBuilder sb = new StringBuilder();
-        SubNode targetNode = null;
-        int counter = 0;
+        for (SubNode node : nodes) {
+            String thisParentPath = node.getParentPath();
 
-        for (SubNode n : nodes) {
-            if (targetNode == null) {
-                if (req.isJoinToParent()) {
-                    targetNode = svc_mongoRead.getParent(n);
-                    if (targetNode == null) {
-                        throw new RuntimeEx("Failed to find parent of node: " + n.getIdStr());
+            // if no first parentPath, set it to this node's parentPath
+            if (parentPath1 == null) {
+                parentPath1 = thisParentPath;
+                node1 = node;
+            } else {
+                // If no second parentPath, and this path is different from first, it's now the second path
+                if (parentPath2 == null) {
+                    // if we have no second path yet and this one is indeed different it's now the second path
+                    if (!parentPath1.equals(thisParentPath)) {
+                        parentPath2 = thisParentPath;
+                        node2 = node;
                     }
-                } else {
-                    targetNode = n;
+                }
+                // If we have two paths already, maire sure this path is one of them, or else we have a total of
+                // three which is not allowed.
+                else {
+                    if (!parentPath1.equals(thisParentPath) && !parentPath2.equals(thisParentPath)) {
+                        res.error("Failed: All nodes must be under the same parent node.");
+                        return res;
+                    }
                 }
             }
-            if (counter > 0) {
-                sb.append("\n");
+        }
+
+        SubNode targetNode = null;
+        if (parentPath2 != null) {
+            joinToParent = true;
+            // whichever path is shorter (in terms of path components) as separated by slashes, is the target
+            // node.
+            if (parentPath1.split("/").length < parentPath2.split("/").length) {
+                targetNode = node1;
+            } else {
+                targetNode = node2;
             }
+            // remove targetNode from nodes, because we will be joining all nodes to it.
+            nodes.remove(targetNode);
+        }
+
+        // nodes can be sorted by ordinal, because they're all under the same parent now.
+        nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
+
+        int counter = 0;
+
+        // scan nodes to check for children
+        for (SubNode node : nodes) {
+            /*
+             * Note we allow parents on the first node, because that one will be the target node, and will not
+             * be deleted, and if we're joining to parent then in that case we check make sure no nodes have
+             * children.
+             */
+            if ((counter > 0 || joinToParent) && svc_mongoRead.hasChildren(node)) {
+                res.error("Failed. Nodes to be joined cannot have any children/subnodes");
+                return res;
+            }
+            counter++;
+        }
+        StringBuilder sb = new StringBuilder();
+
+        // process all nodes to append their content to the target node.
+        for (SubNode n : nodes) {
+            if (targetNode == null) {
+                targetNode = n;
+                continue;
+            }
+            sb.append("\n");
             if (!StringUtils.isEmpty(n.getContent())) {
                 // trim and add ONE new line, for consistency.
                 sb.append(n.getContent().trim());
                 sb.append("\n");
             }
-            // counter > 0 means we have a firstNode but are NOT now processing first node.
-            if (counter > 0 || req.isJoinToParent()) {
-                svc_attach.mergeAttachments(n, targetNode);
-                delIds.add(n.getIdStr());
-            }
-            counter++;
+
+            svc_attach.mergeAttachments(n, targetNode);
+            delIds.add(n.getIdStr());
         }
 
-        if (req.isJoinToParent()) {
-            targetNode.setContent(targetNode.getContent() + "\n\n" + sb.toString());
-        } else {
-            targetNode.setContent(sb.toString());
-        }
+        targetNode.setContent(targetNode.getContent() + "\n\n" + sb.toString());
         targetNode.touch();
         nodesModified.add(targetNode.getIdStr());
         svc_mongoUpdate.saveSession();

@@ -390,7 +390,6 @@ export interface InsertNodeRequest extends RequestBase {
 
 export interface JoinNodesRequest extends RequestBase {
     nodeIds: string[];
-    joinToParent: boolean;
 }
 
 export interface LikeNodeRequest extends RequestBase {
