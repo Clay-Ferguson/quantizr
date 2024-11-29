@@ -16,7 +16,6 @@ import { FeedTab } from "./tabs/data/FeedTab";
 import { StatisticsTab } from "./tabs/data/StatisticsTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
-import { StatisticsView } from "./tabs/StatisticsView";
 
 export class Quanta {
     // initialized in main.ts
@@ -322,12 +321,7 @@ export class Quanta {
         }
 
         if (initialTab === C.TAB_FEED) {
-            if (S.quanta.config.search) {
-                StatisticsView._searchWord(null, S.quanta.config.search);
-            }
-            else {
-                S.tabUtil.selectTab(initialTab);
-            }
+            S.tabUtil.selectTab(initialTab);
             return;
         }
 

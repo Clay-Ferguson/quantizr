@@ -8,7 +8,7 @@ import { StatisticsRSInfo } from "../../StatisticsRSInfo";
 import { StatisticsView } from "../StatisticsView";
 
 export class StatisticsTab extends TabBase<StatisticsRSInfo> {
-    name = "Node Stats";
+    name = "Node Info";
     tooltip = "Statistics about the node and its children";
     id = C.TAB_STATS;
     props = new StatisticsRSInfo();

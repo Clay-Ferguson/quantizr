@@ -147,7 +147,9 @@ export class MenuPanel extends Comp {
             S.srch.showThread(node.id);
         }
     };
-    static nodeStats = () => S.view.getNodeStats();
+    static nodeStats = () => S.view.getNodeStats(false, false);
+    static uniqueWords = () => S.view.getNodeStats(true, false);
+    static uniqueTags = () => S.view.getNodeStats(false, true);
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signAllSubGraph = () => S.view.signSubGraph(false);
     static signUnsignedSubGraph = () => S.view.signSubGraph(true);
@@ -262,6 +264,8 @@ export class MenuPanel extends Comp {
                 ], null, null, null, true),
 
                 new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
+                new MenuItem("Unique Tags", MenuPanel.uniqueTags, onMainTab, null, true), //
+                new MenuItem("Unique Words", MenuPanel.uniqueWords, onMainTab, null, true), //
 
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
@@ -380,7 +384,7 @@ export class MenuPanel extends Comp {
                 // I decided with this on the toolbar we don't need it repliated here.
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
                 new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
-                new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
+                new MenuItem("Node Info", MenuPanel.nodeStats, onMainTab, null, true), //
                 new MenuItemSeparator(), //
 
                 new Menu("Import From", [

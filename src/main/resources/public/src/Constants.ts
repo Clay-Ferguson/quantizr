@@ -16,7 +16,6 @@ export class Constants {
     static DOM_ID_ATTR = "data-domid";
     static USER_ID_ATTR = "data-usrid";
     static TAB_ID_ATTR = "data-tab";
-    static WORD_ATTR = "data-word";
     static ARROW_OPTION_ATTR = "data-arrow-option";
 
     static DND_TYPE_NODEID = "nodeid"; // keep lowercase

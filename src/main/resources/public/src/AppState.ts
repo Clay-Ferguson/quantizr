@@ -171,7 +171,7 @@ export class AppState {
     rssNode: NodeInfo = null;
 
     bookmarks: J.Bookmark[];
-    searchDefs: J.SearchDefinition[]
+    searchDefs: J.SearchDefinition[];
 
     editNode: NodeInfo;
     afterEditJumpToId: string;
@@ -218,6 +218,7 @@ export class AppState {
 
     expandedMenus: Set<string> = new Set<string>();
     expandedCodeBlocks = new Set<string>();
+    wordSelections = new Set<string>; // hashtags or words in info view
 
     menuIndexToggle: string = "menu";
     showGptCredit: boolean = false;

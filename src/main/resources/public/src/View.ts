@@ -304,16 +304,20 @@ export class View {
         });
     }
 
-    async getNodeStats(): Promise<any> {
+    async getNodeStats(getWords: boolean, getTags: boolean): Promise<any> {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node.id,
-            getWords: true,
-            getTags: true,
+            getWords,
+            getTags,
             signatureVerify: false
         });
 
         dispatch("showNodeStats", s => {
+            // if we requested words or tags then discard the stats data (there's a separate method to display stats)
+            if (getWords || getTags) {
+                res.stats = null;
+            }
             // lookup data for TAB_STATS and set the data with res
             const data: TabBase = S.tabUtil.getAppTabData(C.TAB_STATS);
             data.props.res = res;
