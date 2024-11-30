@@ -516,20 +516,29 @@ public class NodeEditService extends ServiceBase {
             cachedChanges++;
         }
 
+        Iterable<SubNode> nodes = null;
+
         // todo-0: we need an option for only top level nodes, in addition to recursive.
-        if (req.isRecursive()) {
-            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
-                if (processHashtags(n, req.getHashtags(), req.getAction())) {
-                    changes++;
-                    cachedChanges++;
-                    // save session immediately every time we get up to 100 pending updates cached.
-                    if (cachedChanges >= 100) {
-                        cachedChanges = 0;
-                        svc_mongoUpdate.saveSession();
-                    }
+        if (req.getTargetSet().equals("recursive")) {
+            nodes = svc_mongoRead.getSubGraph(node, null, 0, false, null);
+        } else if (req.getTargetSet().equals("children")) {
+            nodes = svc_mongoRead.getChildren(node, null, null, 0);
+        } else {
+            throw new RuntimeEx("Invalid targetSet: " + req.getTargetSet());
+        }
+
+        for (SubNode n : nodes) {
+            if (processHashtags(n, req.getHashtags(), req.getAction())) {
+                changes++;
+                cachedChanges++;
+                // save session immediately every time we get up to 100 pending updates cached.
+                if (cachedChanges >= 100) {
+                    cachedChanges = 0;
+                    svc_mongoUpdate.saveSession();
                 }
             }
         }
+
         svc_mongoUpdate.saveSession();
         res.setMessage(String.valueOf(changes) + " nodes were updated.");
         return res;
@@ -573,6 +582,12 @@ public class NodeEditService extends ServiceBase {
     }
 
     private boolean processHashtags(SubNode node, String hashtags, String action) {
+        if (action.equals("clearAllHashtags")) {
+            node.setTags(null);
+            node.touch();
+            return true;
+        }
+
         if (hashtags == null || hashtags.trim().length() == 0) {
             return false;
         }

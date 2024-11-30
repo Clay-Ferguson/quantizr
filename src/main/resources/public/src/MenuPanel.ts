@@ -7,7 +7,7 @@ import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
-import { ModifySubGraphDlg } from "./dlg/ModifySubGraphDlg";
+import { ModifyHashtags } from "./dlg/ModifyHashtagsDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchDlg } from "./dlg/SearchDlg";
@@ -68,7 +68,7 @@ export class MenuPanel extends Comp {
     static reclaimTransfer = () => { new TransferNodeDlg(J.TransferOp.RECLAIM).open(); };
     static subgraphHash = () => { S.edit._subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
-    static modifySubGraph = () => { new ModifySubGraphDlg().open(); };
+    static modifyHashtags = () => { new ModifyHashtags().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static showPublicWritableShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.READ); }
@@ -333,7 +333,7 @@ export class MenuPanel extends Comp {
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
                 ast.isAdminUser ? new MenuItem("Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
-                new MenuItem("Modify", MenuPanel.modifySubGraph, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Hashtags", MenuPanel.modifyHashtags, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Split", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Join", S.edit._joinNodes, onMainTab && selNodeIsMine, null, true), //

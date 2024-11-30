@@ -1,7 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
@@ -11,30 +10,42 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
 interface LS { // Local State
-    recursive?: boolean;
-    action?: "addHashtags" | "removeHashtags";
+    action?: "addHashtags" | "removeHashtags" | "clearAllHashtags";
+    targetSet?: "children" | "recursive";
 }
 
-export class ModifySubGraphDlg extends DialogBase {
+export class ModifyHashtags extends DialogBase {
     hashtags: Validator = new Validator();
 
     constructor() {
-        super("Modify SubGraph", "appModalContNarrowWidth");
-        this.mergeState<LS>({ recursive: true, action: "addHashtags" });
+        super("Modify Hashtags", "appModalContNarrowWidth");
+        this.mergeState<LS>({ targetSet: "recursive", action: "addHashtags" });
     }
 
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
                 new TextField({ label: "Hashtags", val: this.hashtags }),
-                new Div(null, { className: "mt-3" }, [
-                    new Checkbox("Include Sub-Nodes", null, {
-                        setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
-                        getValue: (): boolean => this.getState<LS>().recursive
-                    })
-                ]),
                 new RadioButtonGroup([
-                    new RadioButton("Add Hashtags", false, "actionGroup", null, {
+                    new RadioButton("Recursive", true, "targetSetGroup", null, {
+                        setValue: (checked: boolean) => {
+                            if (checked) {
+                                this.mergeState<LS>({ targetSet: "recursive" });
+                            }
+                        },
+                        getValue: (): boolean => this.getState<LS>().targetSet === "recursive"
+                    }),
+                    new RadioButton("Children Only", false, "targetSetGroup", null, {
+                        setValue: (checked: boolean) => {
+                            if (checked) {
+                                this.mergeState<LS>({ targetSet: "children" });
+                            }
+                        },
+                        getValue: (): boolean => this.getState<LS>().targetSet === "children"
+                    }),
+                ], "formGrpBorder modifyActionsRadioButtonGroup"),
+                new RadioButtonGroup([
+                    new RadioButton("Add", false, "actionGroup", null, {
                         setValue: (checked: boolean) => {
                             if (checked) {
                                 this.mergeState<LS>({ action: "addHashtags" });
@@ -42,13 +53,21 @@ export class ModifySubGraphDlg extends DialogBase {
                         },
                         getValue: (): boolean => this.getState<LS>().action === "addHashtags"
                     }),
-                    new RadioButton("Remove Hashtags", true, "actionGroup", null, {
+                    new RadioButton("Remove", true, "actionGroup", null, {
                         setValue: (checked: boolean) => {
                             if (checked) {
                                 this.mergeState<LS>({ action: "removeHashtags" });
                             }
                         },
                         getValue: (): boolean => this.getState<LS>().action === "removeHashtags"
+                    }),
+                    new RadioButton("Clear All", true, "actionGroup", null, {
+                        setValue: (checked: boolean) => {
+                            if (checked) {
+                                this.mergeState<LS>({ action: "clearAllHashtags" });
+                            }
+                        },
+                        getValue: (): boolean => this.getState<LS>().action === "clearAllHashtags"
                     })
                 ], "formGrpBorder modifyActionsRadioButtonGroup"),
                 new ButtonBar([
@@ -68,7 +87,7 @@ export class ModifySubGraphDlg extends DialogBase {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
-        S.srch.modifySubGraph(this.getState<LS>().recursive, node.id, this.hashtags.getValue(), this.getState<LS>().action);
+        S.srch.modifySubGraph(this.getState<LS>().targetSet, node.id, this.hashtags.getValue(), this.getState<LS>().action);
         this.close();
     }
 }

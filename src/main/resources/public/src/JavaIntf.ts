@@ -418,7 +418,7 @@ export interface LogoutRequest extends RequestBase {
 }
 
 export interface ModifySubGraphRequest extends RequestBase {
-    recursive: boolean;
+    targetSet: string;
     nodeId: string;
     hashtags: string;
     action: string;

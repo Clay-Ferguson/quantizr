@@ -625,9 +625,9 @@ export class Search {
         });
     }
 
-    async modifySubGraph(recursive: boolean, nodeId: string, hashtags: string, action: string) {
+    async modifySubGraph(targetSet: string, nodeId: string, hashtags: string, action: string) {
         const res = await S.rpcUtil.rpc<J.ModifySubGraphRequest, J.ModifySubGraphResponse>("modifySubGraph", {
-            recursive,
+            targetSet,
             nodeId,
             hashtags,
             action
