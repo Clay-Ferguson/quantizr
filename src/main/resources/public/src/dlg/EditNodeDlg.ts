@@ -767,7 +767,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     _selectTags = async () => {
-        const dlg = new SelectTagsDlg("edit", this.tagsState.getValue(), false);
+        const dlg = new SelectTagsDlg("edit", this.tagsState.getValue(), false, getAs().editNode.id);
         await dlg.open();
         this.addTagsToTextField(dlg);
     }

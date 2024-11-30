@@ -20,7 +20,10 @@ import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
-import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
+import { SelectTagsDlg } from "./SelectTagsDlg";
+
+// todo-0: Need to retest searchRoot (account root vs. current node root), and make this class consistent about whether searchRoot
+// is a string (ID) or a NodeInfo
 
 interface LS { // Local State
     searchRoot?: string;
@@ -157,7 +160,7 @@ export class SearchDlg extends DialogBase {
         return new Div(null, null, [
             new Div(null, null, [
                 this.searchTextField = new TextField({
-                    label: "Enter Search Text",
+                    label: "Search Text",
                     enter: () => this.search(false),
                     val: this.searchTextState
                 })
@@ -345,6 +348,7 @@ export class SearchDlg extends DialogBase {
     }
 
     createSearchFieldIconButtons(): Comp {
+        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         return new ButtonBar([
             new Button("Clear", () => {
                 this.searchTextState.setValue("");
@@ -353,40 +357,14 @@ export class SearchDlg extends DialogBase {
                 })
             }),
             !getAs().isAnonUser ? new Button("Hashtags", async () => {
-                const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true);
+                const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true, node?.id);
                 await dlg.open();
-                this.addTagsToSearchField(dlg);
+                SearchDlg.defaultSearchText = dlg.addTagsToString(this.searchTextState.getValue());
+                this.searchTextState.setValue(SearchDlg.defaultSearchText);
             }, {
                 title: "Select Hashtags to Search"
             }, "-primary", "fa-tag fa-lg") : null
         ], "float-right mt-2");
-    }
-
-    addTagsToSearchField(dlg: SelectTagsDlg) {
-        let val = this.searchTextState.getValue();
-        val = val.trim();
-
-        dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(mtag => {
-            const amtags: string[] = mtag.split(" ");
-            amtags.forEach(tag => {
-                if (!tag) return;
-                tag = tag.trim();
-                if (!tag) return;
-
-                // if tag is alread in quotes remove the quotes
-                if (tag.startsWith("\"") && tag.endsWith("\"")) {
-                    tag = tag.substring(1, tag.length - 1);
-                }
-
-                const quoteTag = "\"" + tag + "\"";
-                if (val.indexOf(quoteTag) == -1) {
-                    if (val) val += " ";
-                    val += quoteTag;
-                }
-            });
-        });
-
-        this.searchTextState.setValue(SearchDlg.defaultSearchText = val);
     }
 
     _searchGraphLayout = () => {

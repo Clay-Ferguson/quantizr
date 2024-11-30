@@ -5,11 +5,9 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
 
 export interface LS { // Local State
     tags: Tag[];
@@ -28,10 +26,10 @@ interface Tag {
 
 export class SelectTagsDlg extends DialogBase {
     indenting = false;
-    editFieldState: Validator = new Validator();
+    // editFieldState: Validator = new Validator();
 
     /* modeOption = search | edit */
-    constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean) {
+    constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean, private rootNodeId: string) {
         super("Add Hashtags", "appModalContMediumWidth");
 
         this.mergeState<LS>({
@@ -77,13 +75,15 @@ export class SelectTagsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                new TextField({
-                    label: "Tag",
-                    outterClass: "noPaddingRight mb-3",
-                    val: this.editFieldState,
-                    labelClass: "txtFieldLabelShort"
-                }),
-                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "float-right" }, {
+                // todo-0: update User Guide that this edit field is gone.
+                // Leaving this for now, but I'm pretty sure it's not needed.
+                // new TextField({
+                //     label: "Tag",
+                //     outterClass: "noPaddingRight mb-3",
+                //     val: this.editFieldState,
+                //     labelClass: "txtFieldLabelShort"
+                // }),
+                this.allowSuggestTags && this.rootNodeId ? new Checkbox("Suggest Tags", { className: "float-right" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState<LS>().suggestedTags.length === 0) {
@@ -106,10 +106,8 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     _updateSuggestTags = async () => {
-        const node = getAs().node;
-
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
-            nodeId: node ? node.id : null,
+            nodeId: this.rootNodeId,
             getWords: false,
             getTags: true,
             signatureVerify: false
@@ -178,10 +176,10 @@ export class SelectTagsDlg extends DialogBase {
                 div.addChild(new Heading(4, "Suggestions", { className: "mt-3" }));
 
                 state.suggestedTags.forEach(tagObj => {
-                    // don't duplicate any we've already added above
-                    if (state.tags.find(o => o.tag === tagObj.tag)) {
-                        return;
-                    }
+                    // NOTE: We choose to NOT do this so that the suggestions are complete and represent what's available.
+                    // if (state.tags.find(o => o.tag === tagObj.tag)) {
+                    //     return;
+                    // }
                     this.processAddCheckboxOrHeading(div, tagObj);
                 });
             }
@@ -224,10 +222,10 @@ export class SelectTagsDlg extends DialogBase {
 
     _select = () => {
         const state = this.getState<LS>();
-        const editVal = this.editFieldState.getValue();
-        if (editVal) {
-            state.selectedTags.add(editVal);
-        }
+        // const editVal = this.editFieldState.getValue();
+        // if (editVal) {
+        //     state.selectedTags.add(editVal);
+        // }
         this.mergeState(state);
         this.close();
     }
@@ -240,5 +238,32 @@ export class SelectTagsDlg extends DialogBase {
         await S.edit._editHashtags();
         const tags = this.parseTags();
         this.mergeState({ tags });
+    }
+
+    // Adds the selected tags to a pre-existing string of tags, without duplicating any.
+    addTagsToString(val: string) {
+        val = val.trim();
+
+        this.getState<LS>().selectedTags.forEach(mtag => {
+            const amtags: string[] = mtag.split(" ");
+            amtags.forEach(tag => {
+                if (!tag) return;
+                tag = tag.trim();
+                if (!tag) return;
+
+                // if tag is alread in quotes remove the quotes
+                if (tag.startsWith("\"") && tag.endsWith("\"")) {
+                    tag = tag.substring(1, tag.length - 1);
+                }
+
+                const quoteTag = "\"" + tag + "\"";
+                if (val.indexOf(quoteTag) == -1) {
+                    if (val) val += " ";
+                    val += quoteTag;
+                }
+            });
+        });
+
+        return val;
     }
 }

@@ -160,6 +160,10 @@ export class Search {
     }
 
     async runSearchDef(searchDef: J.SearchDefinition) {
+        // todo-0:make searchRoot part of Search Defiition
+        // switch (searchDef.searchRoot) {
+        //     case J.Constant.SEARCH_CUR_NODE // Current Node
+        //     case J.Constant.SEARCH_ALL_NODES // My Account
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");

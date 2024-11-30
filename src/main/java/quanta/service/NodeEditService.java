@@ -517,8 +517,6 @@ public class NodeEditService extends ServiceBase {
         }
 
         Iterable<SubNode> nodes = null;
-
-        // todo-0: we need an option for only top level nodes, in addition to recursive.
         if (req.getTargetSet().equals("recursive")) {
             nodes = svc_mongoRead.getSubGraph(node, null, 0, false, null);
         } else if (req.getTargetSet().equals("children")) {

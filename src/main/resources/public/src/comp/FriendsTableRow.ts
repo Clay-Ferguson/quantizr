@@ -87,7 +87,7 @@ export class FriendsTableRow extends ListBoxRow {
     }
 
     editTags = async () => {
-        const dlg = new SelectTagsDlg("edit", this.friend.tags, false);
+        const dlg = new SelectTagsDlg("edit", this.friend.tags, false, null);
         await dlg.open();
         this.addTags(dlg);
     }

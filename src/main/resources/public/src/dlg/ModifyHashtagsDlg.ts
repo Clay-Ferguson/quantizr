@@ -8,6 +8,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
     action?: "addHashtags" | "removeHashtags" | "clearAllHashtags";
@@ -23,9 +24,20 @@ export class ModifyHashtags extends DialogBase {
     }
 
     renderDlg(): Comp[] {
+        const node = S.nodeUtil.getHighlightedNode();
         return [
             new Div(null, null, [
                 new TextField({ label: "Hashtags", val: this.hashtags }),
+                new Button("Hashtags", async () => {
+                    const dlg = new SelectTagsDlg("search", this.hashtags.getValue(), true, node?.id);
+                    await dlg.open();
+                    let val = dlg.addTagsToString(this.hashtags.getValue());
+                    // remove all double quotes from val
+                    val = val.replace(/"/g, "");
+                    this.hashtags.setValue(val);
+                }, {
+                    title: "Select Hashtags to Search"
+                }, "-primary mb-3", "fa-tag fa-lg"),
                 new RadioButtonGroup([
                     new RadioButton("Recursive", true, "targetSetGroup", null, {
                         setValue: (checked: boolean) => {
@@ -87,6 +99,9 @@ export class ModifyHashtags extends DialogBase {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
+        let val = this.hashtags.getValue();
+        // remove all double quotes from val
+        val = val.replace(/"/g, "");
         S.srch.modifySubGraph(this.getState<LS>().targetSet, node.id, this.hashtags.getValue(), this.getState<LS>().action);
         this.close();
     }
