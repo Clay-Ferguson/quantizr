@@ -7,7 +7,7 @@ import quanta.rest.request.base.RequestBase;
 public class NodeSearchRequest extends RequestBase {
 	private SearchDefinition searchDefinition;
 	/* Can be 'curNode' (default, null) or 'allNodes' */
-	private String searchRoot;
+	private String searchRootOption;
 	/* Zero offset page number. First page is zero */
 	private int page;
 
@@ -23,8 +23,8 @@ public class NodeSearchRequest extends RequestBase {
 	// Admin can set this, and it will delete all matches to the search results
 	private boolean deleteMatches;
 
-	public String getSearchRoot() {
-		return this.searchRoot;
+	public String getSearchRootOption() {
+		return this.searchRootOption;
 	}
 
 	public int getPage() {
@@ -51,8 +51,8 @@ public class NodeSearchRequest extends RequestBase {
 		return this.deleteMatches;
 	}
 
-	public void setSearchRoot(final String searchRoot) {
-		this.searchRoot = searchRoot;
+	public void setSearchRootOption(final String searchRootOption) {
+		this.searchRootOption = searchRootOption;
 	}
 
 	public void setPage(final int page) {

@@ -22,11 +22,8 @@ import { TextField } from "../comp/core/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { SelectTagsDlg } from "./SelectTagsDlg";
 
-// todo-0: Need to retest searchRoot (account root vs. current node root), and make this class consistent about whether searchRoot
-// is a string (ID) or a NodeInfo
-
 interface LS { // Local State
-    searchRoot?: string;
+    searchRootOption?: string;
     sortField?: string;
     caseSensitive?: boolean;
     fuzzy?: boolean;
@@ -53,14 +50,15 @@ export class SearchDlg extends DialogBase {
         requirePriority: false,
         requireAttachment: false,
         requireDate: false,
-        searchType: "node.content"
+        searchType: "node.content",
+        searchRootOption: null
     };
 
     searchTextField: TextField;
     searchTextState: Validator = new Validator();
     searchNameState: Validator = new Validator();
 
-    constructor(private searchRoot: NodeInfo = null, searchDef: J.SearchDefinition = null) {
+    constructor(private searchRootNode: NodeInfo = null, searchDef: J.SearchDefinition = null) {
         super("Search");
         this.onMount(() => {
             this.searchTextField?.focus();
@@ -228,12 +226,11 @@ export class SearchDlg extends DialogBase {
                     { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
                 ], "searchDlgSearchRoot", {
                     setValue: (val: string) => {
-                        SearchDlg.dlgState.searchRoot = val;
                         this.mergeState<LS>({
-                            searchRoot: val
+                            searchRootOption: val
                         });
                     },
-                    getValue: (): string => this.getState<LS>().searchRoot
+                    getValue: (): string => this.getState<LS>().searchRootOption
                 }),
                 new Selection(null, "Display Layout", [
                     { key: "list", val: "List" },
@@ -348,7 +345,7 @@ export class SearchDlg extends DialogBase {
     }
 
     createSearchFieldIconButtons(): Comp {
-        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
+        const node = this.searchRootNode || S.nodeUtil.getHighlightedNode();
         return new ButtonBar([
             new Button("Clear", () => {
                 this.searchTextState.setValue("");
@@ -368,7 +365,7 @@ export class SearchDlg extends DialogBase {
     }
 
     _searchGraphLayout = () => {
-        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
+        const node = this.searchRootNode || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -418,7 +415,7 @@ export class SearchDlg extends DialogBase {
     }
 
     async searchDocLayout() {
-        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
+        const node = this.searchRootNode || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -453,7 +450,7 @@ export class SearchDlg extends DialogBase {
     }
 
     async searchListLayout(deleteMatches: boolean) {
-        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
+        const node = this.searchRootNode || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -475,7 +472,7 @@ export class SearchDlg extends DialogBase {
 
         const success = await S.srch.search(this.searchNameState.getValue(),
             node.id, null, SearchDlg.defaultSearchText, null, desc,
-            state.searchRoot,
+            state.searchRootOption,
             state.fuzzy,
             state.caseSensitive, 0,
             state.recursive,

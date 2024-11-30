@@ -447,7 +447,7 @@ export interface NodeFeedRequest extends RequestBase {
 
 export interface NodeSearchRequest extends RequestBase {
     searchDefinition: SearchDefinition;
-    searchRoot: string;
+    searchRootOption: string;
     page: number;
     nodeId: string;
     view: string;

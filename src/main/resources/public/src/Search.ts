@@ -160,7 +160,7 @@ export class Search {
     }
 
     async runSearchDef(searchDef: J.SearchDefinition) {
-        // todo-0:make searchRoot part of Search Defiition
+        // todo-0:make searchRoot part of Search Definition
         // switch (searchDef.searchRoot) {
         //     case J.Constant.SEARCH_CUR_NODE // Current Node
         //     case J.Constant.SEARCH_ALL_NODES // My Account
@@ -176,7 +176,7 @@ export class Search {
     }
 
     async search(name: string, nodeId: string, prop: string, searchText: string, searchType: string, description: string,
-        searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
+        searchRootOption: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
         jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> {
 
@@ -189,7 +189,7 @@ export class Search {
                 requireDate,
                 displayLayout: "list"
             },
-            searchRoot,
+            searchRootOption,
             page,
             nodeId, // for user searchTypes this node can be null
             searchType,
@@ -339,7 +339,7 @@ export class Search {
                 requireDate: false,
                 displayLayout: "list"
             },
-            searchRoot: null,
+            searchRootOption: null, // null means use nodeId as search root.
             page,
             nodeId,
             view: "timeline",

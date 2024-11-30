@@ -165,7 +165,7 @@ public class NodeSearchService extends ServiceBase {
             else {
                 SubNode searchRoot = null;
 
-                if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
+                if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRootOption())) {
                     searchRoot = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
                 } else {
                     searchRoot = svc_mongoRead.getNode(req.getNodeId());
