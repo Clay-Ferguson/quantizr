@@ -364,7 +364,7 @@ export class SearchDlg extends DialogBase {
         ], "float-right mt-2");
     }
 
-    _searchGraphLayout = () => {
+    _searchGraphLayout = async () => {
         const node = this.searchRootNode || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
@@ -372,6 +372,8 @@ export class SearchDlg extends DialogBase {
         }
 
         SearchDlg.defaultSearchText = this.searchTextState.getValue();
+        const ok = await this.showSearchWarnings();
+        if (!ok) return;
         this.close();
         S.render.showGraph(null, SearchDlg.defaultSearchText);
     }
@@ -428,6 +430,8 @@ export class SearchDlg extends DialogBase {
             requirePriority = false;
         }
 
+        const ok = await this.showSearchWarnings();
+        if (!ok) return;
         await S.srch.showDocument(node.id, true, {
             name: this.searchNameState.getValue(),
             searchText: this.searchTextState.getValue(),
@@ -470,6 +474,8 @@ export class SearchDlg extends DialogBase {
             return;
         }
 
+        const ok = await this.showSearchWarnings();
+        if (!ok) return;
         const success = await S.srch.search(this.searchNameState.getValue(),
             node.id, null, SearchDlg.defaultSearchText, null, desc,
             state.searchRootOption,
@@ -490,5 +496,29 @@ export class SearchDlg extends DialogBase {
                 S.util._loadSearchDefs();
             }
         }
+    }
+
+    showSearchWarnings = async (): Promise<boolean> => {
+        let warning = null;
+        const searchVal = this.searchTextState.getValue();
+        if (searchVal) {
+            // check if searchVal contains any hashtags that are not surrounded by quotes
+            const words = searchVal.split(" ");
+            for (const word of words) {
+                if (word.startsWith("#") && searchVal.indexOf(`"${word}"`) === -1) {
+                    warning = "Hashtags should be surrounded by quotes. Example: \"#hashtag\". Continue anyway?";
+                    break;
+                }
+            }
+        }
+
+        if (warning) {
+            const dlg = new ConfirmDlg(warning, "Warning");
+            await dlg.open();
+            if (!dlg.yes) {
+                return false;
+            }
+        }
+        return true;
     }
 }
