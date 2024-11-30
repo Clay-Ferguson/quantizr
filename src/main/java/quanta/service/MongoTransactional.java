@@ -19,6 +19,7 @@ import quanta.rest.request.ImportJsonRequest;
 import quanta.rest.request.JoinNodesRequest;
 import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LoginRequest;
+import quanta.rest.request.ModifySubGraphRequest;
 import quanta.rest.request.MoveNodesRequest;
 import quanta.rest.request.PasteAttachmentsRequest;
 import quanta.rest.request.RemovePrivilegeRequest;
@@ -45,6 +46,7 @@ import quanta.rest.response.ImportJsonResponse;
 import quanta.rest.response.JoinNodesResponse;
 import quanta.rest.response.LikeNodeResponse;
 import quanta.rest.response.LoginResponse;
+import quanta.rest.response.ModifySubGraphResponse;
 import quanta.rest.response.MoveNodesResponse;
 import quanta.rest.response.PasteAttachmentsResponse;
 import quanta.rest.response.RemovePrivilegeResponse;
@@ -178,6 +180,10 @@ public class MongoTransactional extends ServiceBase {
 
     public SearchAndReplaceResponse cm_searchAndReplace(SearchAndReplaceRequest req) {
         return svc_edit.searchAndReplace(req);
+    }
+
+    public ModifySubGraphResponse cm_modifySubGraph(ModifySubGraphRequest req) {
+        return svc_edit.modifySubGraph(req);
     }
 
     public SaveNodeJsonResponse cm_saveNodeJson(SaveNodeJsonRequest req) {

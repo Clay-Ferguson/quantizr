@@ -67,6 +67,7 @@ import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LinkNodesRequest;
 import quanta.rest.request.LoginRequest;
 import quanta.rest.request.LogoutRequest;
+import quanta.rest.request.ModifySubGraphRequest;
 import quanta.rest.request.MoveNodesRequest;
 import quanta.rest.request.NodeFeedRequest;
 import quanta.rest.request.NodeSearchRequest;
@@ -344,6 +345,13 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
         return svc_callProc.run("searchAndReplace", true, true, req, session,
                 () -> svc_mongoTrans.cm_searchAndReplace(req));
+    }
+
+    @RequestMapping(value = API_PATH + "/modifySubGraph", method = RequestMethod.POST)
+    @ResponseBody
+    public Object modifySubGraph(@RequestBody ModifySubGraphRequest req, HttpSession session) {
+        return svc_callProc.run("modifySubGraph", true, true, req, session,
+                () -> svc_mongoTrans.cm_modifySubGraph(req));
     }
 
     @RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)

@@ -625,6 +625,27 @@ export class Search {
         });
     }
 
+    async modifySubGraph(recursive: boolean, nodeId: string, hashtags: string, action: string) {
+        const res = await S.rpcUtil.rpc<J.ModifySubGraphRequest, J.ModifySubGraphResponse>("modifySubGraph", {
+            recursive,
+            nodeId,
+            hashtags,
+            action
+        });
+
+        S.view.refreshTree({
+            nodeId: null,
+            zeroOffset: false,
+            highlightId: null,
+            scrollToTop: false,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            jumpToRss: false
+        });
+        S.util.showMessage(res.message, "Success");
+    }
+
     async searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string) {
         const res = await S.rpcUtil.rpc<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,

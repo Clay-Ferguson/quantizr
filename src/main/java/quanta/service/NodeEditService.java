@@ -26,6 +26,7 @@ import quanta.rest.request.GetNodeJsonRequest;
 import quanta.rest.request.InitNodeEditRequest;
 import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LinkNodesRequest;
+import quanta.rest.request.ModifySubGraphRequest;
 import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveNodeRequest;
 import quanta.rest.request.SearchAndReplaceRequest;
@@ -35,6 +36,7 @@ import quanta.rest.response.GetNodeJsonResponse;
 import quanta.rest.response.InitNodeEditResponse;
 import quanta.rest.response.LikeNodeResponse;
 import quanta.rest.response.LinkNodesResponse;
+import quanta.rest.response.ModifySubGraphResponse;
 import quanta.rest.response.SaveNodeJsonResponse;
 import quanta.rest.response.SaveNodeResponse;
 import quanta.rest.response.SearchAndReplaceResponse;
@@ -500,6 +502,39 @@ public class NodeEditService extends ServiceBase {
         return ret.toString().trim();
     }
 
+    public ModifySubGraphResponse modifySubGraph(ModifySubGraphRequest req) {
+        MongoTranMgr.ensureTran();
+        ModifySubGraphResponse res = new ModifySubGraphResponse();
+        int changes = 0;
+        int cachedChanges = 0;
+        String nodeId = req.getNodeId();
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        svc_auth.ownerAuth(node);
+
+        if (processHashtags(node, req.getHashtags(), req.getAction())) {
+            changes++;
+            cachedChanges++;
+        }
+
+        // todo-0: we need an option for only top level nodes, in addition to recursive.
+        if (req.isRecursive()) {
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
+                if (processHashtags(n, req.getHashtags(), req.getAction())) {
+                    changes++;
+                    cachedChanges++;
+                    // save session immediately every time we get up to 100 pending updates cached.
+                    if (cachedChanges >= 100) {
+                        cachedChanges = 0;
+                        svc_mongoUpdate.saveSession();
+                    }
+                }
+            }
+        }
+        svc_mongoUpdate.saveSession();
+        res.setMessage(String.valueOf(changes) + " nodes were updated.");
+        return res;
+    }
+
     /*
      * todo-3: we should be using a bulk update in here and using a streaming resultset instead of
      * holding it all in memory
@@ -512,6 +547,7 @@ public class NodeEditService extends ServiceBase {
         String nodeId = req.getNodeId();
         SubNode node = svc_mongoRead.getNode(nodeId);
         svc_auth.ownerAuth(node);
+
         if (replaceText(node, req.getSearch(), req.getReplace())) {
             replacements++;
             cachedChanges++;
@@ -534,6 +570,58 @@ public class NodeEditService extends ServiceBase {
         svc_mongoUpdate.saveSession();
         res.setMessage(String.valueOf(replacements) + " nodes were updated.");
         return res;
+    }
+
+    private boolean processHashtags(SubNode node, String hashtags, String action) {
+        if (hashtags == null || hashtags.trim().length() == 0) {
+            return false;
+        }
+        // get all the current tags on the node
+        String nodeTags = node.getTags();
+        if (nodeTags == null) {
+            nodeTags = "";
+        }
+        HashSet<String> tags = new HashSet<>();
+
+        // put the tags already on the node into an array
+        String[] nodeTagsArray = nodeTags.split(" ");
+        // add all the current tags to the hashset
+        for (String tag : nodeTagsArray) {
+            tag = tag.trim();
+            if (tag.length() > 0) {
+                tags.add(tag);
+            }
+        }
+
+        String[] sentTagsArray = hashtags.split(" ");
+        boolean changed = false;
+        for (String tag : sentTagsArray) {
+            tag = tag.trim();
+            if (tag.length() > 0) {
+                if (action.equals("addHashtags")) {
+                    if (tags.add(tag)) {
+                        changed = true;
+                    }
+                } else if (action.equals("removeHashtags")) {
+                    if (tags.remove(tag)) {
+                        changed = true;
+                    }
+                } else {
+                    throw new RuntimeEx("Invalid action: " + action);
+                }
+            }
+        }
+
+        if (changed) {
+            StringBuilder newTags = new StringBuilder();
+            for (String tag : tags) {
+                newTags.append(tag + " ");
+            }
+            node.setTags(newTags.toString().trim());
+            node.touch();
+        }
+
+        return changed;
     }
 
     private boolean replaceText(SubNode node, String search, String replace) {

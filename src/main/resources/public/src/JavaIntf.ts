@@ -417,6 +417,13 @@ export interface LoginRequest extends RequestBase {
 export interface LogoutRequest extends RequestBase {
 }
 
+export interface ModifySubGraphRequest extends RequestBase {
+    recursive: boolean;
+    nodeId: string;
+    hashtags: string;
+    action: string;
+}
+
 export interface MoveNodesRequest extends RequestBase {
     targetNodeId: string;
     nodeIds: string[];
@@ -849,6 +856,9 @@ export interface LoginResponse extends ResponseBase {
 }
 
 export interface LogoutResponse extends ResponseBase {
+}
+
+export interface ModifySubGraphResponse extends ResponseBase {
 }
 
 export interface MoveNodesResponse extends ResponseBase {
