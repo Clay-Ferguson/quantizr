@@ -88,9 +88,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
                 }));
             });
         }
-
         const hasTop100s = tagPanel?.hasChildren() || wordPanel?.hasChildren();
-
         this.children = [
             this.headingBar = new TabHeading([
                 new Div("Node Info", { className: "tabTitle" })
@@ -99,7 +97,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
             hasTop100s ? new Div("Top 100 listed in order of frequency", { className: "mb-3" }) : null,
             tagPanel.hasChildren() ? tagPanel : null,
             wordPanel.hasChildren() ? wordPanel : null,
-            new Button("Search", this._searchSelectedWords, { className: "mt-3" }, "-primary")
+            hasTop100s ? new Button("Search", this._searchSelectedWords, { className: "mt-3" }, "-primary") : null
         ];
         return true;
     }
