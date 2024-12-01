@@ -75,7 +75,6 @@ export class SelectTagsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                // todo-0: update User Guide that this edit field is gone.
                 // Leaving this for now, but I'm pretty sure it's not needed.
                 // new TextField({
                 //     label: "Tag",
