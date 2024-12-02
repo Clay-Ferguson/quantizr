@@ -777,7 +777,7 @@ public class MongoRead extends ServiceBase {
                 else if ("pastOnly".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
                 } //
-                else if ("pastDue".equals(timeRangeType)) { //
+                else if ("overdue".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
                     ands.add(Criteria.where(SubNode.TAGS).regex("#due", "i"));
                 }
