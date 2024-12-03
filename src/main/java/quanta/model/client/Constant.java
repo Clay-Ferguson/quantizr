@@ -3,8 +3,6 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Constant {
-    SEARCH_ALL_NODES("allNodes"), //
-    SEARCH_CUR_NODE("curNode"), //
     SEARCH_TYPE_USERS("userAll"), //
     SEARCH_TYPE_LINKED_NODES("linkedNodes"), //
     SEARCH_TYPE_RDF_SUBJECTS("rdfSubjects"), //

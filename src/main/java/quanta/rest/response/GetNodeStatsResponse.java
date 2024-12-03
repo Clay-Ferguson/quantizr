@@ -7,7 +7,7 @@ import quanta.rest.response.base.ResponseBase;
 public class GetNodeStatsResponse extends ResponseBase {
     private String stats;
     private ArrayList<String> topWords;
-    private ArrayList<String> topTags;
+    private ArrayList<HashtagInfo> topTags;
     private ArrayList<String> topVotes;
 
     public String getStats() {
@@ -18,7 +18,7 @@ public class GetNodeStatsResponse extends ResponseBase {
         return this.topWords;
     }
 
-    public ArrayList<String> getTopTags() {
+    public ArrayList<HashtagInfo> getTopTags() {
         return this.topTags;
     }
 
@@ -34,7 +34,7 @@ public class GetNodeStatsResponse extends ResponseBase {
         this.topWords = topWords;
     }
 
-    public void setTopTags(final ArrayList<String> topTags) {
+    public void setTopTags(final ArrayList<HashtagInfo> topTags) {
         this.topTags = topTags;
     }
 

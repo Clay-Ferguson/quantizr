@@ -11,7 +11,7 @@ import { S } from "../Singletons";
 
 export interface LS { // Local State
     tags: Tag[];
-    suggestedTags: Tag[];
+    suggestedTags: J.HashtagInfo[];
 
     // holds the set of all tags selected by the user (via. checkboxes)
     selectedTags?: Set<string>;
@@ -113,9 +113,7 @@ export class SelectTagsDlg extends DialogBase {
         });
 
         if (res.topTags?.length > 0) {
-            const suggestedTags: Tag[] = [];
-            res.topTags.forEach(tag => suggestedTags.push({ tag, description: null }));
-            this.mergeState({ suggestedTags });
+            this.mergeState({ suggestedTags: res.topTags });
         }
     }
 
@@ -179,7 +177,13 @@ export class SelectTagsDlg extends DialogBase {
                     // if (state.tags.find(o => o.tag === tagObj.tag)) {
                     //     return;
                     // }
-                    this.processAddCheckboxOrHeading(div, tagObj);
+                    if (tagObj.usedWith) {
+                        const usedWith = tagObj.usedWith ? "  (" + tagObj.usedWith.join(" ") + ")" : "";
+                        this.processAddCheckboxOrHeading(div, { tag: tagObj.hashtag, description: tagObj.hashtag + usedWith });
+                    }
+                    else {
+                        this.processAddCheckboxOrHeading(div, { tag: tagObj.hashtag, description: null });
+                    }
                 });
             }
         }

@@ -47,20 +47,20 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
             tagPanel.addChild(new Heading(6, "Hashtags", { className: "trendingSectionTitle " + Tailwind.alertPrimary }));
             res.topTags.forEach(tag => {
-                tagPanel.addChild(new Checkbox(tag, { className: "mr-3" }, {
+                tagPanel.addChild(new Checkbox(tag.hashtag, { className: "mr-3" }, {
                     setValue: (checked: boolean) => {
                         const worsSelections = getAs().wordSelections;
                         if (checked) {
-                            worsSelections.add(tag);
+                            worsSelections.add(tag.hashtag);
                         } else {
-                            worsSelections.delete(tag);
+                            worsSelections.delete(tag.hashtag);
                         }
                         dispatch("UpdateTagSelections", s => {
                             s.wordSelections = worsSelections;
                         });
                     },
                     getValue: (): boolean => {
-                        return getAs().wordSelections.has(tag);
+                        return getAs().wordSelections.has(tag.hashtag);
                     }
                 }));
             });

@@ -759,7 +759,7 @@ export interface GetNodePrivilegesResponse extends ResponseBase {
 export interface GetNodeStatsResponse extends ResponseBase {
     stats: string;
     topWords: string[];
-    topTags: string[];
+    topTags: HashtagInfo[];
     topVotes: string[];
 }
 
@@ -814,6 +814,11 @@ export interface GetUserProfileResponse extends ResponseBase {
 
 export interface GraphResponse extends ResponseBase {
     rootNode: GraphNode;
+}
+
+export interface HashtagInfo {
+    hashtag: string;
+    usedWith: string[];
 }
 
 export interface ImportJsonResponse extends ResponseBase {
@@ -1155,8 +1160,6 @@ export const enum AIModel {
 }
 
 export const enum Constant {
-    SEARCH_ALL_NODES = "allNodes",
-    SEARCH_CUR_NODE = "curNode",
     SEARCH_TYPE_USERS = "userAll",
     SEARCH_TYPE_LINKED_NODES = "linkedNodes",
     SEARCH_TYPE_RDF_SUBJECTS = "rdfSubjects",

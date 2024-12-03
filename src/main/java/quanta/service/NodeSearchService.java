@@ -40,6 +40,7 @@ import quanta.rest.response.GetBookmarksResponse;
 import quanta.rest.response.GetNodeStatsResponse;
 import quanta.rest.response.GetSearchDefsResponse;
 import quanta.rest.response.GetSharedNodesResponse;
+import quanta.rest.response.HashtagInfo;
 import quanta.rest.response.NodeSearchResponse;
 import quanta.rest.response.RenderDocumentResponse;
 import quanta.util.ExUtil;
@@ -163,13 +164,7 @@ public class NodeSearchService extends ServiceBase {
             }
             // else we're doing a normal subgraph search for the text
             else {
-                SubNode searchRoot = null;
-
-                if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRootOption())) {
-                    searchRoot = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
-                } else {
-                    searchRoot = svc_mongoRead.getNode(req.getNodeId());
-                }
+                SubNode searchRoot = svc_mongoRead.getNode(req.getNodeId());
 
                 NodeInfo rootInfo = svc_convert.toNodeInfo(false, TL.getSC(), searchRoot, false, counter + 1, false,
                         false, false, false, null);
@@ -469,13 +464,13 @@ public class NodeSearchService extends ServiceBase {
 
         // for tree stats we need to process the root node as well because our query only gets children
         if (searchRoot != null) {
-            processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo,
-                    countVotes, null, wordMap, tagMap, voteMap);
+            processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, uniqueUsersSharedTo, countVotes,
+                    wordMap, tagMap, voteMap);
         }
 
         for (SubNode node : iter) {
-            processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo, countVotes,
-                    null, wordMap, tagMap, voteMap);
+            processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, uniqueUsersSharedTo, countVotes,
+                    wordMap, tagMap, voteMap);
         }
 
         List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
@@ -535,11 +530,14 @@ public class NodeSearchService extends ServiceBase {
         }
 
         if (tagList != null) {
-            ArrayList<String> topTags = new ArrayList<>();
+            ArrayList<HashtagInfo> topTags = new ArrayList<>();
             res.setTopTags(topTags);
 
             for (WordStats ws : tagList) {
-                topTags.add(ws.word); // + "," + ws.count);
+                HashtagInfo hi = new HashtagInfo();
+                hi.setHashtag(ws.word);
+                hi.setUsedWith(new ArrayList<>(ws.usedWith));
+                topTags.add(hi); // + "," + ws.count);
                 if (topTags.size() >= 100)
                     break;
             }
@@ -548,9 +546,13 @@ public class NodeSearchService extends ServiceBase {
     }
 
     private void processStatsForNode(SubNode node, GetNodeStatsRequest req, Stats stats, //
-            HashSet<ObjectId> uniqueVoters, boolean strictFiltering, boolean trending,
-            HashSet<String> uniqueUsersSharedTo, boolean countVotes, HashSet<String> blockTerms,
-            HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap, HashMap<String, WordStats> voteMap) {
+            HashSet<ObjectId> uniqueVoters, boolean strictFiltering, HashSet<String> uniqueUsersSharedTo,
+            boolean countVotes, HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap,
+            HashMap<String, WordStats> voteMap) {
+
+        // set to hold all hashtags in this node only
+        HashSet<String> tags = null;
+
         stats.nodeCount++;
         if (req.isSignatureVerify()) {
             String sig = node.getStr(NodeProp.CRYPTO_SIG);
@@ -601,36 +603,32 @@ public class NodeSearchService extends ServiceBase {
             content += " " + node.getTags();
         }
 
-        HashSet<String> knownTokens = null;
         StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
-
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken().trim();
             if (!svc_english.isStopWord(token)) {
                 String lcToken = token.toLowerCase();
                 // if word is a hashtag.
                 if (token.startsWith("#")) {
-                    if (token.endsWith("#") || token.length() < 4)
+                    if (token.endsWith("#") || token.length() < 3)
                         continue;
-                    String tokSearch = token.replace("#", "").toLowerCase();
-                    if (blockTerms != null && blockTerms.contains(tokSearch))
-                        continue;
+
                     // ignore stuff like #1 #23
                     String numCheck = token.substring(1);
                     if (StringUtils.isNumeric(numCheck))
                         continue;
-                    // lazy create and update knownTokens
-                    if (knownTokens == null) {
-                        knownTokens = new HashSet<>();
-                    }
-                    knownTokens.add(lcToken);
+
                     if (tagMap != null) {
                         WordStats ws = tagMap.get(lcToken);
                         if (ws == null) {
                             ws = new WordStats(token);
                             tagMap.put(lcToken, ws);
                         }
-                        ws.inc(node, trending);
+                        if (tags == null) {
+                            tags = new HashSet<>();
+                        }
+                        tags.add(token);
+                        ws.inc(node);
                     }
                 }
                 // ordinary word
@@ -638,15 +636,14 @@ public class NodeSearchService extends ServiceBase {
                     if (!StringUtils.isAlpha(token) || token.length() < 3) {
                         continue;
                     }
-                    if (blockTerms != null && blockTerms.contains(token.toLowerCase()))
-                        continue;
+
                     if (wordMap != null) {
                         WordStats ws = wordMap.get(lcToken);
                         if (ws == null) {
                             ws = new WordStats(token);
                             wordMap.put(lcToken, ws);
                         }
-                        ws.inc(node, trending);
+                        ws.inc(node);
                     }
                 }
             }
@@ -663,7 +660,21 @@ public class NodeSearchService extends ServiceBase {
                         ws = new WordStats(vote);
                         voteMap.put(vote, ws);
                     }
-                    ws.inc(node, trending);
+                    ws.inc(node);
+                }
+            }
+        }
+
+        // now process all the tags, so all of them know what other tags they are used with
+        if (tags != null) {
+            for (String tag : tags) {
+                WordStats ws = tagMap.get(tag);
+                if (ws != null) {
+                    for (String otherTag : tags) {
+                        if (!tag.equals(otherTag)) {
+                            ws.addUsedWith(otherTag);
+                        }
+                    }
                 }
             }
         }

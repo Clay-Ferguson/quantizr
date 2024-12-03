@@ -221,17 +221,6 @@ export class SearchDlg extends DialogBase {
             ], "mb-3"),
 
             new FlexRowLayout([
-                new Selection(null, "Search in", [
-                    { key: J.Constant.SEARCH_CUR_NODE, val: "Current Node" },
-                    { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
-                ], "searchDlgSearchRoot", {
-                    setValue: (val: string) => {
-                        this.mergeState<LS>({
-                            searchRootOption: val
-                        });
-                    },
-                    getValue: (): string => this.getState<LS>().searchRootOption
-                }),
                 new Selection(null, "Display Layout", [
                     { key: "list", val: "List" },
                     { key: "doc", val: "Document" },
