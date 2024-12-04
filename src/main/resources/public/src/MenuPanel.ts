@@ -211,9 +211,19 @@ export class MenuPanel extends Comp {
                     new MenuItem("Today", MenuPanel.calendarToday, onMainTab && !!hltNode, null, true),
                     new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
                 ], null, null, null, true),
-                new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
-                new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
-                new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
+                new MenuItem("Thread", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
+                new MenuItem("Document", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
+                new MenuItem("Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
+                new MenuItemSeparator(), //
+                new Menu("My Shares", [
+                    new MenuItem("All", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
+                    new MenuItem("Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
+                    new MenuItem("Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
+                ], null, null, null, true),
+
+                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
+                new MenuItem("Unique Tags", MenuPanel.uniqueTags, onMainTab, null, true), //
+                new MenuItem("Unique Words", MenuPanel.uniqueWords, onMainTab, null, true), //
             ], null));
 
             const searchDefItems = [];
@@ -247,9 +257,6 @@ export class MenuPanel extends Comp {
                         searchDefItems.push(mi);
                     });
                 }
-                if (searchDefItems.length > 0) {
-                    searchDefItems.push(new MenuItemSeparator());
-                }
             }
 
             children.push(new Menu("Search", [
@@ -259,16 +266,6 @@ export class MenuPanel extends Comp {
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
                 //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-                new Menu("My Shared Nodes", [
-                    new MenuItem("All", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
-                    new MenuItem("Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
-                    new MenuItem("Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
-                ], null, null, null, true),
-
-                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
-                new MenuItem("Unique Tags", MenuPanel.uniqueTags, onMainTab, null, true), //
-                new MenuItem("Unique Words", MenuPanel.uniqueWords, onMainTab, null, true), //
-
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
             ], null));
@@ -276,7 +273,13 @@ export class MenuPanel extends Comp {
 
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
+            bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
             if (ast.bookmarks) {
+
+                if (ast.bookmarks.length > 0) {
+                    bookmarkItems.push(new MenuItemSeparator());
+                }
+
                 ast.bookmarks.forEach(bookmark => {
                     const nodeId = bookmark.id || bookmark.selfId;
                     const floatRightComps = [
@@ -298,13 +301,7 @@ export class MenuPanel extends Comp {
                 });
             }
 
-            const hasBookmarks = bookmarkItems.length > 0;
             if (bookmarkItems.length > 0) {
-                bookmarkItems.push(new MenuItemSeparator());
-            }
-            bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
-
-            if (hasBookmarks) {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));
             }
         }
