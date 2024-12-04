@@ -5,9 +5,11 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { Validator } from "../Validator";
 
 export interface LS { // Local State
     tags: Tag[];
@@ -26,7 +28,7 @@ interface Tag {
 
 export class SelectTagsDlg extends DialogBase {
     indenting = false;
-    // editFieldState: Validator = new Validator();
+    editFieldState: Validator = new Validator();
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean, private rootNodeId: string) {
@@ -75,13 +77,12 @@ export class SelectTagsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                // Leaving this for now, but I'm pretty sure it's not needed.
-                // new TextField({
-                //     label: "Tag",
-                //     outterClass: "noPaddingRight mb-3",
-                //     val: this.editFieldState,
-                //     labelClass: "txtFieldLabelShort"
-                // }),
+                new TextField({
+                    label: "Tag",
+                    outterClass: "noPaddingRight mb-3",
+                    val: this.editFieldState,
+                    labelClass: "txtFieldLabelShort"
+                }),
                 this.allowSuggestTags && this.rootNodeId ? new Checkbox("Suggest Tags", { className: "float-right" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
@@ -225,10 +226,17 @@ export class SelectTagsDlg extends DialogBase {
 
     _select = () => {
         const state = this.getState<LS>();
-        // const editVal = this.editFieldState.getValue();
-        // if (editVal) {
-        //     state.selectedTags.add(editVal);
-        // }
+        const editVal = this.editFieldState.getValue();
+        if (editVal) {
+            // split editVal using space as delimiter and then add all to 'selectedTags'
+            const tags = editVal.split(" ");
+            tags.forEach(tag => {
+                if (!tag) return;
+                tag = tag.trim();
+                if (!tag) return;
+                state.selectedTags.add(tag);
+            });
+        }
         this.mergeState(state);
         this.close();
     }

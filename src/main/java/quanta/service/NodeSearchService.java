@@ -536,7 +536,9 @@ public class NodeSearchService extends ServiceBase {
             for (WordStats ws : tagList) {
                 HashtagInfo hi = new HashtagInfo();
                 hi.setHashtag(ws.word);
-                hi.setUsedWith(new ArrayList<>(ws.usedWith));
+                if (ws.usedWith != null) {
+                    hi.setUsedWith(new ArrayList<>(ws.usedWith));
+                }
                 topTags.add(hi); // + "," + ws.count);
                 if (topTags.size() >= 100)
                     break;
