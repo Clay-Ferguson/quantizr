@@ -3,7 +3,7 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { ServerInfoView } from "../ServerInfoView";
 
-export class ServerInfoTab extends TabBase<any> {
+export class ServerInfoTab extends TabBase<any, ServerInfoView> {
     name = "Info View";
     tooltip = "Displaying the information view for the most recently requested info";
     id = C.TAB_SERVERINFO;
@@ -18,7 +18,7 @@ export class ServerInfoTab extends TabBase<any> {
         return !!getAs().serverInfoText;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<any, ServerInfoView>): ServerInfoView {
         return new ServerInfoView(data);
     }
 }

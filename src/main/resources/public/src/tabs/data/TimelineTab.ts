@@ -6,7 +6,7 @@ import { S } from "../../Singletons";
 import { TimelineRSInfo } from "../../TimelineRSInfo";
 import { TimelineResultSetView } from "../TimelineResultSetView";
 
-export class TimelineTab extends TabBase<TimelineRSInfo> {
+export class TimelineTab extends TabBase<TimelineRSInfo, TimelineResultSetView<TimelineRSInfo>> {
     name = "Timeline";
     tooltip = "Reverse-chronological list of the entire subgraph of all nodes under one node"
     id = C.TAB_TIMELINE;
@@ -31,7 +31,7 @@ export class TimelineTab extends TabBase<TimelineRSInfo> {
         return false;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<TimelineRSInfo, TimelineResultSetView<TimelineRSInfo>>): TimelineResultSetView<TimelineRSInfo> {
         return new TimelineResultSetView<TimelineRSInfo>(data);
     }
 

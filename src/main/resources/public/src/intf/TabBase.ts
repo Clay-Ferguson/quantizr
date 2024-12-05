@@ -1,10 +1,11 @@
 import { AppState } from "../AppState";
-import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { NodeInfo } from "../JavaIntf";
 
-// PT=PropsType, TT=TabType
+// PT=PropsType, TT=TabType (type returned from constructView)
+// todo-0: a little at a time we can remove the "=any" defaults on TabBase and make as much of the code
+//       as possible type-safe.
 export class TabBase<PT = any, TT = any> {
     // display name shown on the tab
     name: string;
@@ -20,7 +21,7 @@ export class TabBase<PT = any, TT = any> {
     */
     id: string;
     scrollPos: number = 0;
-    inst?: TT; // AppTab;
+    inst?: TT;
 
     // used for re-scrolling screen back to same place after the page layout may have changed due to 'edit mode' or 'info mode'
     // turning on/off or other places.
@@ -29,7 +30,7 @@ export class TabBase<PT = any, TT = any> {
     props: PT = {} as PT;
     openGraphComps: OpenGraphPanel[] = [];
 
-    constructView(_data: TabBase): AppTab { return null; }
+    constructView(_data: TabBase<PT, TT>): TT { return null; }
 
     // controls whether to show tab button or not.
     isVisible(): boolean { return false; }

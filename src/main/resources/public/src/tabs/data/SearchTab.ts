@@ -6,7 +6,7 @@ import { ResultSetInfo } from "../../ResultSetInfo";
 import { S } from "../../Singletons";
 import { SearchResultSetView } from "../SearchResultSetView";
 
-export class SearchTab extends TabBase<ResultSetInfo> {
+export class SearchTab extends TabBase<ResultSetInfo, SearchResultSetView<ResultSetInfo>> {
     name = "Search";
     tooltip = "Showing the results of your most recent search";
     id = C.TAB_SEARCH;
@@ -21,7 +21,7 @@ export class SearchTab extends TabBase<ResultSetInfo> {
     isVisible() {
         return S.tabUtil.resultSetHasData(C.TAB_SEARCH);
     }
-    constructView(data: TabBase) {
+    constructView(data: TabBase<ResultSetInfo, SearchResultSetView<ResultSetInfo>>): SearchResultSetView<ResultSetInfo> {
         return new SearchResultSetView(data);
     }
 

@@ -7,7 +7,7 @@ import { S } from "../../Singletons";
 import { StatisticsRSInfo } from "../../StatisticsRSInfo";
 import { StatisticsView } from "../StatisticsView";
 
-export class StatisticsTab extends TabBase<StatisticsRSInfo> {
+export class StatisticsTab extends TabBase<StatisticsRSInfo, StatisticsView> {
     name = "Node Info";
     tooltip = "Statistics about the node and its children";
     id = C.TAB_STATS;
@@ -32,7 +32,7 @@ export class StatisticsTab extends TabBase<StatisticsRSInfo> {
         return false;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<StatisticsRSInfo, StatisticsView>): StatisticsView {
         return new StatisticsView(data);
     }
 

@@ -3,7 +3,7 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { RSSView } from "../RSSView";
 
-export class RSSTab extends TabBase<any> {
+export class RSSTab extends TabBase<any, RSSView> {
     name = "RSS Feed";
     tooltip = "Get some news or podcasts";
     id = C.TAB_RSS;
@@ -18,7 +18,7 @@ export class RSSTab extends TabBase<any> {
         return !!getAs().rssNode;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<any, RSSView>) {
         return new RSSView(data);
     }
 }

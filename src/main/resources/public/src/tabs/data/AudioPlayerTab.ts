@@ -2,7 +2,7 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { AudioPlayerView } from "../AudioPlayerView";
 
-export class AudioPlayerTab extends TabBase<any> {
+export class AudioPlayerTab extends TabBase<any, AudioPlayerView> {
     name = "Audio Player";
     tooltip = "Audio Player";
     id = C.TAB_AUDIO_PLAYER;
@@ -19,7 +19,7 @@ export class AudioPlayerTab extends TabBase<any> {
         return AudioPlayerTab.tabShown;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<any, AudioPlayerView>): AudioPlayerView {
         return new AudioPlayerView(data);
     }
 }

@@ -9,7 +9,7 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
-export class MainTab extends TabBase<any> {
+export class MainTab extends TabBase<any, MainTabComp> {
     name = "Folders";
     tooltip = "Content Tree";
     id = C.TAB_MAIN;
@@ -23,7 +23,7 @@ export class MainTab extends TabBase<any> {
     isVisible() {
         return true;
     }
-    constructView(data: TabBase) {
+    constructView(data: TabBase<any, MainTabComp>): MainTabComp {
         return new MainTabComp(data);
     }
 
@@ -70,7 +70,7 @@ export class MainTab extends TabBase<any> {
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav._navToMyAccntRoot, "ui-my-account") : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
             !ast.isAnonUser ? new AppNavLink("My Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, false)) : null,
-            
+
             // NOTE: This works, but let's not do this for now.
             // ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)
         ]);

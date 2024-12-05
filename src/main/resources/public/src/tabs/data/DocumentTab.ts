@@ -6,7 +6,7 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { DocumentResultSetView } from "../DocumentResultSetView";
 
-export class DocumentTab extends TabBase<DocumentRSInfo> {
+export class DocumentTab extends TabBase<DocumentRSInfo, DocumentResultSetView<DocumentRSInfo>> {
     name = "Document";
     tooltip = "Document View of Node"
     id = C.TAB_DOCUMENT;
@@ -31,7 +31,7 @@ export class DocumentTab extends TabBase<DocumentRSInfo> {
         return false;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<DocumentRSInfo, DocumentResultSetView<DocumentRSInfo>>): DocumentResultSetView<DocumentRSInfo> {
         return new DocumentResultSetView<DocumentRSInfo>(data);
     }
 

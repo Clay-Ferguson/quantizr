@@ -485,7 +485,6 @@ export class Nav {
         });
     }
 
-    // todo-0: is this being used?
     messagesFromMeToUser(user: string, displayName: string) {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");

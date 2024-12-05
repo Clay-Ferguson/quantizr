@@ -3,7 +3,7 @@ import { TabBase } from "../../intf/TabBase";
 import { AISettingsView } from "../AISettingsView";
 import { S } from "../../Singletons";
 
-export class AISettingsTab extends TabBase<any> {
+export class AISettingsTab extends TabBase<any, AISettingsView> {
     name = "AI Settings";
     tooltip = "Edit your AI Settings";
     id = C.TAB_AI_SETTINGS;
@@ -28,7 +28,7 @@ export class AISettingsTab extends TabBase<any> {
         return false;
     }
 
-    constructView(data: TabBase) {
+    constructView(data: TabBase<any, AISettingsView>): AISettingsView {
         return new AISettingsView(data);
     }
 }

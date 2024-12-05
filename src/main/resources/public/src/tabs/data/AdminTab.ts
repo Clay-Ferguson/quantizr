@@ -1,10 +1,9 @@
 import { getAs } from "../../AppContext";
-import { AppTab } from "../../comp/AppTab";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { AdminView } from "../AdminView";
 
-export class AdminTab extends TabBase<any> {
+export class AdminTab extends TabBase<any, AdminView> {
     name = "Admin";
     tooltip = "Manage the Server Instance";
     id = C.TAB_ADMIN;
@@ -20,7 +19,7 @@ export class AdminTab extends TabBase<any> {
         return getAs().isAdminUser;
     }
 
-    constructView(data: TabBase): AppTab { 
-        return new AdminView(data); 
+    constructView(data: TabBase<any, AdminView>): AdminView {
+        return new AdminView(data);
     }
 }
