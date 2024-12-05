@@ -446,7 +446,8 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_NEW
+            name: J.Constant.FEED_NEW,
+            subHeading: "To/From Me"
         });
     }
 
@@ -462,7 +463,8 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_TOFROMME
+            name: J.Constant.FEED_TOFROMME,
+            subHeading: "To/From Me"
         });
     }
 
@@ -478,10 +480,12 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_TOME
+            name: J.Constant.FEED_TOME,
+            subHeading: "To Me"
         });
     }
 
+    // todo-0: is this being used?
     messagesFromMeToUser(user: string, displayName: string) {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
@@ -496,7 +500,8 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_FROMMETOUSER
+            name: J.Constant.FEED_FROMMETOUSER,
+            subHeading: "From Me to " + user
         });
     }
 
@@ -512,7 +517,8 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_FROMME
+            name: J.Constant.FEED_FROMME,
+            subHeading: "From Me"
         });
     }
 
@@ -529,7 +535,8 @@ export class Nav {
             feedFilterToPublic: false,
             results: null,
             applyAdminBlocks: false,
-            name: J.Constant.FEED_FROMFRIENDS
+            name: J.Constant.FEED_FROMFRIENDS,
+            subHeading: "From Follows"
         });
     }
 
@@ -545,7 +552,8 @@ export class Nav {
             feedFilterToPublic: true,
             results: null,
             applyAdminBlocks: true,
-            name: J.Constant.FEED_PUB
+            name: J.Constant.FEED_PUB,
+            subHeading: "Public Posts"
         });
     }
 

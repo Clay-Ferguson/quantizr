@@ -217,37 +217,9 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             subHeading = "Interactions with " + data.props.feedFilterToUser;
         }
         else {
-            // todo-0: this switch pattern seems kind of awkward. Maybe there's a better way to do this.
-            switch (data.props.name) {
-                case J.Constant.FEED_NEW:
-                case J.Constant.FEED_TOFROMME:
-                    subHeading = "To/From Me";
-                    break;
-
-                case J.Constant.FEED_TOME:
-                    subHeading = "To Me";
-                    break;
-
-                case J.Constant.FEED_FROMME:
-                    subHeading = "From Me";
-                    break;
-
-                case J.Constant.FEED_FROMFRIENDS:
-                    subHeading = "From Follows";
-                    break;
-
-                case J.Constant.FEED_LOCAL:
-                    subHeading = "Local Users";
-                    break;
-
-                case J.Constant.FEED_PUB:
-                    subHeading = "Public Posts";
-                    break;
-
-                default: break;
-            }
+            subHeading = data.props.subHeading;
         }
-        return subHeading ? subHeading : "";
+        return subHeading || "Feed";
     }
 
     clearSearch() {

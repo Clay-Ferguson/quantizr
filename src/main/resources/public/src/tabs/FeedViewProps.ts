@@ -14,6 +14,7 @@ export class FeedViewProps {
     feedFilterToPublic = false;
     applyAdminBlocks: true;
     name: string = J.Constant.FEED_TOFROMME;
+    subHeading: string = "To/From Me";
     friendsTagSearch: string = null;
     feedDirty = false;
     feedLoading = false;
