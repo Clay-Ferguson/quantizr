@@ -17,6 +17,7 @@ import { Validator } from "../Validator";
 export class ExportDlg extends DialogBase {
 
     fileNameState: Validator = new Validator();
+    contentWidthState: Validator = new Validator();
     res: J.ExportResponse = null;
 
     constructor(defaultName: string, private nodeId: string, public exportingThread: boolean) {
@@ -69,6 +70,11 @@ export class ExportDlg extends DialogBase {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
                 getValue: (): boolean => getAs().exportSettings.includeToc
             }));
+
+            if (ast.exportSettings.exportType === "pdf" || ast.exportSettings.contentType == "md" || ast.exportSettings.contentType == "html") children.push(new Checkbox("Numbered Figures", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.numberedFigures = checked),
+                getValue: (): boolean => getAs().exportSettings.numberedFigures
+            }));
         }
 
         if (!this.exportingThread && ast.exportSettings.contentType == "md" && ast.exportSettings.exportType !== "pdf") children.push(new Checkbox("Metadata", null, {
@@ -80,6 +86,15 @@ export class ExportDlg extends DialogBase {
             setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeOwners = checked),
             getValue: (): boolean => getAs().exportSettings.includeOwners
         }));
+
+        if (ast.exportSettings.contentType == "html") {
+            children.push(new TextField({
+                inputClass: "txtFieldExportContentWidth",
+                outterClass: "mt-3",
+                label: "Content Width (optional. 50rem, 800px, etc.)",
+                val: this.contentWidthState
+            }));
+        }
 
         children.push(new ButtonBar([
             new Button("Export", this._exportNodes, null, "-primary"),
@@ -142,7 +157,9 @@ export class ExportDlg extends DialogBase {
                 dividerLine: ast.exportSettings.dividerLine,
                 updateHeadings: false,
                 threadAsPDF: true,
-                includeOwners: ast.exportSettings.includeOwners
+                includeOwners: ast.exportSettings.includeOwners,
+                numberedFigures: ast.exportSettings.numberedFigures,
+                contentWidth: null
             });
         }
         else {
@@ -157,7 +174,9 @@ export class ExportDlg extends DialogBase {
                 dividerLine: ast.exportSettings.dividerLine,
                 updateHeadings: ast.exportSettings.updateHeadings,
                 threadAsPDF: false,
-                includeOwners: ast.exportSettings.includeOwners
+                includeOwners: ast.exportSettings.includeOwners,
+                numberedFigures: ast.exportSettings.numberedFigures,
+                contentWidth: this.contentWidthState.getValue(),
             });
         }
         this.close();

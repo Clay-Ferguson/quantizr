@@ -16,6 +16,8 @@ public class ExportRequest extends RequestBase {
 	private boolean updateHeadings;
 	private boolean threadAsPDF;
 	private boolean includeOwners;
+	private boolean numberedFigures;
+	private String contentWidth;
 
 	public ExportRequest() {}
 
@@ -105,5 +107,21 @@ public class ExportRequest extends RequestBase {
 
 	public void setIncludeOwners(boolean includeOwners) {
 		this.includeOwners = includeOwners;
+	}
+
+	public boolean isNumberedFigures() {
+		return numberedFigures;
+	}
+
+	public void setNumberedFigures(boolean numberedFigures) {
+		this.numberedFigures = numberedFigures;
+	}
+
+	public String getContentWidth() {
+		return contentWidth;
+	}
+
+	public void setContentWidth(String contentWidth) {
+		this.contentWidth = contentWidth;
 	}
 }

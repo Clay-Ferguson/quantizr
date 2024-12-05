@@ -16,6 +16,8 @@ export interface ExportSettings {
     dividerLine?: boolean;
     updateHeadings?: boolean;
     includeOwners?: boolean;
+    numberedFigures?: boolean;
+    contentWidth?: string;
 }
 
 export class AppState {
@@ -137,7 +139,9 @@ export class AppState {
         includeIDs: false,
         dividerLine: false,
         updateHeadings: false,
-        includeOwners: false
+        includeOwners: false,
+        numberedFigures: true,
+        contentWidth: null
     };
 
     userProfile: J.UserProfile = null;

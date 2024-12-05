@@ -260,6 +260,8 @@ export interface ExportRequest extends RequestBase {
     updateHeadings: boolean;
     threadAsPDF: boolean;
     includeOwners: boolean;
+    numberedFigures: boolean;
+    contentWidth: string;
 }
 
 export interface FileSearchRequest extends RequestBase {

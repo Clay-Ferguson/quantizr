@@ -74,6 +74,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     // When publishing=true, this will hold the output HTML.
     private String html;
+    private boolean numberedFigures = false;
+    private String contentWidth = null;
 
     private class MarkdownLink {
         @SuppressWarnings("unused")
@@ -127,6 +129,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         dividerLine = req.isDividerLine();
         includeMetaComments = req.isIncludeMetaComments();
         targetFileName = req.getFileName();
+        numberedFigures = req.isNumberedFigures();
+        contentWidth = req.getContentWidth();
         publishing = false;
 
         // for markdown force updateHeadings and Attachments folder
@@ -225,8 +229,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String templateFile = toc.length() > 0 ? "/public/export-includes/html/html-template-with-toc.html"
                 : "/public/export-includes/html/html-template.html";
         String ret = XString.getResourceAsString(context, templateFile);
-        ret = ret.replace("/*{{style}}*/",
-                XString.getResourceAsString(context, "/public/export-includes/html/style.css"));
+
+        String css = XString.getResourceAsString(context, "/public/export-includes/html/style.css");
+        String contentWidthCss = null;
+        if (StringUtils.isEmpty(contentWidth)) {
+            contentWidthCss = "";
+        } else {
+            contentWidthCss = "width: " + contentWidth + ";\nmargin-left: auto;\nmargin-right: auto;\n";
+        }
+
+        ret = ret.replace("/*{{style}}*/", css);
+        ret = ret.replace("/*{{contentWidth}}*/", contentWidthCss);
+
         ret = ret.replace("/*{{script}}*/",
                 XString.getResourceAsString(context, "/public/export-includes/html/script.js"));
         if (toc.length() > 0) {
@@ -432,11 +446,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             List<Attachment> atts = node.getOrderedAttachments();
-            /*
-             * we save off the 'content' into htmlContent, because we need a copy that doesn't have attachments
-             * inserted into it for the special case of inserting HTML attachments
-             */
-            Val<String> contentVal = new Val<>(content);
             String targetFolder = null;
 
             // if we have a markdown file, all the attachments go into that folder
@@ -446,10 +455,30 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 targetFolder = "." + parentFolder;
             }
 
+            // Normally images go below content but if we have any attributes with position="ur" (upper right,
+            // or left) then we need to insert those into the content first, and make float right.
+            if (contentType.equals("html")) {
+                int figNum = tn.figNumStart;
+                for (Attachment att : atts) {
+                    if (att.getPosition().equals("ur") || att.getPosition().equals("ul")
+                            || att.getPosition().equals("c")) {
+                        handleAttachment(node, false, null, deeperPath, targetFolder, writeFile, att, figNum);
+                        figNum++;
+                    }
+                }
+            }
+
+            Val<String> contentVal = new Val<>(content);
+
             // Process all attachments just to insert File Tags into content
             if (atts != null) {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
+                    // detect case where we'll have already handle the image above
+                    if (contentType.equals("html") && (att.getPosition().equals("ur") || att.getPosition().equals("ul")
+                            || att.getPosition().equals("c"))) {
+                        continue;
+                    }
                     // Process File Tag type attachments here first
                     if (!"ft".equals(att.getPosition())) {
                         continue;
@@ -480,6 +509,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (atts != null) {
                         int figNum = tn.figNumStart;
                         for (Attachment att : atts) {
+                            // detect case where we'll have already handle the image above
+                            if (contentType.equals("html") && (att.getPosition().equals("ur")
+                                    || att.getPosition().equals("ul") || att.getPosition().equals("c"))) {
+                                continue;
+                            }
+
                             // Process File Tag type attachments here first
                             if (!"ft".equals(att.getPosition())) {
                                 continue;
@@ -509,6 +544,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (atts != null) {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
+                    // detect case where we'll have already handle the image above
+                    if (contentType.equals("html") && (att.getPosition().equals("ur") || att.getPosition().equals("ul")
+                            || att.getPosition().equals("c"))) {
+                        continue;
+                    }
+
                     // Skip File Tag type attachments because they'll already have been processed
                     // above
                     if ("ft".equals(att.getPosition())) {
@@ -852,12 +893,21 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         sizePart = "style='width:" + att.getCssSize() + "'";
                     }
 
+                    String imgClass = "";
+                    if (att.getPosition().equals("ur")) {
+                        imgClass = "class='img-upper-right'";
+                    } else if (att.getPosition().equals("ul")) {
+                        imgClass = "class='img-upper-left'";
+                    } else if (att.getPosition().equals("c")) {
+                        imgClass = "class='img-upper-center'";
+                    }
+
                     // NOTE: This simple markdown works too but looses the styling
                     // mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
                     String domId = "img_" + nodeId + "_" + att.getKey();
-                    mdLink = "<img id='%s' src='%s' %s/>\n\n".formatted(domId, fullUrl, sizePart);
+                    mdLink = "<img id='%s' src='%s' %s %s/>\n\n".formatted(domId, fullUrl, sizePart, imgClass);
 
-                    if (figNum > 0) {
+                    if (figNum > 0 && numberedFigures) {
                         mdLink = "<figure>\n" + mdLink + "<figcaption>Fig. " + figNum + "</figcaption>\n</figure>\n";
                     }
 
