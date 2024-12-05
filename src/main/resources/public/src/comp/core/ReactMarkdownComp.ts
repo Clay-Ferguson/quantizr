@@ -15,8 +15,14 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
     props = props || {};
 
     // Note: mkBody doesn't have any styling, and is only used to identify the markdown body for DOM lookup
-    if (props.className) props.className += " mkBody";
-    else props.className = "mkBody";
+    if (props.className) {
+        if (props.className.indexOf("mkBody") === -1)
+            props.className += " mkBody";
+    }
+    else {
+        props.className = "mkBody";
+    }
+
     props.components = {
         code: (arg: any) => _codeFunc(arg, props.nodeId),
         a: _anchorFunc
