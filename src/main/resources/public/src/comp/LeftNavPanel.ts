@@ -89,7 +89,6 @@ export class LeftNavPanel extends Comp {
                         }, "-primary menuButton", "fa-sitemap fa-lg") : null
                     ])
                 ]),
-                // ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
                 docIndexToggle,
                 !ast.isAnonUser && showDocIndex ? new DocIndexPanel() : null,
                 ast.isAnonUser || showDocIndex ? null : new MenuPanel()

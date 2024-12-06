@@ -87,7 +87,6 @@ export class Constants {
      * loginState="0" if user logged out intentionally. loginState="1" if last known state of user was 'logged in'
      */
     static readonly LOCALDB_LOGIN_STATE: string = "loginState";
-    static readonly LOCALDB_MOBILE_MODE: string = "mobileMode";
 
     static readonly LOCALDB_AUDIO_SOURCE: string = "audioSource";
     static readonly LOCALDB_VIDEO_SOURCE: string = "videoSource";

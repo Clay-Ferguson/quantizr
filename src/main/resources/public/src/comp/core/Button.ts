@@ -1,4 +1,3 @@
-import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Progress } from "./Progress";
 import { Tag } from "./Tag";
@@ -31,8 +30,7 @@ export class Button extends Comp {
 
         this.attribs.type = "button";
         this.attribs.onClick = callback;
-        this.attribs.className = (this.attribs.className || "") +
-            moreClasses + (getAs().mobileMode ? " mobileButton" : "");
+        this.attribs.className = (this.attribs.className || "") + moreClasses;
         this.mergeState<LS>({ text, enabled: true });
         this.tag = "button";
     }
@@ -69,8 +67,6 @@ export class Button extends Comp {
         }
 
         this.children = [
-            // We use Tag("i") here instead of Icon(), because Icon renders larger in size for mobile mode and that
-            // would conflict with this button already itself sizing larger for mobile
             this.iconClass ? new Tag("i", {
                 className: "fa " + this.iconClass + (text ? " buttonIconWithText" : " buttonIconNoText")
             }) : null, text];

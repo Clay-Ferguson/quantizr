@@ -61,6 +61,10 @@ export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
 }
 
+export function dispatcherReady(): boolean {
+    return dispatcher !== null;
+}
+
 export function asyncDispatch(type: string, func: StateModFunc) {
     setTimeout(() => {
         dispatch(type, func);
@@ -75,7 +79,7 @@ export function asyncDispatch(type: string, func: StateModFunc) {
 export function dispatch(type: string, func: StateModFunc, dispatchLater: boolean = false) {
     // console.log("DISP: " + type);
     if (!dispatcher) {
-        throw new Error("Called dispatch before first render. type: " + type);
+        throw new Error("Called dispatch before initDispatch. type: " + type);
     }
 
     if (dispatchLater) {
@@ -97,7 +101,7 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
 export function promiseDispatch(type: string, func: StateModFunc): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         if (!dispatcher) {
-            throw new Error("Called dispatch before first render. type: " + type);
+            throw new Error("Called promiseDispatch before initDispatch. type: " + type);
         }
 
         dispatcher({

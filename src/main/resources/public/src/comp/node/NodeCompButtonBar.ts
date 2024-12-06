@@ -111,7 +111,7 @@ export class NodeCompButtonBar extends Comp {
             }
         }
 
-        const iconClazz = ast.mobileMode ? "" : "buttonBarIcon";
+        const iconClazz = "buttonBarIcon";
 
         /*
          * If in edit mode we always at least create the potential (buttons) for a user to insert
@@ -120,7 +120,7 @@ export class NodeCompButtonBar extends Comp {
          */
         const dragIconClazz = "fas fa-grip-lines-vertical fa-lg"
         if (ast.userPrefs.editMode) {
-            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && S.props.isMine(this.node)) {
+            if ((!type || type.subOrdinal() === -1) && S.props.isMine(this.node)) {
                 dragIcon = new Icon({
                     className: dragIconClazz + " dragIcon",
                     title: "Drag to move this node"

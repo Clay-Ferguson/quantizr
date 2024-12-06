@@ -60,7 +60,7 @@ export class HistoryPanel extends Comp {
             }
 
             const dragProps = {};
-            if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
+            if (ast.userPrefs.editMode && !ast.editNode) {
                 S.domUtil.setNodeDragHandler(dragProps, h.id);
             }
 
@@ -75,9 +75,7 @@ export class HistoryPanel extends Comp {
                 new SpanHtml(h.content, { id: h.id + "_histCont" })
             ]));
 
-            if (!ast.mobileMode) {
-                S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
-            }
+            S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
         });
         this.children = children;
         return true;

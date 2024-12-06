@@ -5,6 +5,7 @@ import { Factory } from "./Factory";
 import { ImportTest } from "./ImportTest";
 import { S } from "./Singletons";
 import AppContainer from "./comp/core/AppContainer";
+import { dispatcherReady } from "./AppContext";
 
 // we have this as the first import for troubleshooting how browsers are
 // able to handle the 'import' statement.
@@ -19,7 +20,15 @@ const processAppLoad = async () => {
     S.quanta.cfg = S.quanta.config.config || {};
     const root = createRoot(document.getElementById("app"));
     root.render(React.createElement(AppContainer));
-    S.quanta.initApp();
+
+    // Wait for the dispatcher to be ready before initializing the app, because the dispatcher
+    // is needed for all state management
+    const dispatchWaiter = setInterval(() => {
+        if (dispatcherReady()) {
+            clearInterval(dispatchWaiter);
+            S.quanta.initApp();
+        }
+    }, 100);
 }
 
 window.addEventListener("load", async (_event) => {

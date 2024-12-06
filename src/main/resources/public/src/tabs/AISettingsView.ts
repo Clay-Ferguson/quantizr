@@ -43,7 +43,7 @@ export class AISettingsView extends AppTab<any> {
     override preRender(): boolean | null {
         const ast = getAs();
         const horzClass = "mt-3 mb-3 settingsSection";
-        const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
+        const settingsCol = "settingsCol";
 
         const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
         const aiModelInfo = aiService && aiService.longDescription ? aiService.description + " -- " + aiService.longDescription : null;

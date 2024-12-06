@@ -13,16 +13,11 @@ export class TabPanel extends Comp {
         TabPanel.inst = this;
         const ast = getAs();
 
-        if (ast.mobileMode) {
-            this.attribs.className = Tailwind.col_12 + " tabPanelMobile";
+        let panelCols = ast.userPrefs.mainPanelCols || 6;
+        if (!ast.showRhs) {
+            panelCols += RightNavPanel.calcWidthCols();
         }
-        else {
-            let panelCols = ast.userPrefs.mainPanelCols || 6;
-            if (!ast.showRhs) {
-                panelCols += RightNavPanel.calcWidthCols();
-            }
-            this.attribs.className = Tailwind.getColClass(panelCols) + " tabPanel appColumn";
-        }
+        this.attribs.className = Tailwind.getColClass(panelCols) + " tabPanel appColumn";
     }
 
     async setVisibility(visible: boolean): Promise<void> {

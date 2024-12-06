@@ -41,12 +41,10 @@ export abstract class DialogBase extends Comp {
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: string = null, public mode: DialogMode = null, public forceMode: boolean = false) {
         super({ id: "dlg_" + getAs().dialogStack.length });
-        const ast = getAs();
         this.title = this.title || "Message";
 
-        // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
-        if (!forceMode && (!this.mode || ast.mobileMode)) {
-            this.mode = ast.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
+        if (!forceMode && !this.mode) {
+            this.mode = DialogMode.POPUP; // used to be DialogMode.FULLSCREEN for mobile
         }
     }
 
@@ -69,11 +67,6 @@ export abstract class DialogBase extends Comp {
                 dispatch("OpenDialog", s => {
                     // adding to dialogStack will cause it to be rendered by main App component.
                     s.dialogStack.push(this);
-
-                    // opening first dialog in mobile mode
-                    if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 1) {
-                        document.body.style.overflow = "hidden";
-                    }
                 });
 
                 this.resolve = resolve;
@@ -112,11 +105,6 @@ export abstract class DialogBase extends Comp {
             if (index > -1) {
                 s.dialogStack.splice(index, 1);
             }
-
-            // if just closed last dialog (no more dialogs open)
-            if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 0) {
-                document.body.style.overflow = "auto";
-            }
         });
     }
 
@@ -139,7 +127,6 @@ export abstract class DialogBase extends Comp {
     }
 
     override preRender(): boolean | null {
-        const ast = getAs();
         const isTopmost = this.isTopmost();
 
         const width = this.genInitWidth();
@@ -179,7 +166,7 @@ export abstract class DialogBase extends Comp {
             contentAreaClass = "appModalContentAreaPopup" + (isTopmost ? " dlgContentBorderTopmost" : " dlgContentBorderNormal");
         }
         else {
-            contentAreaClass = ast.mobileMode ? "" : "appModalContentAreaEmbed";
+            contentAreaClass = "appModalContentAreaEmbed";
         }
 
         this.children = [
@@ -189,7 +176,7 @@ export abstract class DialogBase extends Comp {
                     extraTitleClass
             },
                 [
-                    new Div(null, { className: ast.mobileMode ? "dlgTitleContentMobile" : "dlgTitleContent" }, titleChildren),
+                    new Div(null, { className: "dlgTitleContent" }, titleChildren),
                     this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
                 ]
             )) : null,
@@ -204,9 +191,7 @@ export abstract class DialogBase extends Comp {
             this.attribs.style = { zIndex: this.zIndex };
         }
         else {
-            const clazzName = ast.mobileMode
-                ? (this.closeByOutsideClick ? "appModalMainMenu" : "appModalContFullscreen")
-                : (this.overrideClass ? this.overrideClass : "appModalCont");
+            const clazzName = this.overrideClass ? this.overrideClass : "appModalCont";
 
             // if fullscreen we render without backdrop
             if (this.mode !== DialogMode.POPUP) {
@@ -239,7 +224,7 @@ export abstract class DialogBase extends Comp {
                     }, children)
                 ];
 
-                if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
+                if (this.dlgFrame && this.titleDiv) {
                     this.makeDraggable(this.dlgFrame, this.titleDiv);
                 }
             }

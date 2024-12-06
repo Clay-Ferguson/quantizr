@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
@@ -151,7 +150,6 @@ export class OpenGraphPanel extends Comp {
 
     override preRender(): boolean | null {
         const state = this.getState<LS>();
-        const ast = getAs();
         if (state.loading || !state.og) {
             // be sure to return true to let this render or else we won't get the observer callback,
             // because the observer callback is only called when the element is rendered.
@@ -193,45 +191,34 @@ export class OpenGraphPanel extends Comp {
             // even if I'm making a mistake blaming the scrolling glitch on this.
             state.og.image = state.og.image.replaceAll("http://", "https://");
 
-            // if mobile portrait mode render image above (not beside) description
-            if (ast.mobileMode && !S.quanta.isLandscapeOrientation()) {
-                imgAndDesc = new Div(null, null, [
+            if (this.ui?.shortOg) {
+                this.attribs.className = this.wrapperClass;
+                this.children = [
                     new Img({
-                        className: "openGraphImageVert",
+                        className: this.imageClass + " openGraphFlowImage",
                         src: state.og.image
                     }),
-                    this.ui?.shortOg ? null : new Div(state.og.description)
-                ]);
+                    new Anchor(this.ui.url, state.og.title, {
+                        target: "_blank",
+                        className: "openGraphTitle"
+                    })
+                ];
+                return true;
             }
-            else {
-                if (this.ui?.shortOg) {
-                    this.attribs.className = this.wrapperClass;
-                    this.children = [
-                        new Img({
-                            className: this.imageClass + " openGraphFlowImage",
-                            src: state.og.image
-                        }),
-                        new Anchor(this.ui.url, state.og.title, {
-                            target: "_blank",
-                            className: "openGraphTitle"
-                        })
-                    ];
-                    return true;
-                }
 
-                // if we have an image then render a left-hand side and right-hand side.
-                imgAndDesc = new FlexRowLayout([
-                    new Div(null, { className: "openGraphLhs" }, [
-                        new Img({
-                            className: this.imageClass,
-                            src: state.og.image
-                        })
-                    ]),
-                    this.ui?.shortOg ? null : new Div(null, { className: "openGraphRhs" }, [
-                        new Html(state.og.description, { className: "openGraphDesc" })
-                    ])
-                ]);
-            }
+            // if we have an image then render a left-hand side and right-hand side.
+            imgAndDesc = new FlexRowLayout([
+                new Div(null, { className: "openGraphLhs" }, [
+                    new Img({
+                        className: this.imageClass,
+                        src: state.og.image
+                    })
+                ]),
+                this.ui?.shortOg ? null : new Div(null, { className: "openGraphRhs" }, [
+                    new Html(state.og.description, { className: "openGraphDesc" })
+                ])
+            ]);
+
         }
         // if no image just display the description in a div
         else {

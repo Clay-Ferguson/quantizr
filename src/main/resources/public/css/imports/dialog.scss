@@ -125,14 +125,6 @@
     width: 100%;
 }
 
-.dlgTitleContentMobile {
-    padding: 6px 6px 4px 12px;
-    width: 100%;
-    border: 1px solid gray;
-    height: 3rem;
-    margin-bottom: $smallGap;
-}
-
 .appModalContTinyWidth {
     @extend .appModalCont;
     max-width: 350px;

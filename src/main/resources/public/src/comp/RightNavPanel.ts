@@ -47,16 +47,14 @@ export class RightNavPanel extends Comp {
     override preRender(): boolean | null {
         const ast = getAs();
 
-        if (!ast.mobileMode) {
-            if (!ast.showRhs) {
-                this.attribs.className = "appColumn";
-            }
-            else {
-                this.attribs.className = Tailwind.getColClass(RightNavPanel.calcWidthCols()) + " appColumn";
-            }
+        if (!ast.showRhs) {
+            this.attribs.className = "appColumn";
+        }
+        else {
+            this.attribs.className = Tailwind.getColClass(RightNavPanel.calcWidthCols()) + " appColumn";
         }
 
-        const avatarImg = ast.mobileMode ? null : this.makeRHSAvatarDiv();
+        const avatarImg = this.makeRHSAvatarDiv();
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
         if (displayName && ast.node) {
@@ -64,7 +62,7 @@ export class RightNavPanel extends Comp {
             displayName = displayName || ast.node.owner;
         }
 
-        const clipboardPasteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
+        const clipboardPasteButton = !ast.isAnonUser ? new Icon({
             className: "fa fa-clipboard fa-lg mr-3 cursor-pointer",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
@@ -73,7 +71,7 @@ export class RightNavPanel extends Comp {
             title: "Save clipboard"
         }) : null;
 
-        const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
+        const addNoteButton = !ast.isAnonUser ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg mr-3 cursor-pointer",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
@@ -107,7 +105,7 @@ export class RightNavPanel extends Comp {
             });
         }
 
-        const textToSpeech = !ast.isAnonUser && !ast.mobileMode && S.tts.ttsSupported() ? new Icon({
+        const textToSpeech = !ast.isAnonUser && S.tts.ttsSupported() ? new Icon({
             className: "fa fa-volume-high fa-lg mr-3 cursor-pointer",
             onClick: S.tts._speakClipboard,
             title: "Text-to-Speech: Speak clipboard content"
@@ -125,8 +123,7 @@ export class RightNavPanel extends Comp {
             });
         }
 
-        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-right" }, [
-            // Not showing login on this panel in mobileMode, because it's shown at top of page instead
+        const loginSignupDiv = ast.isAnonUser ? new Div(null, { className: "float-right" }, [
             new Span("Login", {
                 className: "signupLinkText ui-login",
                 onClick: () => {
@@ -158,10 +155,10 @@ export class RightNavPanel extends Comp {
                             new UserProfileDlg(null).open();
                         }
                     }, [
-                        !ast.isAnonUser && !ast.mobileMode ? new Icon({
+                        !ast.isAnonUser ? new Icon({
                             className: "fa fa-gear fa-lg mr-3",
                         }) : null,
-                        !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
+                        !ast.isAnonUser ? new Span(displayName, {
                             className: "mr-3",
                         }) : null,
                     ]),
@@ -183,34 +180,25 @@ export class RightNavPanel extends Comp {
             //         }) : null
             //     ])
             // ]),
-            !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+            !ast.isAnonUser ? new TabPanelButtons(true, "rhsMenu") : null,
 
-            ast.nodeHistory?.length > 0 && !ast.isAnonUser && !ast.mobileMode ? new HistoryPanel() : null
+            ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
         ]);
 
-        if (ast.mobileMode) {
-            this.children = [
+        this.children = [
+            scrollDiv = new Div(null, { className: ast.showRhs ? "rightNavPanel customScrollbar" : "rightNavPanelPopup" }, [
                 creditDiv,
                 rightNavDiv
-            ];
-        }
-        else {
-            this.children = [
-                scrollDiv = new Div(null, { className: ast.showRhs ? "rightNavPanel customScrollbar" : "rightNavPanelPopup" }, [
-                    creditDiv,
-                    rightNavDiv
-                ])
-            ];
+            ])
+        ];
 
-            scrollDiv.getScrollPos = (): number => {
-                return RightNavPanel.scrollPos;
-            }
-
-            scrollDiv.setScrollPos = (pos: number): void => {
-                RightNavPanel.scrollPos = pos;
-            }
+        scrollDiv.getScrollPos = (): number => {
+            return RightNavPanel.scrollPos;
         }
 
+        scrollDiv.setScrollPos = (pos: number): void => {
+            RightNavPanel.scrollPos = pos;
+        }
         return true;
     }
 

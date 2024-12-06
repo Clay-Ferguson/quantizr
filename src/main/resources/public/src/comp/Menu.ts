@@ -16,7 +16,7 @@ export class Menu extends Comp {
         const renderName = this.subMenu ? this.name + ":" : this.name;
         this.children = [
             new Div(null, {
-                className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
+                className: clazz + " " + this.moreClasses,
                 id: "heading" + this.getId(),
                 onClick: () => {
                     asyncDispatch("ToggleExpansion", s => S.nav.changeMenuExpansion(s, "toggle", this.name));

@@ -86,7 +86,6 @@ $input-bg: $gray-700;
 $input-color: white;
 $input-color-placeholder: #999;
 
-$mobileHeaderBarHeight: 3.5rem;
 $baseBgColor: black; // rgb(32, 34, 36);
 $body-bg: black; // darken($baseBgColor, 7%);
 $body-color: white;
@@ -129,8 +128,6 @@ $mediumBorderSize: 6px;
 $highlightBorderSize: 10px;
 $highlightBorderSizeMinus1: 9px;
 $smallBorderSize: 3px;
-$mobileHeaderHeight: 3.5rem;
-
 
 // Currently disabling our current font, just to save on app load time. Leaving for future reference.
 // @font-face {

@@ -39,9 +39,7 @@ export class BreadcrumbsPanel extends Comp {
                         className: "breadcrumbItem"
                     });
 
-                    if (!ast.mobileMode) {
-                        S.domUtil.makeDropTarget(span.attribs, bc.id);
-                    }
+                    S.domUtil.makeDropTarget(span.attribs, bc.id);
                     return span;
                 }
                 else {

@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { Span } from "../comp/core/Span";
 import { Comp } from "./base/Comp";
@@ -61,8 +60,8 @@ export class MenuItem extends Comp {
         }
 
         this.attribs.style = { display: (state.visible ? "" : "none") };
-        this.attribs.className = innerClazz + enablementClass + "  listGroupTransparent" +
-            (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses;
+        this.attribs.className = innerClazz + enablementClass + "  listGroupTransparent " +
+            + this.moreClasses;
         this.attribs.onClick = this._onClick
         return true
     }

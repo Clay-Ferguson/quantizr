@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -22,7 +21,7 @@ export class AdminView extends AppTab<any> {
 
     override preRender(): boolean | null {
         const horzClass = "mt-3 mb-3 settingsSection";
-        const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
+        const settingsCol = "settingsCol";
 
         this.children = [
             this.headingBar = new TabHeading([

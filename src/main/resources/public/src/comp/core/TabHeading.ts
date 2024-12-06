@@ -1,4 +1,3 @@
-import { getAs } from "../../AppContext";
 import { TabBase } from "../../intf/TabBase";
 import { BreadcrumbsPanel } from "../BreadcrumbsPanel";
 import { Comp } from "../base/Comp";
@@ -12,10 +11,10 @@ export class TabHeading extends Comp {
         if (data) {
             children = children || [];
             children.push(new Clearfix());
-            children.push(!getAs().mobileMode && data?.props?.breadcrumbs ? new BreadcrumbsPanel(data?.props?.breadcrumbs) : null);
+            children.push(data?.props?.breadcrumbs ? new BreadcrumbsPanel(data?.props?.breadcrumbs) : null);
         }
 
         this.children = children;
-        this.attribs.className = getAs().mobileMode ? "headingBarMobile" : "headingBar";
+        this.attribs.className = "headingBar";
     }
 }

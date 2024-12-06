@@ -343,7 +343,7 @@ export class EditNodeDlg extends DialogBase {
 
             // only take some number of default rows greater than 1 if this is a non-schemaOrg type
             if (!type?.schemaOrg) {
-                rows = getAs().mobileMode ? "8" : "10";
+                rows = "10";
             }
             mainPropsTable.addChild(this.makeContentEditor(rows, type?.schemaOrg ? 1 : 3));
             this.contentEditor.setWordWrap(isWordWrap);

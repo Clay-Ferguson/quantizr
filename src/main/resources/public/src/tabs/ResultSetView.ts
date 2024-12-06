@@ -77,7 +77,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo> extends AppTab<PT>
                 new Clearfix()
             ], this.data),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading " + Tailwind.alertSecondary) : null,
-            // !ast.mobileMode && this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
+            // this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
         ];
 
         // this shows the page number. not needed. used for debugging.
@@ -115,7 +115,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo> extends AppTab<PT>
     }
 
     configDragAndDrop(c: Comp, ast: AppState, id: string) {
-        if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
+        if (ast.userPrefs.editMode && !ast.editNode) {
             S.domUtil.setNodeDragHandler(c.attribs, id);
             S.domUtil.makeDropTarget(c.attribs, id);
         }

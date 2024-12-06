@@ -87,7 +87,7 @@ export abstract class DocumentView<PT extends ResultSetInfo> extends AppTab<PT> 
     }
 
     configDragAndDrop(c: Comp, ast: AppState, id: string) {
-        if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
+        if (ast.userPrefs.editMode && !ast.editNode) {
             S.domUtil.setNodeDragHandler(c.attribs, id);
             S.domUtil.makeDropTarget(c.attribs, id);
         }

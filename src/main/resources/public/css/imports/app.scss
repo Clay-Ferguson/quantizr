@@ -27,17 +27,6 @@ p:last-child {
     border-radius: 4px;
 }
 
-.mobileHeaderBar {
-    padding-right: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: $nodeBorderBottomColor;
-    border-bottom: 1px solid gray;
-    height: $mobileHeaderBarHeight;
-}
-
 .mainAppRow {
     margin-left: 0px !important;
     margin-right: 0px !important;
@@ -94,12 +83,6 @@ p:last-child {
 .mainContainer {
     padding: 0;
     overflow: hidden;
-}
-
-.mainContainerMobile {
-    padding: 0;
-    font-size: 1.2rem;
-    font-weight: 300;
 }
 
 .rightNavPanel {
@@ -240,14 +223,6 @@ p:last-child {
     position: sticky;
     top: 0;
     z-index: 100;
-    min-height: 3.5rem;
-}
-
-.headingBarMobile {
-    padding-bottom: 8px;
-    padding-left: $smallGap;
-    border-bottom: 2px solid $nodeBorderBottomColor;
-    background-color: $body-bg;
     min-height: 3.5rem;
 }
 

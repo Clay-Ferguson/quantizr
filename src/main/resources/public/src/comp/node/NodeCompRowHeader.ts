@@ -28,7 +28,7 @@ export class NodeCompRowHeader extends Comp {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
+        const allowWideViewIcons = S.quanta.isLandscapeOrientation();
         let displayName = this.node.displayName || this.node.owner;
         const isMine = S.props.isMine(this.node);
         const children = [];
@@ -100,18 +100,13 @@ export class NodeCompRowHeader extends Comp {
             }
 
             if (!ast.isAnonUser && allowWideViewIcons) {
-                if (ast.mobileMode) {
-                    // for now let's not have tts on mobile.
-                }
-                else {
-                    if (S.tts.ttsSupported()) {
-                        children.push(new Icon({
-                            className: "fa fa-volume-high fa-lg rowHeaderIcon",
-                            title: "Text-to-Speech (Read Aloud)",
-                            [C.DOM_ID_ATTR]: this._getContentDomId(),
-                            onClick: S.nav._ttsClick
-                        }));
-                    }
+                if (S.tts.ttsSupported()) {
+                    children.push(new Icon({
+                        className: "fa fa-volume-high fa-lg rowHeaderIcon",
+                        title: "Text-to-Speech (Read Aloud)",
+                        [C.DOM_ID_ATTR]: this._getContentDomId(),
+                        onClick: S.nav._ttsClick
+                    }));
                 }
             }
         }
@@ -324,8 +319,7 @@ export class NodeCompRowHeader extends Comp {
             floatUpperRightDiv.addChildren([jumpButton]);
         }
 
-        // for mobile, we don't show this float right component unless in wide-screen orientation.
-        if ((!ast.mobileMode || S.quanta.isLandscapeOrientation()) && floatUpperRightDiv.hasChildren()) {
+        if ((S.quanta.isLandscapeOrientation()) && floatUpperRightDiv.hasChildren()) {
             children.push(floatUpperRightDiv);
             children.push(new Clearfix());
         }

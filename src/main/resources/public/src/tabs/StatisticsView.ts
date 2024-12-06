@@ -39,7 +39,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo> {
         //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle "+Tailwind.alertPrimary }));
         //     this.res.topVotes.forEach(word => {
         //         tagPanel.addChild(new Span(word, {
-        //             className: ast.mobileMode ? "statsWordMobile" : "statsWord",
+        //             className: "statsWord",
         //             [C.WORD_ATTR]: "\"" + word + "\""
         //         }));
         //     });

@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
@@ -172,13 +171,6 @@ export class Quanta {
                 return;
             }
 
-            const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE);
-            dispatch("InitState", async (s: AppState) => {
-                if (mobileMode) {
-                    s.mobileMode = mobileMode === "true";
-                }
-            });
-
             if (history.scrollRestoration) {
                 history.scrollRestoration = "manual";
             }
@@ -226,9 +218,6 @@ export class Quanta {
 
             // not used. do not delete.
             window.addEventListener("resize", () => {
-                // for mobile mode we leave showRhs true always
-                if (getAs().mobileMode) return;
-
                 if ((window.innerWidth < 1024 && this.screenWidth >= 1024) ||
                     (window.innerWidth >= 1024 && this.screenWidth < 1024)) {
                     dispatch("browserResize", s => s.showRhs = window.innerWidth >= 1024);

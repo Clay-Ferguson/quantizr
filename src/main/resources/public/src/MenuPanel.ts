@@ -294,9 +294,7 @@ export class MenuPanel extends Comp {
                         })
                     ];
                     const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComps);
-                    if (!ast.mobileMode) {
-                        S.domUtil.makeDropTarget(mi.attribs, nodeId);
-                    }
+                    S.domUtil.makeDropTarget(mi.attribs, nodeId);
                     bookmarkItems.push(mi);
                 });
             }
@@ -377,7 +375,7 @@ export class MenuPanel extends Comp {
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
                 new MenuItem("Set Headings", S.edit._setHeadings, onMainTab && selNodeIsMine, null, true), //
-                !ast.isAnonUser && !ast.mobileMode && S.tts.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
+                !ast.isAnonUser && S.tts.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
 

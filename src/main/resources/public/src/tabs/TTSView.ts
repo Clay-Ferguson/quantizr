@@ -51,25 +51,25 @@ export class TTSView extends AppTab<any> {
             }
         });
 
-        const speakAgainBtn = ast.ttsRan && S.tts.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
+        const speakAgainBtn = ast.ttsRan && S.tts.queuedSpeech?.length > 0 ? new Icon({
             className: "fa fa-refresh fa-2x mr-6 cursor-pointer",
             onClick: () => S.tts.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
-        // const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
+        // const stopBtn = ast.speechSpeaking ? new Icon({
         //     className: "fa fa-stop fa-2x mr-6 cursor-pointer",
         //     onClick: () => S.speech.stopSpeaking(),
         //     title: "Stop Speaking Text"
         // }) : null;
 
-        const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
+        const pauseBtn = ast.speechSpeaking && !ast.speechPaused ? new Icon({
             className: "fa fa-pause fa-2x mr-6 cursor-pointer",
             onClick: S.tts._pauseSpeaking,
             title: "Pause Speaking Text"
         }) : null;
 
-        const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
+        const resumeBtn = ast.speechSpeaking && ast.speechPaused ? new Icon({
             className: "fa fa-play fa-2x mr-6 cursor-pointer",
             onClick: S.tts._resumeSpeaking,
             title: "Resume Speaking Text"

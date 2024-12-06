@@ -36,7 +36,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         const nodeSlashesMatch = node.path.match(/\//g);
 
         let style = null;
-        if (!ast.mobileMode && ast.docIndent) {
+        if (ast.docIndent) {
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
             if (indentLevel > 0) {
                 style = { marginLeft: "" + (indentLevel * 25) + "px" };
@@ -47,9 +47,8 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
     }
 
     override getFloatRightHeaderComp(): Comp {
-        const ast = getAs();
         return new Div(null, { className: "float-right" }, [
-            ast.mobileMode ? null : new Checkbox("Indent", {
+            new Checkbox("Indent", {
                 className: "ml-3",
                 title: "Indent the Document based on content hierarchy"
             }, {

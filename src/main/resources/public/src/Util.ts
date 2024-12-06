@@ -1,6 +1,5 @@
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
-import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -646,23 +645,8 @@ export class Util {
     }
 
     _showBrowserInfo = () => {
-        let info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
-        info += "\n\nType: ";
-        if (clientInfo.isMobileOrTablet) {
-            info += "Mobile or Tablet";
-        }
-        else {
-            info += "Desktop";
-        }
-
+        const info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
         this.showMessage(info, "Browser Info");
-    }
-
-    _switchBrowsingMode = () => {
-        dispatch("SwitchBrowsingMode", s => {
-            s.mobileMode = !s.mobileMode;
-            S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false");
-        });
     }
 
     _sendTestEmail = async () => {

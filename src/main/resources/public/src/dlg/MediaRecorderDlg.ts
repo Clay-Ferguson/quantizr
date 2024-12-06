@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -121,7 +120,7 @@ export class MediaRecorderDlg extends DialogBase {
             }
             this.videoPlayer = new VideoPlayer({
                 style: {
-                    width: getAs().mobileMode ? "50%" : "100%",
+                    width: "100%",
                     border: "3px solid gray",
                     display: "block",
                     padding: "0px",

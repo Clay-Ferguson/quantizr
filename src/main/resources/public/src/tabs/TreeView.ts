@@ -36,7 +36,7 @@ export class TreeView extends AppTab<any> {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
-                // !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
+                // new BreadcrumbsPanel(this.data.props?.breadcrumbs),
                 ast.pageMessage ? new Html(ast.pageMessage, { className: Tailwind.alertInfo + " float-right" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 
@@ -53,10 +53,10 @@ export class TreeView extends AppTab<any> {
         const isRootNode = ast.node.path === "/r";
         const parentVisible = S.nav.parentVisibleToUser();
 
-        if (ast.node && ((!ast.mobileMode && !isRootNode) || parentVisible)) {
+        if (ast.node && (!isRootNode || parentVisible)) {
             const headingBarItems = [];
 
-            if (!ast.isAnonUser && !ast.mobileMode) {
+            if (!ast.isAnonUser) {
                 headingBarItems.push(new Icon({
                     className: "fa fa-search fa-lg buttonBarIcon",
                     title: "Search under this Node",

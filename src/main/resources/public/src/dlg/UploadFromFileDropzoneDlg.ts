@@ -170,7 +170,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         const config: any = {
             action,
             width: "100%",
-            height: getAs().mobileMode ? "60%" : "100%",
+            height: "100%",
             progressBarWidth: "100%",
             url,
             headers: {

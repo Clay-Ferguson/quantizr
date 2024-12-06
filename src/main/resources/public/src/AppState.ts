@@ -1,4 +1,3 @@
-import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { NodeHistoryItem } from "./HistoryUtil";
@@ -27,8 +26,7 @@ export class AppState {
 
     // this will be true only if screen width greater than 1024px. In desktop mode we have the RHS
     // panel in a popup, and if this var is false that means we're allowing the RHS only in this
-    // popup panel that can be triggered by the sitemap button on the upper left. For mobile mode
-    // this is always true.
+    // popup panel that can be triggered by the sitemap button on the upper left. 
     showRhs = true;
 
     appInitComplete = false;
@@ -36,10 +34,6 @@ export class AppState {
     stateId: number = 0;
     displayFeedSearch: boolean = false;
     docIndent: boolean = false;
-
-    mobileMode: boolean = clientInfo.isMobileOrTablet;
-    // mobileMode: boolean = true;
-
     dialogStack: DialogBase[] = [];
 
     /* text at top of page, when user tries to upLevel too far etc */
