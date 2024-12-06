@@ -53,7 +53,7 @@ export class NodeCompContent extends Comp {
         here is not showing the normal attachment for this node, because that will the same as the
         avatar */
         const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
-        const showImages = (ast.docImages || this.tabData.id !== C.TAB_DOCUMENT) && S.props.hasBinary(this.node) && !isAccountNode;
+        const showImages = S.props.hasBinary(this.node) && !isAccountNode;
         let floatedImages = false;
         if (showImages) {
             const attachments = S.props.getOrderedAtts(this.node);

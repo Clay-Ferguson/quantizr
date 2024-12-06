@@ -49,19 +49,6 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
     override getFloatRightHeaderComp(): Comp {
         const ast = getAs();
         return new Div(null, { className: "float-right" }, [
-            ast.mobileMode ? null : new Checkbox("Images", {
-                className: "ml-3",
-                title: "Display inline images"
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("docImages", s => {
-                        s.docImages = checked;
-                    });
-                },
-                getValue: (): boolean => {
-                    return getAs().docImages;
-                }
-            }),
             ast.mobileMode ? null : new Checkbox("Indent", {
                 className: "ml-3",
                 title: "Indent the Document based on content hierarchy"
