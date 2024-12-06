@@ -16,9 +16,9 @@ import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
 
-export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
+export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT> {
 
-    constructor(data: TabBase<PT, ThreadView<PT>>) {
+    constructor(data: TabBase<PT>) {
         super(data);
         data.inst = this;
     }

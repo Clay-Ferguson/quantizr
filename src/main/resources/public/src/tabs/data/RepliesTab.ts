@@ -7,7 +7,7 @@ import { S } from "../../Singletons";
 import { TabBase } from "../../intf/TabBase";
 import { RepliesView } from "../RepliesView";
 
-export class RepliesTab extends TabBase<RepliesRSInfo, RepliesView<RepliesRSInfo>> {
+export class RepliesTab extends TabBase<RepliesRSInfo> {
     name = "Replies";
     tooltip = "All known replies to the post"
     id = C.TAB_REPLIES;
@@ -20,7 +20,7 @@ export class RepliesTab extends TabBase<RepliesRSInfo, RepliesView<RepliesRSInfo
     }
 
     isVisible() { return !!getAs().repliesViewNodeId; }
-    constructView(data: TabBase<RepliesRSInfo, RepliesView<RepliesRSInfo>>): RepliesView<RepliesRSInfo> {
+    constructView(data: TabBase<RepliesRSInfo>): RepliesView<RepliesRSInfo> {
         return new RepliesView(data);
     }
 

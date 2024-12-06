@@ -14,9 +14,9 @@ import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 
-export class TreeView extends AppTab<any, TreeView> {
+export class TreeView extends AppTab<any> {
 
-    constructor(data: TabBase<any, TreeView>) {
+    constructor(data: TabBase<any>) {
         super(data, null);
         this.attribs.key = "treeViewKey";
         data.inst = this;

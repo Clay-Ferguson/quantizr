@@ -27,7 +27,7 @@ import { Validator } from "../Validator";
  * https://www.w3.org/2010/05/video/mediaevents.html 
  * See also: VideoPlayerDlg (which is very similar)
  */
-export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
+export class AudioPlayerView extends AppTab<any> {
 
     public static audioNodeId: string;
     public static customTitle: string;
@@ -56,7 +56,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(data: TabBase<any, AudioPlayerView>) {
+    constructor(data: TabBase<any>) {
         super(data);
         data.inst = this;
     }

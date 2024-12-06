@@ -7,11 +7,11 @@ import { Comp } from "./base/Comp";
 having a class 'data.id' tacked on to it. This class is expected to be there for managing scrolling,
 and also the IDs on each of those elements needs to be repeatable across all renders. */
 
-// PT=Properties Type, TT=Tab Type
-export class AppTab<PT = any, TT = any> extends Comp {
+// PT=Properties Type
+export class AppTab<PT = any> extends Comp {
     headingBar: Comp = null;
 
-    constructor(public data: TabBase<PT, TT>, private extraEditModeClass: string = null) {
+    constructor(public data: TabBase<PT>, private extraEditModeClass: string = null) {
         super({
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.

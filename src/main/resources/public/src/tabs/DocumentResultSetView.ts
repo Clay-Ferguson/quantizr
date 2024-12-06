@@ -8,9 +8,9 @@ import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { DocumentView } from "./DocumentView";
 
-export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentView<TT, DocumentResultSetView<TT>> {
+export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentView<TT> {
 
-    constructor(data: TabBase<TT, DocumentResultSetView<TT>>) {
+    constructor(data: TabBase<TT>) {
         super(data);
         data.inst = this;
 

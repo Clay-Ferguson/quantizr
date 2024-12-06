@@ -9,9 +9,9 @@ import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 
-export class AdminView extends AppTab<any, AdminView> {
+export class AdminView extends AppTab<any> {
 
-    constructor(data: TabBase<any, AdminView>) {
+    constructor(data: TabBase<any>) {
         super(data);
         data.inst = this;
     }

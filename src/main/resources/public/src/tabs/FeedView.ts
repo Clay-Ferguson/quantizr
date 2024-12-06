@@ -17,9 +17,9 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedViewProps } from "./FeedViewProps";
 
-export class FeedView extends AppTab<FeedViewProps, FeedView> {
+export class FeedView extends AppTab<FeedViewProps> {
 
-    constructor(data: TabBase<FeedViewProps, FeedView>) {
+    constructor(data: TabBase<FeedViewProps>) {
         super(data);
         data.inst = this;
     }

@@ -13,10 +13,10 @@ import { SearchDlg } from "../dlg/SearchDlg";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 
-export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
+export class StatisticsView extends AppTab<StatisticsRSInfo> {
     static inst: StatisticsView = null;
 
-    constructor(data: TabBase<StatisticsRSInfo, StatisticsView>) {
+    constructor(data: TabBase<StatisticsRSInfo>) {
         super(data);
         data.inst = StatisticsView.inst = this;
     }

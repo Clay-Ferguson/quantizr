@@ -9,9 +9,9 @@ import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSetView<PT, FollowersResultSetView<PT>> {
+export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSetView<PT> {
 
-    constructor(data: TabBase<PT, FollowersResultSetView<PT>>) {
+    constructor(data: TabBase<PT>) {
         super(data);
         data.inst = this;
         this.showContentHeading = false;

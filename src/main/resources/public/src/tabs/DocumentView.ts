@@ -16,13 +16,13 @@ import { TabBase } from "../intf/TabBase";
 
 /* This class does client-side paging so that we don't overload React renderer with too many items.
 which can render too slow, so we max out at only 100 items per page. */
-export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> extends AppTab<PT, TT> {
+export abstract class DocumentView<PT extends ResultSetInfo> extends AppTab<PT> {
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
     pagingContainerClass: string = "-float-right mb-3 mt-3";
 
-    constructor(data: TabBase<PT, TT>) {
+    constructor(data: TabBase<PT>) {
         super(data);
     }
 

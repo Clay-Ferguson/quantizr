@@ -9,7 +9,7 @@ import { S } from "../../Singletons";
 import { FeedView } from "../FeedView";
 import { FeedViewProps } from "../FeedViewProps";
 
-export class FeedTab extends TabBase<FeedViewProps, FeedView> {
+export class FeedTab extends TabBase<FeedViewProps> {
     name = "Feed";
     tooltip = "Reverse-chronological list of posts";
     id = C.TAB_FEED;
@@ -34,7 +34,7 @@ export class FeedTab extends TabBase<FeedViewProps, FeedView> {
         return false;
     }
 
-    constructView(data: TabBase<FeedViewProps, FeedView>): FeedView {
+    constructView(data: TabBase<FeedViewProps>): FeedView {
         return new FeedView(data);
     }
 

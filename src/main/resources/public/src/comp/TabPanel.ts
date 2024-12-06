@@ -2,7 +2,6 @@ import { getAs, promiseDispatch } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { Tailwind } from "../Tailwind";
-import { AppTab } from "./AppTab";
 import { Comp } from "./base/Comp";
 import { RightNavPanel } from "./RightNavPanel";
 
@@ -52,7 +51,7 @@ export class TabPanel extends Comp {
         return true;
     }
 
-    buildTabs(): AppTab[] {
+    buildTabs(): Comp[] {
         const ast = getAs();
         const tabs = ast.tabData.map(tab => {
             if (tab.isVisible() && tab.id === ast.activeTab) {

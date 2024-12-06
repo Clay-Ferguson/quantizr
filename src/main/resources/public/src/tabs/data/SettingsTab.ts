@@ -2,7 +2,7 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { SettingsView } from "../SettingsView";
 
-export class SettingsTab extends TabBase<any, SettingsView> {
+export class SettingsTab extends TabBase<any> {
     name = "Settings";
     tooltip = "Edit your Account Settings";
     id = C.TAB_SETTINGS;
@@ -18,7 +18,7 @@ export class SettingsTab extends TabBase<any, SettingsView> {
         return SettingsTab.tabShown;
     }
 
-    constructView(data: TabBase<any, SettingsView>): SettingsView {
+    constructView(data: TabBase<any>): SettingsView {
         return new SettingsView(data);
     }
 }

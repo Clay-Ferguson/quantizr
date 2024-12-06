@@ -9,11 +9,10 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { TreeView } from "../TreeView";
 
-export class MainTab extends TabBase<any, TreeView> {
+export class MainTab extends TabBase<any> {
     name = "Folders";
     tooltip = "Content Tree";
     id = C.TAB_MAIN;
-
     static inst: MainTab = null;
     constructor() {
         super();
@@ -23,7 +22,8 @@ export class MainTab extends TabBase<any, TreeView> {
     isVisible() {
         return true;
     }
-    constructView(data: TabBase<any, TreeView>): TreeView {
+
+    constructView(data: TabBase<any>): TreeView {
         return new TreeView(data);
     }
 

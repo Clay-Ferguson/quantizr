@@ -16,14 +16,14 @@ import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 
-export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab> extends AppTab<PT, TT> {
+export abstract class ResultSetView<PT extends ResultSetInfo> extends AppTab<PT> {
 
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
     pagingContainerClass: string = "mb-3 mt-3";
 
-    constructor(data: TabBase<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
+    constructor(data: TabBase<PT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
         if (infiniteScrolling && showPageNumber) {
             throw new Error("page numbering incompatable with infinite scrolling")

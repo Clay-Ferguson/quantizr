@@ -6,7 +6,7 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { FollowersResultSetView } from "../FollowersResultSetView";
 
-export class FollowersTab extends TabBase<FollowersRSInfo, FollowersResultSetView<FollowersRSInfo>> {
+export class FollowersTab extends TabBase<FollowersRSInfo> {
     name = "Followers";
     tooltip = "Followers of your account";
     id = C.TAB_FOLLOWERS;
@@ -22,7 +22,7 @@ export class FollowersTab extends TabBase<FollowersRSInfo, FollowersResultSetVie
         return S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
     }
 
-    constructView(data: TabBase<FollowersRSInfo, FollowersResultSetView<FollowersRSInfo>>): FollowersResultSetView<FollowersRSInfo> {
+    constructView(data: TabBase<FollowersRSInfo>): FollowersResultSetView<FollowersRSInfo> {
         return new FollowersResultSetView<FollowersRSInfo>(data);
     }
 

@@ -6,7 +6,7 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { FollowingResultSetView } from "../FollowingResultSetView";
 
-export class FollowingTab extends TabBase<FollowingRSInfo, FollowingResultSetView<FollowingRSInfo>> {
+export class FollowingTab extends TabBase<FollowingRSInfo> {
     name = "Following";
     tooltip = "List of people the person is following";
     id = C.TAB_FOLLOWING;
@@ -21,7 +21,7 @@ export class FollowingTab extends TabBase<FollowingRSInfo, FollowingResultSetVie
     isVisible() {
         return S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
     }
-    constructView(ast: TabBase<FollowingRSInfo, FollowingResultSetView<FollowingRSInfo>>): FollowingResultSetView<FollowingRSInfo> {
+    constructView(ast: TabBase<FollowingRSInfo>): FollowingResultSetView<FollowingRSInfo> {
         return new FollowingResultSetView<FollowingRSInfo>(ast);
     }
 

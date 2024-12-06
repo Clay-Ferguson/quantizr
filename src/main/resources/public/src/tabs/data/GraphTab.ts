@@ -4,7 +4,7 @@ import { Constants as C } from "../../Constants";
 import { FullScreenType } from "../../Interfaces";
 import { TabBase } from "../../intf/TabBase";
 
-export class GraphTab extends TabBase<any, any> {
+export class GraphTab extends TabBase<any> {
     name = "Node Graph";
     tooltip = "View Node Graph";
     id = C.TAB_GRAPH;
@@ -22,7 +22,7 @@ export class GraphTab extends TabBase<any, any> {
 
     // todo-0: It's kind of ugly that constructView uses a side effect rather than constructing a view. Fix this and also
     // check to see if here are other cases of this.
-    constructView(_data: TabBase<any, any>): any {
+    constructView(_data: TabBase<any>): any {
         dispatch("RestoreGraph", s => {
             s.savedActiveTab = s.activeTab;
             s.fullScreenConfig = { type: FullScreenType.GRAPH };

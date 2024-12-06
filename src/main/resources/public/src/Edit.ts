@@ -22,13 +22,14 @@ import { FullScreenType } from "./Interfaces";
 import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
+import { ResultSetInfo } from "./ResultSetInfo";
 import { S } from "./Singletons";
 import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
-import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
+import { DocumentView } from "./tabs/DocumentView";
 import { Tailwind } from "./Tailwind";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
@@ -1463,9 +1464,9 @@ export class Edit {
                 });
             }
             else if (ast.activeTab === C.TAB_DOCUMENT) {
-                const data: TabBase<any, DocumentResultSetView<any>> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                const data: TabBase<any> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
-                    data.inst.pageChange(null);
+                    (data.inst as DocumentView<ResultSetInfo>).pageChange(null);
                 }
             }
         }

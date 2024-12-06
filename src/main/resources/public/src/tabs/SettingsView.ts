@@ -15,8 +15,8 @@ import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabBase } from "../intf/TabBase";
 
-export class SettingsView extends AppTab<any, SettingsView> {
-    constructor(data: TabBase<any, SettingsView>) {
+export class SettingsView extends AppTab<any> {
+    constructor(data: TabBase<any>) {
         super(data);
         data.inst = this;
     }

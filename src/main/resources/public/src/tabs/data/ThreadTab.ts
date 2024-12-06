@@ -7,7 +7,7 @@ import { S } from "../../Singletons";
 import { ThreadRSInfo } from "../../ThreadRSInfo";
 import { ThreadView } from "../ThreadView";
 
-export class ThreadTab extends TabBase<ThreadRSInfo, ThreadView<ThreadRSInfo>> {
+export class ThreadTab extends TabBase<ThreadRSInfo> {
     name = "Thread";
     tooltip = "View of Posts in top-down chronological order showing the full reply chain"
     id = C.TAB_THREAD;
@@ -32,7 +32,7 @@ export class ThreadTab extends TabBase<ThreadRSInfo, ThreadView<ThreadRSInfo>> {
         return false;
     }
 
-    constructView(data: TabBase<ThreadRSInfo, ThreadView<ThreadRSInfo>>): ThreadView<ThreadRSInfo> {
+    constructView(data: TabBase<ThreadRSInfo>): ThreadView<ThreadRSInfo> {
         return new ThreadView(data);
     }
 

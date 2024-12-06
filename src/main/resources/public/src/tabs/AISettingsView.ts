@@ -17,7 +17,7 @@ import { ScrollPos } from "../comp/base/Comp";
 import { FlexLayout } from "../comp/core/FlexLayout";
 import { Tailwind } from "../Tailwind";
 
-export class AISettingsView extends AppTab<any, AISettingsView> {
+export class AISettingsView extends AppTab<any> {
     maxWordsState: Validator = new Validator();
     temperatureState: Validator = new Validator();
     fileExtState: Validator = new Validator("");
@@ -26,7 +26,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
     foldersToIncludeScrollPos = new ScrollPos();
     foldersToExcludeScrollPos = new ScrollPos();
 
-    constructor(data: TabBase<any, AISettingsView>) {
+    constructor(data: TabBase<any>) {
         super(data);
         data.inst = this;
         this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);

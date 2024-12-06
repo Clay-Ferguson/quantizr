@@ -3,7 +3,7 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { AdminView } from "../AdminView";
 
-export class AdminTab extends TabBase<any, AdminView> {
+export class AdminTab extends TabBase<any> {
     name = "Admin";
     tooltip = "Manage the Server Instance";
     id = C.TAB_ADMIN;
@@ -19,7 +19,7 @@ export class AdminTab extends TabBase<any, AdminView> {
         return getAs().isAdminUser;
     }
 
-    constructView(data: TabBase<any, AdminView>): AdminView {
+    constructView(data: TabBase<any>): AdminView {
         return new AdminView(data);
     }
 }

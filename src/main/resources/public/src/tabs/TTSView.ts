@@ -14,12 +14,12 @@ import { S } from "../Singletons";
 
 interface LS { // Local State
 }
-export class TTSView extends AppTab<any, TTSView> {
+export class TTSView extends AppTab<any> {
 
     static inst: TTSView = null;
     static ttsHighlightIdx: number = -1;
 
-    constructor(data: TabBase<any, TTSView>) {
+    constructor(data: TabBase<any>) {
         super(data);
         data.inst = this;
         TTSView.inst = this;

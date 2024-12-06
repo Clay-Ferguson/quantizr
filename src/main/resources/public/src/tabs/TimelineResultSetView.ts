@@ -8,9 +8,9 @@ import { Selection } from "../comp/core/Selection";
 import { TabBase } from "../intf/TabBase";
 import { ResultSetView } from "./ResultSetView";
 
-export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetView<PT, TimelineResultSetView<PT>> {
+export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetView<PT> {
 
-    constructor(data: TabBase<PT, TimelineResultSetView<PT>>) {
+    constructor(data: TabBase<PT>) {
         super(data);
         data.inst = this;
     }
