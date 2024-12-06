@@ -7,9 +7,9 @@ import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { MainTabComp } from "../MainTabComp";
+import { TreeView } from "../TreeView";
 
-export class MainTab extends TabBase<any, MainTabComp> {
+export class MainTab extends TabBase<any, TreeView> {
     name = "Folders";
     tooltip = "Content Tree";
     id = C.TAB_MAIN;
@@ -23,8 +23,8 @@ export class MainTab extends TabBase<any, MainTabComp> {
     isVisible() {
         return true;
     }
-    constructView(data: TabBase<any, MainTabComp>): MainTabComp {
-        return new MainTabComp(data);
+    constructView(data: TabBase<any, TreeView>): TreeView {
+        return new TreeView(data);
     }
 
     findNode(nodeId: string, ast: AppState = null): NodeInfo {

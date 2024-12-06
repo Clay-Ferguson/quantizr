@@ -14,11 +14,11 @@ import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 
-export class MainTabComp extends AppTab<any, MainTabComp> {
+export class TreeView extends AppTab<any, TreeView> {
 
-    constructor(data: TabBase<any, MainTabComp>) {
+    constructor(data: TabBase<any, TreeView>) {
         super(data, null);
-        this.attribs.key = "mainTabCompKey";
+        this.attribs.key = "treeViewKey";
         data.inst = this;
     }
 

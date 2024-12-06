@@ -9,7 +9,6 @@ import { Clearfix } from "../core/Clearfix";
 import { PropDisplayLayout } from "../PropDisplayLayout";
 import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
-import { Constants as C } from "../../Constants";
 
 export class NodeCompContent extends Comp {
     domPreUpdateFunc: (parent: Comp) => void;
