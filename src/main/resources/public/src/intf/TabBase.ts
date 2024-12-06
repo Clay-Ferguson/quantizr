@@ -30,6 +30,8 @@ export class TabBase<PT = any> {
     props: PT = {} as PT;
     openGraphComps: OpenGraphPanel[] = [];
 
+    onActivate(): void { }
+
     constructView(_data: TabBase<PT>): Comp { return null; }
 
     // controls whether to show tab button or not.

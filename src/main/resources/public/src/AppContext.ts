@@ -14,7 +14,7 @@ function */
 let dispatcher: (o: { type: string, func: (s: AppState) => any }) => void = null;
 
 export let state = new AppState();
-export const AppContext = createContext(state);
+export const AppContext: React.Context<AppState> = createContext(state);
 export type StateModFunc = (s: AppState) => any;
 
 interface DispatchData {
@@ -31,7 +31,7 @@ function reducer(s: AppState, action: DispatchData) {
         // ============================
         // WARNING!!!! Normally dispatch methods return NOTHING, and so returning exactly 'false' is
         // the only case we need to detect here. Do not change this to handle any "falsy" type
-        // because that will break the entier app.
+        // because that will break the entire app.
         // ============================
         if (action.func(newState) === false) {
             // if func itself requested rollback, then rollback

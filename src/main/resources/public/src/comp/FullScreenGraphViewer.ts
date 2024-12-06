@@ -24,9 +24,9 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    // This technique of overriding the _domUpdateEvent() method is used to ensure that the Graphg
+    // This technique of overriding the _domUpdateEvent() method is used to ensure that the Graph
     // DOM element which is not managed by react, is always maintained across renders, so that it
-    // doesn't loose state
+    // doesn't lose state
     override _domUpdateEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected) return;
@@ -90,7 +90,7 @@ export class FullScreenGraphViewer extends Main {
                     }
                 });
             }
-        
+
             FullScreenGraphViewer.sim = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(ast.attractionLinksInGraph ? [...links, ...nodeLinks] : links) //
                     .id((d: any) => d.id).distance(5)
@@ -207,7 +207,7 @@ export class FullScreenGraphViewer extends Main {
                 })
 
                 .on("click", (event: any, d: any) => {
-                    d3.select(event.currentTarget) 
+                    d3.select(event.currentTarget)
                         .attr("fill", "green");
 
                     if (d.data.id) {

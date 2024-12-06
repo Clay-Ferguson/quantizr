@@ -3,7 +3,6 @@ import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { TabBase } from "./intf/TabBase";
-import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { AdminTab } from "./tabs/data/AdminTab";
 import { DocumentTab } from "./tabs/data/DocumentTab";
@@ -138,14 +137,14 @@ export class TabUtil {
         return data?.props?.results?.length > 0;
     }
 
-    /* This function manages persisting the scroll position when switching from one tab to another,
-    to automatically restore the scroll position that was last scroll position on any given tab */
     tabChanging(prevTab: string, newTab: string) {
-
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {
             return;
         }
-        PubSub.pub(C.PUBSUB_tabChanging, newTab);
+        const data = getAs().tabData.find(d => d.id === newTab);
+        if (data) {
+            data.onActivate();
+        }
     }
 }
