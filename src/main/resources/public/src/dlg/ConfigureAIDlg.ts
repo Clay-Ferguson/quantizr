@@ -41,8 +41,8 @@ export class ConfigureAgentDlg extends DialogBase {
             new Div(null, null, [
                 new FlexLayout([
                     new Selection(null, "AI Service", aiOptions, "mb-3 mr-6", this.aiServiceState),
+                    aiModelInfo ? new Div(aiModelInfo, { className: "mb-3" }) : null,
                 ]),
-                aiModelInfo ? new Div(aiModelInfo, { className: "ml-6 mb-3" }) : null,
                 new TextArea("System Prompt", {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
