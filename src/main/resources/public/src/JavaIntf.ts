@@ -175,7 +175,6 @@ export interface AddPrivilegeRequest extends RequestBase {
 export interface AskSubGraphRequest extends RequestBase {
     nodeId: string;
     question: string;
-    aiService: string;
     nodeIds: string[];
 }
 
@@ -211,7 +210,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     createAtTop: boolean;
     aiMode: string;
     allowAiOverwrite: boolean;
-    aiService: string;
+    aiRequest: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -279,7 +278,6 @@ export interface GenerateBookByAIRequest extends RequestBase {
     prompt: string;
     numChapters: number;
     numSections: number;
-    aiService: string;
 }
 
 export interface GetBookmarksRequest extends RequestBase {
@@ -1101,12 +1099,6 @@ export interface UserPreferences {
     showReplies: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
-    aiService: string;
-    aiAgentFileExtensions: string;
-    aiAgentFoldersToInclude: string;
-    aiAgentFoldersToExclude: string;
-    aiMaxWords: number;
-    aiTemperature: number;
     maxUploadFileSize: number;
 }
 
@@ -1206,12 +1198,6 @@ export const enum NodeProp {
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
     USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",
-    USER_PREF_AI_SERVICE = "sn:aiService",
-    USER_PREF_AI_FILE_EXTENSIONS = "sn:aiAgentFileExtensions",
-    USER_PREF_AI_FOLDERS_TO_INCLUDE = "sn:aiAgentFoldersToInclude",
-    USER_PREF_AI_FOLDERS_TO_EXCLUDE = "sn:aiAgentFoldersToExclude",
-    USER_PREF_AI_MAX_WORDS = "sn:aiMaxWords",
-    USER_PREF_AI_TEMPERATURE = "sn:aiTemp",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
@@ -1259,6 +1245,7 @@ export const enum NodeProp {
     AI_FOLDERS_TO_EXCLUDE = "aiFoldersExclude",
     AI_FILE_EXTENSIONS = "aiFileExt",
     AI_SERVICE = "aiService",
+    AI_AGENT = "aiAgent",
     AI_QUERY_TEMPLATE = "aiTemplate",
     AI_MAX_WORDS = "aiMaxWords",
     AI_TEMPERATURE = "aiTemp",

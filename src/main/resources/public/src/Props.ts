@@ -159,13 +159,6 @@ export class Props {
         return node?.properties?.find(p => p?.name === propName);
     }
 
-    hasAIConfigProps(node: NodeInfo): boolean {
-        return !!this.getPropStr(J.NodeProp.AI_PROMPT, node) || //
-            !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
-            !!this.getPropStr(J.NodeProp.AI_MAX_WORDS, node) || //
-            !!this.getPropStr(J.NodeProp.AI_TEMPERATURE, node);
-    }
-
     getPropStr(propertyName: string, node: NodeInfo): string {
         return this.getProp(propertyName, node)?.value;
     }

@@ -146,7 +146,9 @@ public class AIService extends ServiceBase {
     }
 
     private void buildChatHistory(SubNode node, List<AIMessage> messages, SystemConfig system) {
-        svc_aiUtil.parseAIConfig(node, system);
+        if (system.getAgentNodeId() == null) {
+            svc_aiUtil.parseAIConfig(node, system);
+        }
         SubNode parent = svc_mongoRead.getParent(node);
         int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
@@ -158,7 +160,9 @@ public class AIService extends ServiceBase {
                 messages.add(0, new AIMessage("ai", parent.getContent()));
             } else {
                 nonAnswerCounter++;
-                svc_aiUtil.parseAIConfig(parent, system);
+                if (system.getAgentNodeId() == null) {
+                    svc_aiUtil.parseAIConfig(parent, system);
+                }
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.

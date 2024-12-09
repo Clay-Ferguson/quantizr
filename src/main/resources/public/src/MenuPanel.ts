@@ -409,7 +409,6 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
             children.push(new Menu("AI", [
-                new MenuItem("Settings", S.nav._showAISettings),
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),

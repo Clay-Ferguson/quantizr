@@ -19,13 +19,6 @@ public class UserPreferences {
     private boolean rssHeadlinesOnly;
     // valid Range = 4 thru 8, inclusive.
     private long mainPanelCols = 6;
-    private String aiService;
-    private String aiAgentFileExtensions;
-    private String aiAgentFoldersToInclude;
-    private String aiAgentFoldersToExclude;
-
-    private Integer aiMaxWords;
-    private Double aiTemperature;
 
     @JsonProperty(required = false)
     private long maxUploadFileSize;
@@ -48,14 +41,6 @@ public class UserPreferences {
     @JsonProperty(required = false)
     public void setMainPanelCols(long mainPanelCols) {
         this.mainPanelCols = mainPanelCols;
-    }
-
-    public String getAiService() {
-        return aiService;
-    }
-
-    public void setAiService(String aiService) {
-        this.aiService = aiService;
     }
 
     public boolean isEditMode() {
@@ -106,52 +91,12 @@ public class UserPreferences {
         this.rssHeadlinesOnly = rssHeadlinesOnly;
     }
 
-    public String getAiAgentFileExtensions() {
-        return aiAgentFileExtensions;
-    }
-
-    public void setAiAgentFileExtensions(String aiAgentFileExtensions) {
-        this.aiAgentFileExtensions = aiAgentFileExtensions;
-    }
-
-    public String getAiAgentFoldersToInclude() {
-        return aiAgentFoldersToInclude;
-    }
-
-    public void setAiAgentFoldersToInclude(String aiAgentFoldersToInclude) {
-        this.aiAgentFoldersToInclude = aiAgentFoldersToInclude;
-    }
-
-    public String getAiAgentFoldersToExclude() {
-        return aiAgentFoldersToExclude;
-    }
-
-    public void setAiAgentFoldersToExclude(String aiAgentFoldersToExclude) {
-        this.aiAgentFoldersToExclude = aiAgentFoldersToExclude;
-    }
-
     public String getAiMode() {
         return aiMode;
     }
 
     public void setAiMode(String aiMode) {
         this.aiMode = aiMode;
-    }
-
-    public Integer getAiMaxWords() {
-        return aiMaxWords;
-    }
-
-    public void setAiMaxWords(Integer aiMaxWords) {
-        this.aiMaxWords = aiMaxWords;
-    }
-
-    public Double getAiTemperature() {
-        return aiTemperature;
-    }
-
-    public void setAiTemperature(Double aiTemperature) {
-        this.aiTemperature = aiTemperature;
     }
 
     public UserPreferences() {}

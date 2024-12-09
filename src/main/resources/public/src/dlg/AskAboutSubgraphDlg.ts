@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -45,8 +44,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
         const res = await S.rpcUtil.rpc<J.AskSubGraphRequest, J.AskSubGraphResponse>("askSubGraph", {
             nodeId: this.nodeId,
             question: this.questionState.getValue(),
-            nodeIds: S.nodeUtil.getSelNodeIdsArray(),
-            aiService: getAs().userPrefs.aiService,
+            nodeIds: S.nodeUtil.getSelNodeIdsArray()
         });
 
         this.close();

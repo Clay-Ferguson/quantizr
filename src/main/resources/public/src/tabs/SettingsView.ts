@@ -2,11 +2,13 @@ import { getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 import { AppTab } from "../comp/AppTab";
+import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
+import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
 import { ManageCryptoKeysDlg } from "../dlg/ManageCryptoKeysDlg";
@@ -96,6 +98,16 @@ export class SettingsView extends AppTab<any> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("My GEO Location", S.nav._geoLocation), //
                         this.settingsLink("About Browser", S.util._showBrowserInfo)
+                    ])
+                ], horzClass),
+
+                this.sectionTitle("AI"),
+                new FlexRowLayout([
+                    new Div(null, { className: settingsCol }, [
+                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
+                        S.quanta.config.paymentLink ?
+                            new Button("Add Credit", S.user.addAccountCredit, null, "-primary settingsButton")
+                            : new Span("paymentLink not configured"),
                     ])
                 ], horzClass),
 

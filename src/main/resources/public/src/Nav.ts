@@ -17,7 +17,6 @@ import * as J from "./JavaIntf";
 import { Attachment } from "./JavaIntf";
 import { S } from "./Singletons";
 import { AudioPlayerView } from "./tabs/AudioPlayerView";
-import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
@@ -296,12 +295,6 @@ export class Nav {
     _showUserSettings = () => {
         SettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_SETTINGS);
-    }
-
-    _showAISettings = () => {
-        AISettingsTab.tabShown = true;
-        S.tabUtil.selectTab(C.TAB_AI_SETTINGS);
-        S.histUtil.pushHistory(null, AISettingsTab.URL_PARAM);
     }
 
     _showMainMenu = () => {

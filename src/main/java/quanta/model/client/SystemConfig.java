@@ -1,7 +1,7 @@
 package quanta.model.client;
 
 public class SystemConfig {
-    // If we get any settings from an agent ndoe we set that node ID here.
+    // Holds the AI Config node id
     private String agentNodeId;
     private String prompt; // ex: "you are a helpful assistant"
     private String foldersToInclude; // newline delimited list of file paths

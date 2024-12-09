@@ -34,12 +34,6 @@ public enum NodeProp {
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", null), //
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", null), //
     USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols", null), //
-    USER_PREF_AI_SERVICE("sn:aiService", null), //
-    USER_PREF_AI_FILE_EXTENSIONS("sn:aiAgentFileExtensions", null), //
-    USER_PREF_AI_FOLDERS_TO_INCLUDE("sn:aiAgentFoldersToInclude", null), //
-    USER_PREF_AI_FOLDERS_TO_EXCLUDE("sn:aiAgentFoldersToExclude", null), //
-    USER_PREF_AI_MAX_WORDS("sn:aiMaxWords", null), //
-    USER_PREF_AI_TEMPERATURE("sn:aiTemp", null), //
     SIGNUP_PENDING("sn:signupPending", null), //
 
     EMAIL_CONTENT("sn:content", null), //
@@ -128,6 +122,7 @@ public enum NodeProp {
     AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude", null), //
     AI_FILE_EXTENSIONS("aiFileExt", null), //
     AI_SERVICE("aiService", null), //
+    AI_AGENT("aiAgent", null), // existence of this prop means it's an AI agent node
     AI_QUERY_TEMPLATE("aiTemplate", null), //
     AI_MAX_WORDS("aiMaxWords", null), //
     AI_TEMPERATURE("aiTemp", null), //

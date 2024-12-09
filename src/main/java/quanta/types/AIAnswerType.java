@@ -7,7 +7,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
-@Component 
+@Component
 public class AIAnswerType extends TypeBase {
 
     @Override

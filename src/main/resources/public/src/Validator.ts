@@ -11,6 +11,8 @@ export interface ValidatorError {
 }
 
 export class Validator implements ValueIntf {
+    // NOTE: We have two separate states here so the error state can be updated
+    // all by itself, so don't be tempted to merge these two states into one.
     v: State<ValidatorValue> = new State<ValidatorValue>(null);
     e: State<ValidatorError> = new State<ValidatorError>(null);
 

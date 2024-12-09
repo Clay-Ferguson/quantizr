@@ -1,4 +1,3 @@
-import { getAs } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Div } from "./comp/core/Div";
@@ -20,7 +19,7 @@ export class AIUtil {
         this.aiServices = [];
         this.aiServices.push({
             name: J.AIModel.NONE,
-            description: "none (inherit)",
+            description: "none",
             longDescription: ""
         });
 
@@ -108,10 +107,6 @@ export class AIUtil {
                 longDescription: "XAI Grok Beta from the company formerly known as Twitter (128K context, max $15/megatoken)"
             });
         }
-    }
-
-    getActiveService(): AIService {
-        return this.getServiceByName(getAs().userPrefs.aiService);
     }
 
     getServiceByName(name: string): AIService {

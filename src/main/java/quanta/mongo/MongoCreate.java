@@ -309,21 +309,18 @@ public class MongoCreate extends ServiceBase {
 
         String typeToCreate = req.getTypeName();
         AIResponse aiResponse = null;
+        AIModel svc = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
-            AIModel svc = AIModel.fromString(req.getAiService());
-            if (svc != null) {
+            if (req.isAiRequest()) {
                 // First scan up the tree to see if we have a svc on the tree and if so use it instead.
                 SystemConfig system = new SystemConfig();
-                UserPreferences userPrefs = TL.getSC().getUserPreferences();
-                system.setFileExtensions(userPrefs.getAiAgentFileExtensions());
-                system.setFoldersToInclude(userPrefs.getAiAgentFoldersToInclude());
-                system.setFoldersToExclude(userPrefs.getAiAgentFoldersToExclude());
-                system.setMaxWords(userPrefs.getAiMaxWords());
-                system.setTemperature(userPrefs.getAiTemperature());
                 svc_aiUtil.getAIConfigFromAncestorNodes(parentNode, system);
                 if (system.getService() != null) {
                     svc = AIModel.fromString(system.getService());
+                }
+                if (svc == null) {
+                    throw new RuntimeEx("No AI service found from parent nodes");
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
                 aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,
@@ -346,11 +343,13 @@ public class MongoCreate extends ServiceBase {
         if (!aiOverwrite) {
             CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-            if (req.getProperties() == null) {
-                req.setProperties(Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService())));
-            } else {
-                req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
+            if (svc != null) {
+                if (req.getProperties() == null) {
+                    req.setProperties(Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), svc.s())));
+                } else {
+                    req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), svc.s()));
 
+                }
             }
             newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, null, 0L, createLoc,
                     req.getProperties(), null, true, true, nodeChanges);

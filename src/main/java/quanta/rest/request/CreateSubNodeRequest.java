@@ -16,10 +16,10 @@ public class CreateSubNodeRequest extends RequestBase {
     private String aiMode;
     private boolean allowAiOverwrite;
 
-    // If this is non-null it means we're asking a question on the parent, and the answer will come in
+    // If this is true it means we're asking a question on the parent, and the answer will come in
     // as a child. The string value determines the type of AI that will be asked to (OpenAI or
     // Perplexity, etc)
-    private String aiService;
+    private boolean aiRequest;
 
     /* Adds TYPE_LOCK property which prevents user from being able to change the type on the node */
     private boolean typeLock;
@@ -115,14 +115,6 @@ public class CreateSubNodeRequest extends RequestBase {
         this.payloadType = payloadType;
     }
 
-    public String getAiService() {
-        return aiService;
-    }
-
-    public void setAiService(String aiService) {
-        this.aiService = aiService;
-    }
-
     public String getAiMode() {
         return aiMode;
     }
@@ -138,6 +130,14 @@ public class CreateSubNodeRequest extends RequestBase {
     public void setAllowAiOverwrite(boolean allowAiOverwrite) {
         this.allowAiOverwrite = allowAiOverwrite;
     }
-    
+
+    public boolean isAiRequest() {
+        return aiRequest;
+    }
+
+    public void setAiRequest(boolean aiRequest) {
+        this.aiRequest = aiRequest;
+    }
+
     public CreateSubNodeRequest() {}
 }

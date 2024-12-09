@@ -1,10 +1,9 @@
 import { Dispatch, SetStateAction, useState } from "react";
 
 /* 
-Encapsulates the state of a component and provides by maintaining the state internally and also
-allowing the ability to monitor state with the "onStateChange" callback, as well as support
-for setting a custom state translation function, that can preProcess state changes. This is useful for
-components that need to maintain state but also need to be able to monitor that state for changes.
+Encapsulates the state of a component and allows the ability to monitor state with the "onStateChange" 
+callback, as well as support for setting a custom state translation function, that can preProcess state changes. 
+This is useful for components that need to maintain state but also need to be able to monitor that state for changes.
 */
 export class State<T> {
     private state: T;

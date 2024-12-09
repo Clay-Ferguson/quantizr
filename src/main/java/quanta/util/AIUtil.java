@@ -41,65 +41,47 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public void parseAIConfig(SubNode node, SystemConfig system) {
-        if (node.hasProp(NodeProp.AI_PROMPT.s())) {
-            system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
-            verifyOnlyAgent(node, system);
+    public boolean parseAIConfig(SubNode node, SystemConfig system) {
+        // once we've found an agent node we're done looking.
+        if (system.getAgentNodeId() != null) {
+            return true;
         }
 
-        if (node.hasProp(NodeProp.AI_FOLDERS_TO_INCLUDE.s())) {
-            system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_FOLDERS_TO_EXCLUDE.s())) {
-            system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_FILE_EXTENSIONS.s())) {
-            system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_SERVICE.s())) {
+        if (node.hasProp(NodeProp.AI_AGENT.s())) {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
-            String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
-            queryTemplate = removeHtmlComments(queryTemplate);
-            queryTemplate = injectTemplateContext(node, queryTemplate);
-
-            // When we set this, that means this will be the FINAL format for the question, also we're in
-            // writing mode here
-            system.setTemplate(queryTemplate);
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
-            system.setMaxWords(Integer.valueOf(node.getStr(NodeProp.AI_MAX_WORDS.s())));
-            verifyOnlyAgent(node, system);
-        }
-
-        if (node.hasProp(NodeProp.AI_TEMPERATURE.s())) {
-            system.setTemperature(Double.valueOf(node.getStr(NodeProp.AI_TEMPERATURE.s())));
-            verifyOnlyAgent(node, system);
-        }
-    }
-
-    public void verifyOnlyAgent(SubNode node, SystemConfig system) {
-        if (system.getAgentNodeId() == null) {
             system.setAgentNodeId(node.getIdStr());
-        } else {
-            // todo-0: this is throwing false positives because it's called for when properties not necessarily
-            // indicative of an Agent config are set
-            // if (!system.getAgentNodeId().equals(node.getIdStr())) {
-            // throw new RuntimeEx("Multiple Agent Nodes defined in the same context. Nodes: "
-            // + system.getAgentNodeId() + " and " + node.getIdStr());
-            // }
+            system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
+            system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
+            system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
+            system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));
+
+            String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
+            if (!StringUtils.isEmpty(queryTemplate)) {
+                queryTemplate = removeHtmlComments(queryTemplate);
+                queryTemplate = injectTemplateContext(node, queryTemplate);
+                // When we set this, that means this will be the FINAL format for the question, also we're in
+                // writing mode here
+                system.setTemplate(queryTemplate);
+            }
+
+            String maxWords = node.getStr(NodeProp.AI_MAX_WORDS.s());
+            try {
+                system.setMaxWords(Integer.valueOf(maxWords));
+            } catch (Exception e) {
+                log.debug("Max Words not a number, setting to 1000.");
+                system.setMaxWords(1000);
+            }
+
+            String temperature = node.getStr(NodeProp.AI_TEMPERATURE.s());
+            try {
+                system.setTemperature(Double.valueOf(temperature));
+            } catch (Exception e) {
+                log.debug("Temperature not a number, setting to 0.7.");
+                system.setTemperature(0.7);
+            }
+            return true;
         }
+        return false;
     }
 
     public String removeHtmlComments(String val) {
@@ -197,7 +179,8 @@ public class AIUtil extends ServiceBase {
 
     public void getAIConfigFromAncestorNodes(SubNode node, SystemConfig system) {
         while (node != null) {
-            parseAIConfig(node, system);
+            if (parseAIConfig(node, system))
+                break;
             node = svc_mongoRead.getParent(node);
         }
     }
@@ -255,9 +238,9 @@ public class AIUtil extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
 
-        sb.append("Here is some context infomration:\n");
+        sb.append("Here is some context information, to help answer the question below:\n");
+        sb.append("<context>\n");
         sb.append(node.getContent() + "\n\n");
-        SystemConfig system = new SystemConfig();
 
         for (SubNode n : nodes) {
             // if we have filter IDs and this node isn't in the filter, skip it
@@ -265,7 +248,6 @@ public class AIUtil extends ServiceBase {
                 continue;
             }
 
-            svc_aiUtil.parseAIConfig(node, system);
             sb.append(n.getContent() + "\n\n");
             counter++;
 
@@ -279,6 +261,7 @@ public class AIUtil extends ServiceBase {
                 }
             }
         }
+        sb.append("</context>\n");
         if (counter == 0) {
             throw new RuntimeEx("No context for this query was able to be created.");
         }
@@ -288,15 +271,24 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIModel svc = AIModel.fromString(req.getAiService());
+
+        SystemConfig system = new SystemConfig();
+        AIModel svc = null;
+        svc_aiUtil.getAIConfigFromAncestorNodes(node, system);
+        if (system.getService() != null) {
+            svc = AIModel.fromString(system.getService());
+        }
+        if (svc == null) {
+            throw new RuntimeEx("No AI service found from parent nodes");
+        }
+
         aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc, userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
-        } //
-        else {
-            throw new RuntimeEx("No answer from AI service: " + req.getAiService());
+        } else {
+            throw new RuntimeEx("No answer from AI");
         }
         return res;
     }
@@ -360,83 +352,85 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIModel svc = AIModel.fromString(req.getAiService());
-        if (svc != null) {
-            // First scan up the tree to see if we have a svc on the tree and if so use it instead.
-            SystemConfig system = new SystemConfig();
-            svc_aiUtil.getAIConfigFromAncestorNodes(parentNode, system);
-            if (system.getService() != null) {
-                svc = AIModel.fromString(system.getService());
-            }
-
-            String prompt = req.getPrompt();
-
-            if (StringUtils.isEmpty(prompt)) {
-                throw new RuntimeEx("Book description is required.");
-            }
-
-            if (!prompt.trim().endsWith(".")) {
-                prompt = prompt.trim() + ". ";
-            }
-            prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
-
-            if (req.getNumSections() != null && req.getNumSections() > 0) {
-                prompt += "Divide each chapter up into " + req.getNumSections() + " named sections.\n";
-            }
-
-            // #ai_prompt
-            prompt +=
-                    """
-                            Each chapter will be subdivided into sections too. Can you suggest the names of those chapters, and under each chapter list the section titles that would appear in that chapter. Also please provide this book index as JSON, so that it can be parsed by machine easily.
-
-                            Here's an example of the kind of JSON you should create:
-
-                            ```json
-                            {
-                              "title": "From Java to Python: A Transition Guide for Experts",
-                              "chapters": [
-                                {
-                                  "chapter": 1,
-                                  "title": "Introduction to Python for Java Developers",
-                                  "sections": [
-                                    "Comparing Python with Java",
-                                    "The Zen of Python",
-                                    "Setting up the Python environment",
-                                    "Python versions and compatibility",
-                                    "Key differences in syntax and design philosophy"
-                                  ]
-                                },
-                                {
-                                  "chapter": 2,
-                                  "title": "Python Basics: Variables and Data Types",
-                                  "sections": [
-                                    "Dynamic typing in Python",
-                                    "Primitive data types",
-                                    "Strings and String manipulation",
-                                    "Collections: List, Tuple, Set, Dictionary",
-                                    "Type hinting"
-                                  ]
-                                },
-                                {
-                                  "chapter": 3,
-                                  "title": "Control Flow in Python",
-                                  "sections": [
-                                    "Indentation-based syntax",
-                                    "if, elif, and else statements",
-                                    "for and while loops",
-                                    "List comprehensions",
-                                    "Exception handling differences"
-                                  ]
-                                },
-                                ...other chapters omitted
-                              ]
-                            }
-                            ```
-                            """;
-
-            aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc, userCredit);
-            res.setGptCredit(userCredit.getVal());
+        SystemConfig system = new SystemConfig();
+        AIModel svc = null;
+        svc_aiUtil.getAIConfigFromAncestorNodes(parentNode, system);
+        if (system.getService() != null) {
+            svc = AIModel.fromString(system.getService());
         }
+        if (svc == null) {
+            throw new RuntimeEx("No AI service found from parent nodes");
+        }
+
+        String prompt = req.getPrompt();
+
+        if (StringUtils.isEmpty(prompt)) {
+            throw new RuntimeEx("Book description is required.");
+        }
+
+        if (!prompt.trim().endsWith(".")) {
+            prompt = prompt.trim() + ". ";
+        }
+        prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
+
+        if (req.getNumSections() != null && req.getNumSections() > 0) {
+            prompt += "Divide each chapter up into " + req.getNumSections() + " named sections.\n";
+        }
+
+        // #ai_prompt
+        prompt +=
+                """
+                        Each chapter will be subdivided into sections too. Can you suggest the names of those chapters, and under each chapter list the section titles that would appear in that chapter. Also please provide this book index as JSON, so that it can be parsed by machine easily.
+
+                        Here's an example of the kind of JSON you should create:
+
+                        ```json
+                        {
+                          "title": "From Java to Python: A Transition Guide for Experts",
+                          "chapters": [
+                            {
+                              "chapter": 1,
+                              "title": "Introduction to Python for Java Developers",
+                              "sections": [
+                                "Comparing Python with Java",
+                                "The Zen of Python",
+                                "Setting up the Python environment",
+                                "Python versions and compatibility",
+                                "Key differences in syntax and design philosophy"
+                              ]
+                            },
+                            {
+                              "chapter": 2,
+                              "title": "Python Basics: Variables and Data Types",
+                              "sections": [
+                                "Dynamic typing in Python",
+                                "Primitive data types",
+                                "Strings and String manipulation",
+                                "Collections: List, Tuple, Set, Dictionary",
+                                "Type hinting"
+                              ]
+                            },
+                            {
+                              "chapter": 3,
+                              "title": "Control Flow in Python",
+                              "sections": [
+                                "Indentation-based syntax",
+                                "if, elif, and else statements",
+                                "for and while loops",
+                                "List comprehensions",
+                                "Exception handling differences"
+                              ]
+                            },
+                            ...other chapters omitted
+                          ]
+                        }
+                        ```
+                        """;
+
+        aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc, userCredit);
+        res.setGptCredit(userCredit.getVal());
+
+
         String answer = aiResponse.getContent();
         log.debug("Generated book content: " + answer);
 

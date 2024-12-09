@@ -713,11 +713,6 @@ export class EditNodeDlg extends DialogBase {
         const advancedButtons: boolean = !!this.contentEditor;
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
-        let activeAiService = S.aiUtil.getActiveService()?.description;
-        if (activeAiService) {
-            activeAiService = "Active AI Service: " + activeAiService;
-        }
-
         return new ButtonBar([
             new Button("Save", this._save, { title: "Save this node and close editor." }, "-primary ui-editor-save"),
 
@@ -758,7 +753,7 @@ export class EditNodeDlg extends DialogBase {
                 }, null, "fa-calendar-plus") : null,
 
             ast.activeTab !== C.TAB_FEED ? new Button("Ask AI", this._askAI, {
-                title: "Query AI, using this Node as the Question.\n\n" + activeAiService
+                title: "Query AI, using this Node as the Question."
             }, null, "fa-robot fa-lg") : null,
 
 

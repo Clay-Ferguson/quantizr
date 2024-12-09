@@ -9,7 +9,7 @@ import { TextArea } from "../comp/core/TextArea";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { dispatch, getAs } from "../AppContext";
+import { dispatch } from "../AppContext";
 import { FlexLayout } from "../comp/core/FlexLayout";
 import { TextField } from "../comp/core/TextField";
 
@@ -76,7 +76,6 @@ export class GenerateBookByAIDlg extends DialogBase {
             numChapters,
             numSections,
             prompt: GenerateBookByAIDlg.promptState.getValue(),
-            aiService: getAs().userPrefs.aiService
         });
 
         dispatch("setShowGptCredit", s => {

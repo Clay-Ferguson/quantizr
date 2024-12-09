@@ -625,12 +625,6 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
             prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
-            prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
-            prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
-            prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE, reqUserPrefs.getAiAgentFoldersToInclude());
-            prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_EXCLUDE, reqUserPrefs.getAiAgentFoldersToExclude());
-            prefsNode.set(NodeProp.USER_PREF_AI_MAX_WORDS, reqUserPrefs.getAiMaxWords());
-            prefsNode.set(NodeProp.USER_PREF_AI_TEMPERATURE, reqUserPrefs.getAiTemperature());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setAiMode(reqUserPrefs.getAiMode());
@@ -639,12 +633,6 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
             userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
             userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
-            userPrefs.setAiService(reqUserPrefs.getAiService());
-            userPrefs.setAiAgentFileExtensions(reqUserPrefs.getAiAgentFileExtensions());
-            userPrefs.setAiAgentFoldersToInclude(reqUserPrefs.getAiAgentFoldersToInclude());
-            userPrefs.setAiAgentFoldersToExclude(reqUserPrefs.getAiAgentFoldersToExclude());
-            userPrefs.setAiMaxWords(reqUserPrefs.getAiMaxWords());
-            userPrefs.setAiTemperature(reqUserPrefs.getAiTemperature());
             return null;
         });
         return res;
@@ -918,33 +906,6 @@ public class UserManagerService extends ServiceBase {
                 mainPanelCols = 6;
             }
             userPrefs.setMainPanelCols(mainPanelCols);
-
-            String aiService = prefsNode.getStr(NodeProp.USER_PREF_AI_SERVICE);
-            if (StringUtils.isEmpty(aiService)) {
-                aiService = AIModel.OPENAI.s();
-            }
-            userPrefs.setAiService(aiService);
-
-            String aiAgentFileExtensions = prefsNode.getStr(NodeProp.USER_PREF_AI_FILE_EXTENSIONS);
-            if (StringUtils.isEmpty(aiAgentFileExtensions)) {
-                aiAgentFileExtensions = "txt,md,html,java,js,ts,css,py,sh,xml,json";
-            }
-            userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
-            userPrefs.setAiAgentFoldersToInclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE));
-            userPrefs.setAiAgentFoldersToExclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_EXCLUDE));
-
-            try {
-                userPrefs.setAiMaxWords(Integer.parseInt(prefsNode.getStr(NodeProp.USER_PREF_AI_MAX_WORDS)));
-            } catch (Exception e) {
-                userPrefs.setAiMaxWords(4000);
-            }
-
-            try {
-                userPrefs.setAiTemperature(Double.parseDouble(prefsNode.getStr(NodeProp.USER_PREF_AI_TEMPERATURE)));
-            } catch (Exception e) {
-                userPrefs.setAiTemperature(0.7);
-            }
-
             return null;
         });
         return userPrefs;

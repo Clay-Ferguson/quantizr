@@ -9,7 +9,6 @@ import * as J from "./JavaIntf";
 import { PrincipalName } from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
-import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { StatisticsTab } from "./tabs/data/StatisticsTab";
@@ -128,9 +127,6 @@ export class Quanta {
                     break;
                 case ThreadTab.URL_PARAM:
                     if (ThreadTab.selectIfOpened()) return;
-                    break;
-                case AISettingsTab.URL_PARAM:
-                    if (AISettingsTab.selectIfOpened()) return;
                     break;
                 default: break;
             }
