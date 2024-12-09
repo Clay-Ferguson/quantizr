@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.exception.NoAgentException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.NodeInfo;
@@ -320,7 +321,7 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModel.fromString(system.getService());
                 }
                 if (svc == null) {
-                    throw new RuntimeEx("No AI service found from parent nodes");
+                    throw new NoAgentException();
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
                 aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,

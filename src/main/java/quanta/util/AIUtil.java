@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.NoAgentException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
@@ -279,7 +280,7 @@ public class AIUtil extends ServiceBase {
             svc = AIModel.fromString(system.getService());
         }
         if (svc == null) {
-            throw new RuntimeEx("No AI service found from parent nodes");
+            throw new NoAgentException();
         }
 
         aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc, userCredit);
@@ -359,7 +360,7 @@ public class AIUtil extends ServiceBase {
             svc = AIModel.fromString(system.getService());
         }
         if (svc == null) {
-            throw new RuntimeEx("No AI service found from parent nodes");
+            throw new NoAgentException();
         }
 
         String prompt = req.getPrompt();

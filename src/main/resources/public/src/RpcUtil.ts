@@ -7,8 +7,8 @@ import { RpcQueueItem } from "./RpcQueueItem";
 import { Tailwind } from "./Tailwind";
 
 export class RpcUtil {
-    log: boolean = false;
-    logVerbose: boolean = false;
+    log: boolean = true;
+    logVerbose: boolean = true;
 
     rpcPath: string = null;
     rhost: string = null;
@@ -331,6 +331,7 @@ export class RpcUtil {
 
             if (res.code === C.RESPONSE_CODE_SEE_OTHER) {
                 console.error("Warning: " + postName + " RES: " + S.util.prettyPrint(res));
+                S.util.showMessage(res.message, "Message");
                 return;
             }
 
