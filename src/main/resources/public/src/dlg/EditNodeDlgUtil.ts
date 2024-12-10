@@ -5,7 +5,7 @@ import * as J from "../JavaIntf";
 import { Attachment, NodeInfo, PropertyInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
@@ -365,9 +365,9 @@ export class EditNodeDlgUtil {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        let propState: Validator = this.dlg.propStates.get(propEntry.name);
+        let propState: ValHolder = this.dlg.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new Validator(propVal);
+            propState = new ValHolder(propVal);
             this.dlg.propStates.set(propEntry.name, propState);
         }
 

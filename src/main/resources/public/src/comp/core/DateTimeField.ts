@@ -1,5 +1,5 @@
 import { S } from "../../Singletons";
-import { Validator } from "../../Validator";
+import { ValHolder } from "../../ValHolder";
 import { Button } from "./Button";
 import { DateField } from "./DateField";
 import { Span } from "./Span";
@@ -7,11 +7,11 @@ import { TextField } from "./TextField";
 import { TimeField } from "./TimeField";
 
 export class DateTimeField extends Span {
-    dateState: Validator = new Validator();
-    timeState: Validator = new Validator();
+    dateState: ValHolder = new ValHolder();
+    timeState: ValHolder = new ValHolder();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: Validator, private durationState: Validator,
+    constructor(private dateTimeState: ValHolder, private durationState: ValHolder,
         private showTime: boolean, private addTag: (val: string) => void) {
         super(null);
         this.attribs = {

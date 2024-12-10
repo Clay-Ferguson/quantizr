@@ -4,7 +4,7 @@ import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -55,8 +55,8 @@ export class SearchDlg extends DialogBase {
     };
 
     searchTextField: TextField;
-    searchTextState: Validator = new Validator();
-    searchNameState: Validator = new Validator();
+    searchTextState: ValHolder = new ValHolder();
+    searchNameState: ValHolder = new ValHolder();
 
     constructor(private searchRootNode: NodeInfo = null, searchDef: J.SearchDefinition = null) {
         super("Search");

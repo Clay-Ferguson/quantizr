@@ -8,11 +8,11 @@ import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Markdown } from "../comp/core/Markdown";
 
 export class EditTagsDlg extends DialogBase {
-    tagsState: Validator = new Validator();
+    tagsState: ValHolder = new ValHolder();
     textScrollPos = new ScrollPos();
 
     constructor() {

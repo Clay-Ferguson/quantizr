@@ -1,4 +1,4 @@
-import { Validator } from "../../Validator";
+import { ValHolder } from "../../ValHolder";
 import { Comp, ScrollPos } from "../base/Comp";
 
 interface LS { // Local State
@@ -9,7 +9,7 @@ export class TextareaTag extends Comp {
     static CHAR_THRESHOLD = 40;
     static MAX_ROWS = 15;
 
-    constructor(attribs: any = null, private valState: Validator, private dynamicRows: boolean = false, private minRows: number, private scrollPos: ScrollPos = null) {
+    constructor(attribs: any = null, private valState: ValHolder, private dynamicRows: boolean = false, private minRows: number, private scrollPos: ScrollPos = null) {
         super(attribs, valState.v);
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });

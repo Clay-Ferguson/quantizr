@@ -6,7 +6,7 @@ import { ValueIntf } from "../../Interfaces";
 import { Attachment, NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Tailwind } from "../../Tailwind";
-import { Validator, ValidatorRuleName } from "../../Validator";
+import { ValHolder, ValidatorRuleName } from "../../ValHolder";
 import { Comp } from "../base/Comp";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { Button } from "./Button";
@@ -118,9 +118,9 @@ export class EditAttachmentsPanel extends Comp {
                     }
                 }) : null;
 
-        let fileNameFieldState: Validator = this.dlg.attFileNames.get((att as any).key);
+        let fileNameFieldState: ValHolder = this.dlg.attFileNames.get((att as any).key);
         if (!fileNameFieldState) {
-            fileNameFieldState = new Validator(att.fileName, [{ name: ValidatorRuleName.REQUIRED }]);
+            fileNameFieldState = new ValHolder(att.fileName, [{ name: ValidatorRuleName.REQUIRED }]);
             this.dlg.attFileNames.set((att as any).key, fileNameFieldState);
         }
 

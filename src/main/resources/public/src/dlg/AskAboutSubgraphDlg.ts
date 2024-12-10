@@ -2,7 +2,7 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -11,7 +11,7 @@ import { TextArea } from "../comp/core/TextArea";
 import { AIAnswerDlg } from "./AIAnswerDlg";
 
 export class AskAboutSubgraphDlg extends DialogBase {
-    questionState: Validator = new Validator("", [
+    questionState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MINLEN, payload: 10 }
     ]);

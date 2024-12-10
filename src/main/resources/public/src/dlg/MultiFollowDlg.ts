@@ -8,11 +8,11 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 
 export class MultiFollowDlg extends DialogBase {
-    userNamesState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
-    tagState: Validator = new Validator("");
+    userNamesState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
+    tagState: ValHolder = new ValHolder("");
     textScrollPos = new ScrollPos();
 
     constructor() {

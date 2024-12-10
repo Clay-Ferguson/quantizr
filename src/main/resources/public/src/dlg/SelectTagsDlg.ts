@@ -9,7 +9,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 export interface LS { // Local State
     tags: Tag[];
@@ -28,7 +28,7 @@ interface Tag {
 
 export class SelectTagsDlg extends DialogBase {
     indenting = false;
-    editFieldState: Validator = new Validator();
+    editFieldState: ValHolder = new ValHolder();
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean, private rootNodeId: string) {

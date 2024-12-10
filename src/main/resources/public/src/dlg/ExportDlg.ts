@@ -12,12 +12,12 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 export class ExportDlg extends DialogBase {
 
-    fileNameState: Validator = new Validator();
-    contentWidthState: Validator = new Validator();
+    fileNameState: ValHolder = new ValHolder();
+    contentWidthState: ValHolder = new ValHolder();
     res: J.ExportResponse = null;
 
     constructor(defaultName: string, private nodeId: string, public exportingThread: boolean) {

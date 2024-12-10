@@ -6,7 +6,7 @@ import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 
 interface LS { // Local State
     recursive: boolean;
@@ -14,8 +14,8 @@ interface LS { // Local State
 
 export class SearchAndReplaceDlg extends DialogBase {
 
-    searchState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
-    replaceState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    searchState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
+    replaceState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Search and Replace", "appModalContNarrowWidth");

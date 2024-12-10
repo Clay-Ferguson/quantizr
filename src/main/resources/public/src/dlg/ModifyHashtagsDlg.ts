@@ -7,7 +7,7 @@ import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
@@ -16,7 +16,7 @@ interface LS { // Local State
 }
 
 export class ModifyHashtags extends DialogBase {
-    hashtags: Validator = new Validator();
+    hashtags: ValHolder = new ValHolder();
 
     constructor() {
         super("Modify Hashtags", "appModalContNarrowWidth");

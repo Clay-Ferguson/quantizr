@@ -13,7 +13,7 @@ import * as I from "../Interfaces";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 /**
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does
@@ -50,7 +50,7 @@ export class AudioPlayerView extends AppTab<any> {
     private saveTimer: any = null;
 
     timeLeftTextField: TextField;
-    timeLeftState: Validator = new Validator();
+    timeLeftState: ValHolder = new ValHolder();
 
     intervalTimer: any;
     playButton: Icon;

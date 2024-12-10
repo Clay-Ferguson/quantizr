@@ -4,7 +4,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { FriendsTable } from "../comp/FriendsTable";
 import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
@@ -26,7 +26,7 @@ export interface LS { // Local State
 
 export class BlockedUsersDlg extends DialogBase {
     static inst: BlockedUsersDlg = null;
-    searchTextState: Validator = new Validator();
+    searchTextState: ValHolder = new ValHolder();
     friendsTagSearch: string;
     searchTextField: TextField;
 

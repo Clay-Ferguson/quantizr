@@ -5,11 +5,11 @@ import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { MessageDlg } from "./MessageDlg";
 
 export class ImportCryptoKeyDlg extends DialogBase {
-    keyState: Validator = new Validator();
+    keyState: ValHolder = new ValHolder();
 
     constructor(private keyType: string, keyDescription: string) {
         super("Import " + keyDescription, "appModalContMediumWidth");

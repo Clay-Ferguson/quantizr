@@ -1,6 +1,6 @@
 import { DialogBase } from "../DialogBase";
 import { NodeInfo } from "../JavaIntf";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -14,11 +14,11 @@ import { FlexLayout } from "../comp/core/FlexLayout";
 import { TextField } from "../comp/core/TextField";
 
 export class GenerateBookByAIDlg extends DialogBase {
-    static promptState: Validator = new Validator();
+    static promptState: ValHolder = new ValHolder();
     promptScrollPos = new ScrollPos();
 
-    static numChapters: Validator = new Validator();
-    static numSections: Validator = new Validator();
+    static numChapters: ValHolder = new ValHolder();
+    static numSections: ValHolder = new ValHolder();
 
     constructor(public node: NodeInfo) {
         super("Generate Book using AI");

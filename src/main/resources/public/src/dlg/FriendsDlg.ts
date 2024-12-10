@@ -4,7 +4,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { FriendsTable } from "../comp/FriendsTable";
 import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
@@ -29,8 +29,8 @@ export interface LS { // Local State
 }
 
 export class FriendsDlg extends DialogBase {
-    userNameState: Validator = new Validator("");
-    searchTextState: Validator = new Validator();
+    userNameState: ValHolder = new ValHolder("");
+    searchTextState: ValHolder = new ValHolder();
     friendsTagSearch: string;
     searchTextField: TextField;
 

@@ -4,7 +4,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 export interface LS { // Local State
     amount: string
@@ -14,7 +14,7 @@ export interface LS { // Local State
 nameState, or else get the list of properties from LS.selections, depending on which user has
 selected. */
 export class AddCreditDlg extends DialogBase {
-    amtState: Validator = new Validator("");
+    amtState: ValHolder = new ValHolder("");
 
     constructor() {
         super("Add Credit", "appModalContMediumWidth");

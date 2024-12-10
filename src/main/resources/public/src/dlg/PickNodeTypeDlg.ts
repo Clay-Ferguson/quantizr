@@ -10,7 +10,7 @@ import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 interface LS { // Local State
     selType?: string;
@@ -18,7 +18,7 @@ interface LS { // Local State
 
 export class PickNodeTypeDlg extends DialogBase {
 
-    searchTextState: Validator = new Validator();
+    searchTextState: ValHolder = new ValHolder();
     searchTextField: TextField;
 
     valIntf: ValueIntf;

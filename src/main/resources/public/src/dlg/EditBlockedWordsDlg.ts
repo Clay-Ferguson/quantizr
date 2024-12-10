@@ -7,10 +7,10 @@ import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 export class EditBlockedWordsDlg extends DialogBase {
-    wordsState: Validator = new Validator();
+    wordsState: ValHolder = new ValHolder();
     textScrollPos = new ScrollPos();
 
     constructor() {

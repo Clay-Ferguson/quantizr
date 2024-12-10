@@ -4,7 +4,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 import { NodeLink } from "../JavaIntf";
 import { Checkbox } from "../comp/core/Checkbox";
 import { getAs } from "../AppContext";
@@ -12,7 +12,7 @@ import { S } from "../Singletons";
 
 export class AskNodeLinkNameDlg extends DialogBase {
     editExisting: boolean = false;
-    static nameState: Validator = new Validator("", [
+    static nameState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

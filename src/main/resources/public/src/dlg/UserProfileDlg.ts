@@ -5,7 +5,7 @@ import * as J from "../JavaIntf";
 import { NodeType } from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -27,8 +27,8 @@ export interface LS { // Local State
 
 export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
-    bioState: Validator = new Validator();
-    displayNameState: Validator = new Validator();
+    bioState: ValHolder = new ValHolder();
+    displayNameState: ValHolder = new ValHolder();
     textScrollPos = new ScrollPos();
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else

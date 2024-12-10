@@ -2,7 +2,7 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -13,26 +13,26 @@ import { TextField } from "../comp/core/TextField";
 
 export class SignupDlg extends DialogBase {
 
-    userNameState: Validator = new Validator("", [
+    userNameState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MINLEN, payload: 3 },
         { name: ValidatorRuleName.MAXLEN, payload: 100 },
         { name: ValidatorRuleName.USERNAME }
     ]);
 
-    passwordState: Validator = new Validator("", [
+    passwordState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.MINLEN, payload: 5 },
         { name: ValidatorRuleName.MAXLEN, payload: 40 },
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    emailState: Validator = new Validator("", [
+    emailState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MINLEN, payload: 5 },
         { name: ValidatorRuleName.MAXLEN, payload: 100 }
     ]);
 
-    captchaState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    captchaState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor(private adminCreatingUser: boolean = false) {
         super("Create Account", "appModalContMediumWidth");

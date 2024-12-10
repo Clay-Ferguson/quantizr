@@ -5,14 +5,14 @@ import { Div } from "../comp/core/Div";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 
 interface LS { // Local State
     user: string;
 }
 
 export class AskForEmail extends DialogBase {
-    static emailState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    static emailState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Send To Email Address", "appModalContNarrowWidth");

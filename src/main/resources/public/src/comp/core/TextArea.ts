@@ -1,7 +1,7 @@
 import * as I from "../../Interfaces";
 import { S } from "../../Singletons";
 import { Tailwind } from "../../Tailwind";
-import { Validator } from "../../Validator";
+import { ValHolder } from "../../ValHolder";
 import { CompT, ScrollPos } from "../base/Comp";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
@@ -17,7 +17,7 @@ export class TextArea extends Div implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
-    constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "",
+    constructor(private label: string, attribs: any, private valState: ValHolder, moreClasses: string = "",
         public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null, outterClasses: string = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);

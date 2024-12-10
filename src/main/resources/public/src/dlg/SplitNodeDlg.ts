@@ -8,7 +8,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 interface LS { // Local State
     splitMode?: string;
@@ -17,7 +17,7 @@ interface LS { // Local State
 }
 
 export class SplitNodeDlg extends DialogBase {
-    delimiterState: Validator = new Validator();
+    delimiterState: ValHolder = new ValHolder();
 
     constructor(private node: NodeInfo) {
         super("Split Node");

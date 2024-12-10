@@ -1,7 +1,7 @@
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -9,7 +9,7 @@ import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 
 export class SetNodeUsingJsonDlg extends DialogBase {
-    textState: Validator = new Validator();
+    textState: ValHolder = new ValHolder();
     textScrollPos = new ScrollPos();
 
     constructor(private nodeId: string) {

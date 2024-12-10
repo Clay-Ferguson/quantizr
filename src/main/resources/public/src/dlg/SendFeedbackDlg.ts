@@ -1,5 +1,5 @@
 import { DialogBase } from "../DialogBase";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -11,7 +11,7 @@ import { S } from "../Singletons";
 import { Constants as C } from "../Constants";
 
 export class SendFeedbackDlg extends DialogBase {
-    static promptState: Validator = new Validator();
+    static promptState: ValHolder = new ValHolder();
     promptScrollPos = new ScrollPos();
 
     constructor(public node: NodeInfo) {

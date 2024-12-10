@@ -7,13 +7,13 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
 export class LoginDlg extends DialogBase {
-    userState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
-    pwdState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    userState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
+    pwdState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Login", "appModalContNarrowWidth");

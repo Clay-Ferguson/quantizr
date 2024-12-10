@@ -10,7 +10,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 
 export interface LS { // Local State
     selections?: Map<string, J.SchemaOrgProp>;
@@ -21,7 +21,7 @@ nameState, or else get the list of properties from LS.selections, depending on w
 selected. */
 export class EditPropertyDlg extends DialogBase {
 
-    nameState: Validator = new Validator("");
+    nameState: ValHolder = new ValHolder("");
 
     constructor(private editNode: NodeInfo) {
         super("Add Property", "appModalContMediumWidth");

@@ -1,5 +1,5 @@
 import * as I from "../../Interfaces";
-import { Validator } from "../../Validator";
+import { ValHolder } from "../../ValHolder";
 import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 import { Input } from "./Input";
@@ -7,7 +7,7 @@ import { Input } from "./Input";
 export class DateField extends Comp implements I.ValueIntf {
     input: Input;
 
-    constructor(private valState: Validator) {
+    constructor(private valState: ValHolder) {
         super();
     }
 

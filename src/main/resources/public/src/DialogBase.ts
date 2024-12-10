@@ -1,6 +1,6 @@
 import { dispatch, getAs } from "./AppContext";
 import { S } from "./Singletons";
-import { Validator } from "./Validator";
+import { ValHolder } from "./ValHolder";
 import { Comp } from "./comp/base/Comp";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
@@ -18,7 +18,7 @@ export abstract class DialogBase extends Comp {
     opened: boolean = false;
     loaded: boolean = false;
 
-    validatedStates: Validator[] = null;
+    validatedStates: ValHolder[] = null;
     zIndex: number = DialogBase.backdropZIndex;
 
     isDown: boolean;

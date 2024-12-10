@@ -7,13 +7,13 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 
 export class UploadFromUrlDlg extends DialogBase {
 
     static storeLocally: boolean = false;
 
-    urlState: Validator = new Validator("", [
+    urlState: ValHolder = new ValHolder("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

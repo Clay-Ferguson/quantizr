@@ -25,7 +25,7 @@ import { PrincipalName, PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { MessageDlg } from "./MessageDlg";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
@@ -49,17 +49,17 @@ export class EditNodeDlg extends DialogBase {
     static dlg: EditNodeDlg = null;
     public utl: EditNodeDlgUtil = null;
     public contentEditor: I.TextEditorIntf;
-    contentEditorState: Validator = new Validator();
+    contentEditorState: ValHolder = new ValHolder();
     decryptFailed: boolean = false;
-    nameState: Validator = new Validator();
-    tagsState: Validator = new Validator();
-    newTagState: Validator = new Validator();
+    nameState: ValHolder = new ValHolder();
+    tagsState: ValHolder = new ValHolder();
+    newTagState: ValHolder = new ValHolder();
 
     // holds a map of states by property names.
-    propStates: Map<string, Validator> = new Map<string, Validator>();
+    propStates: Map<string, ValHolder> = new Map<string, ValHolder>();
 
     // Holds all the filenames for attachments
-    attFileNames: Map<string, Validator> = new Map<string, Validator>();
+    attFileNames: Map<string, ValHolder> = new Map<string, ValHolder>();
 
     pendingEncryptionChange: boolean = false;
 
@@ -825,9 +825,9 @@ export class EditNodeDlg extends DialogBase {
             rowAttribs.style = { width: widthStr, maxWidth: widthStr };
         }
 
-        let propState: Validator = this.propStates.get(propEntry.name);
+        let propState: ValHolder = this.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new Validator(propEntry.value);
+            propState = new ValHolder(propEntry.value);
             this.propStates.set(propEntry.name, propState);
         }
 
@@ -838,11 +838,11 @@ export class EditNodeDlg extends DialogBase {
         // We have the one special case that a property named 'date' is assumed to be a "Date" type
         // always DATE TYPE
         if (propType === I.DomainType.Date || propEntry.name === J.NodeProp.DATE) {
-            let durationState: Validator = null;
+            let durationState: ValHolder = null;
             if (durationPropEntry) {
                 durationState = this.propStates.get(durationPropEntry.name);
                 if (!durationState) {
-                    durationState = new Validator(durationPropEntry.value);
+                    durationState = new ValHolder(durationPropEntry.value);
                     this.propStates.set(durationPropEntry.name, durationState);
                 }
             }

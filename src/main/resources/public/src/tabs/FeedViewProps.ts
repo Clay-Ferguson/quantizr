@@ -1,11 +1,11 @@
-import { Validator } from "../Validator";
+import { ValHolder } from "../ValHolder";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 
 export class FeedViewProps {
     page = 0;
     refreshCounter = 0;
-    searchTextState = new Validator();
+    searchTextState = new ValHolder();
     feedFilterFriends = false;
     feedFilterToMe = true;
     feedFilterFromMe = true;

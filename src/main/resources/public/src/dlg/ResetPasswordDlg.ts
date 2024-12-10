@@ -7,7 +7,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Validator, ValidatorRuleName } from "../Validator";
+import { ValHolder, ValidatorRuleName } from "../ValHolder";
 
 interface LS { // Local State
     user: string;
@@ -15,8 +15,8 @@ interface LS { // Local State
 
 export class ResetPasswordDlg extends DialogBase {
 
-    userState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
-    emailState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    userState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
+    emailState: ValHolder = new ValHolder("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor(user: string) {
         super("Reset Password", "appModalContNarrowWidth");

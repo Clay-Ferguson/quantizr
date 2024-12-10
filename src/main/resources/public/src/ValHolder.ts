@@ -2,26 +2,26 @@ import { State } from "./State";
 import { S } from "./Singletons";
 import { ValueIntf } from "./Interfaces";
 
-export interface ValidatorValue {
+export interface ValIntf {
     value: any;
 }
 
-export interface ValidatorError {
+export interface ErrIntf {
     error: string;
 }
 
-export class Validator implements ValueIntf {
+export class ValHolder implements ValueIntf {
     // NOTE: We have two separate states here so the error state can be updated
     // all by itself, so don't be tempted to merge these two states into one.
-    v: State<ValidatorValue> = new State<ValidatorValue>(null);
-    e: State<ValidatorError> = new State<ValidatorError>(null);
+    v: State<ValIntf> = new State<ValIntf>(null);
+    e: State<ErrIntf> = new State<ErrIntf>(null);
 
     constructor(val: any = null, public rules: ValidatorRule[] = null) {
         this.setValue(val);
         rules?.forEach(rule => this.ensureDefaultMessage(rule));
     }
 
-    getState = (): State<ValidatorValue> => {
+    getState = (): State<ValIntf> => {
         return this.v;
     }
 

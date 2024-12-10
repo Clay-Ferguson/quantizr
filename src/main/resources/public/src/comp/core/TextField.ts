@@ -1,6 +1,6 @@
 import * as I from "../../Interfaces";
 import { Tailwind } from "../../Tailwind";
-import { Validator } from "../../Validator";
+import { ValHolder } from "../../ValHolder";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { ErrorDiv } from "./ErrorDiv";
@@ -19,7 +19,7 @@ export interface TextFieldConfig {
     enter?: () => void;
     inputClass?: string;
     labelClass?: string;
-    val?: Validator;
+    val?: ValHolder;
     outterClass?: string;
     placeholder?: string;
     outterTagName?: string; // normally div or span
