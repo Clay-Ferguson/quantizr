@@ -160,13 +160,13 @@ export class MenuPanel extends Comp {
         const ast = getAs();
 
         const hltNode = S.nodeUtil.getHighlightedNode();
-        let hltType = null;
-        if (hltNode) {
-            const type: TypeIntf = S.plugin.getType(hltNode.type);
-            if (type) {
-                hltType = type.getTypeName();
-            }
-        }
+        // let hltType = null;
+        // if (hltNode) {
+        //     const type: TypeIntf = S.plugin.getType(hltNode.type);
+        //     if (type) {
+        //         hltType = type.getTypeName();
+        //     }
+        // }
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === PrincipalName.ADMIN);
         const onMainTab: boolean = ast.activeTab == C.TAB_MAIN;
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
@@ -409,9 +409,9 @@ export class MenuPanel extends Comp {
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
             children.push(new Menu("AI", [
-                new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Configure Agent", MenuPanel.configureAgent, onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Generate Book", MenuPanel.generateBookByAI, onMainTab && selNodeIsMine, null, true),
                 new Menu("Mode", [
                     ast.isAnonUser ? null : new MenuItem("Chat", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
                         () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, null, "aiModeRadioGroup"),

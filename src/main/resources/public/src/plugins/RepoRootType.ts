@@ -5,6 +5,7 @@ import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
+import { S } from "../Singletons";
 
 export class RepoRootType extends TypeBase {
     constructor() {
@@ -15,9 +16,18 @@ export class RepoRootType extends TypeBase {
         return true;
     }
 
-    override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+        let aiConfigDiv = null;
+        if (S.props.getPropStr(J.NodeProp.AI_AGENT, node)) {
+            aiConfigDiv = new Div("AI Agent", {
+                onClick: () => S.edit.configureAgent(node),
+                className: "nodeTags aiTags mb-1 float-right",
+                title: "Configure Agent Settings"
+            });
+        }
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, "Root", { className: "noMargin" })
+            aiConfigDiv,
+            new Heading(4, "Root", { className: "noMargin" }),
         ]);
     }
 }
