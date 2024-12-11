@@ -12,6 +12,7 @@ public class ResponseBase {
     private String message;
     private String stackTrace;
     private Integer code;
+    private String msgCode;
 
     // For diagnostic purposes we can put an info string about which replica on the docker swarm
     // was responsible for processing the request.
@@ -64,5 +65,13 @@ public class ResponseBase {
 
     public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
+    }
+
+    public String getMsgCode() {
+        return msgCode;
+    }
+
+    public void setMsgCode(String msgCode) {
+        this.msgCode = msgCode;
     }
 }

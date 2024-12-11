@@ -1049,6 +1049,7 @@ export interface ResponseBase {
     message: string;
     stackTrace: string;
     code: number;
+    msgCode: string;
     replica: string;
 }
 

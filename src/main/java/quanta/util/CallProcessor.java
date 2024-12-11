@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
+import quanta.exception.MessageException;
 import quanta.exception.base.RuntimeEx;
 import quanta.perf.PerfEvent;
 import quanta.rest.request.base.RequestBase;
@@ -127,6 +128,10 @@ public class CallProcessor extends ServiceBase {
             String stack = ExceptionUtils.getStackTrace(e);
             log.debug("ERROR: " + stack);
             orb.setStackTrace(stack);
+
+            if (e instanceof MessageException _e) {
+                orb.setMsgCode(_e.getMsgCode());
+            }
         }
 
         if (logResponses) {

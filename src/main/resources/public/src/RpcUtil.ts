@@ -331,7 +331,13 @@ export class RpcUtil {
 
             if (res.code === C.RESPONSE_CODE_SEE_OTHER) {
                 console.error("Warning: " + postName + " RES: " + S.util.prettyPrint(res));
+                // if (res.msgCode === "NO_AGENT") {
+                //   NOTE: to resolve this we could create a 'getNode()' method on the server to get the user's
+                //   AccountNode, and then open ConfigurAIDlg with that node. (todo-1)
+                // }
+                // else {
                 S.util.showMessage(res.message, "Message");
+                // }
                 return;
             }
 
