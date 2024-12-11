@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.MessageException;
 import quanta.exception.NoAgentException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
@@ -51,7 +52,14 @@ public class AIUtil extends ServiceBase {
         if (node.hasProp(NodeProp.AI_AGENT.s())) {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
             system.setAgentNodeId(node.getIdStr());
-            system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
+
+            String prompt = node.getStr(NodeProp.AI_PROMPT.s());
+            if (prompt != null && prompt.length() < 100) {
+                String nodeName = TL.getSC().getUserName() + ":" + prompt;
+                prompt = buildSystemPromptFromNode(nodeName);
+            }
+
+            system.setPrompt(prompt);
             system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
             system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
             system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));
@@ -83,6 +91,22 @@ public class AIUtil extends ServiceBase {
             return true;
         }
         return false;
+    }
+
+    public String buildSystemPromptFromNode(String nodeName) {
+        StringBuilder sb = new StringBuilder();
+
+        // verify ndoe exists first
+        SubNode node = svc_mongoRead.getNodeByName(nodeName, null);
+        if (node == null) {
+            throw new MessageException("Node name not found: [" + nodeName + "]");
+        }
+
+        List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(node.getIdStr(), false, null);
+        for (SubNode n : nodes) {
+            sb.append(n.getContent() + "\n\n");
+        }
+        return sb.toString();
     }
 
     public String removeHtmlComments(String val) {

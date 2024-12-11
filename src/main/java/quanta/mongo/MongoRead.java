@@ -1262,7 +1262,6 @@ public class MongoRead extends ServiceBase {
 
     public List<SubNode> getFlatSubGraph(final String rootId, boolean includeComments, SearchDefinition def) {
         LinkedList<SubNode> doc = new LinkedList<>();
-
         Criteria typeCriteria = null;
         if (!includeComments) {
             typeCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT);
