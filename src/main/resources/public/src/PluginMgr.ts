@@ -6,7 +6,7 @@ import { BlockedUsersType } from "./plugins/BlockedUsersType";
 import { BookmarkListType } from "./plugins/BookmarkListType";
 import { BookmarkType } from "./plugins/BookmarkType";
 import { CalcType } from "./plugins/CalcType";
-import { AIAgentType } from "./plugins/AIAgentType";
+// import { AIAgentType } from "./plugins/AIAgentType";
 import { CommentType } from "./plugins/CommentType";
 import { ExportsType } from "./plugins/ExportsType";
 import { FriendsListType } from "./plugins/FriendsListType";
@@ -70,7 +70,9 @@ export class PluginMgr {
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new AIQueryType());
         this.addType(ordinal++, new CalcType());
-        this.addType(ordinal++, new AIAgentType());
+
+        // todo-0: not activating this yet. We may end up just using "composible System Prompts" for this instead.
+        // this.addType(ordinal++, new AIAgentType());
         this.addType(ordinal++, new RepoRootType());
         this.addType(ordinal++, new AccountType());
         this.addType(ordinal++, new PostsType());

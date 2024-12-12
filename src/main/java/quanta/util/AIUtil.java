@@ -55,11 +55,7 @@ public class AIUtil extends ServiceBase {
             system.setAgentNodeId(node.getIdStr());
 
             String prompt = node.getStr(NodeProp.AI_PROMPT.s());
-            if (prompt != null && prompt.length() < 100) {
-                String nodeName = TL.getSC().getUserName() + ":" + prompt;
-                prompt = buildSystemPromptFromNode(nodeName);
-            }
-
+            prompt = composePrompt(prompt);
             system.setPrompt(prompt);
             system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
             system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
@@ -94,6 +90,39 @@ public class AIUtil extends ServiceBase {
         return false;
     }
 
+    /*
+     * Allows the 'prompt' to have lines formatted like "::nodeName::" which will be replaced with the
+     * content of the node with that name. This allows for embedding prompts within prompts. The system
+     * is fully composable and can have multiple levels of embedding.
+     */
+    public String composePrompt(String prompt) {
+        // split prompt into multiple lines, by tokenizing on newline
+        String[] lines = prompt.split("\n");
+        StringBuilder sb = new StringBuilder();
+        boolean composed = false;
+        for (String line : lines) {
+            // if line starts and ends with "::" then extract out the part in between
+            if (line.startsWith("::") && line.endsWith("::")) {
+                String nodeName = line.substring(2, line.length() - 2);
+
+                // now put the nodeName into the expected format for a user-specific lookup
+                nodeName = TL.getSC().getUserName() + ":" + nodeName;
+                String content = buildSystemPromptFromNode(nodeName);
+                composed = true;
+                sb.append(content + "\n\n");
+            } else {
+                sb.append(line + "\n");
+            }
+        }
+
+        if (!composed) {
+            return sb.toString();
+        }
+        // call again to allow embedding of prompts within prompts
+        String ret = composePrompt(sb.toString());
+        return ret;
+    }
+
     public String buildSystemPromptFromNode(String nodeName) {
         StringBuilder sb = new StringBuilder();
 
@@ -101,9 +130,6 @@ public class AIUtil extends ServiceBase {
         SubNode node = svc_mongoRead.getNodeByName(nodeName, null);
         if (node == null) {
             throw new MessageException("Node name not found: [" + nodeName + "]");
-        }
-        if (!NodeType.AI_AGENT.s().equals(node.getType())) {
-            throw new MessageException("Node is not an AI Agent Type: [" + nodeName + "]");
         }
 
         List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(node.getIdStr(), false, null);
