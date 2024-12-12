@@ -457,7 +457,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             // Normally images go below content but if we have any attributes with position="ur" (upper right,
             // or left) then we need to insert those into the content first, and make float right.
-            if (contentType.equals("html")) {
+            if (atts != null && contentType.equals("html")) {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
                     if (att.getPosition().equals("ur") || att.getPosition().equals("ul")
