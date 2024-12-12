@@ -122,7 +122,7 @@ public enum NodeProp {
     AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude", null), //
     AI_FILE_EXTENSIONS("aiFileExt", null), //
     AI_SERVICE("aiService", null), //
-    AI_AGENT("aiAgent", null), // existence of this prop means it's an AI agent node
+    AI_CONFIG("aiConfig", null), // existence of this prop means it's an AI-configured node
     AI_QUERY_TEMPLATE("aiTemplate", null), //
     AI_MAX_WORDS("aiMaxWords", null), //
     AI_TEMPERATURE("aiTemp", null), //

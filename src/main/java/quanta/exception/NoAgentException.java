@@ -7,7 +7,7 @@ public class NoAgentException extends MessageException {
     static final String MSG_CODE = "NO_AGENT";
 
     public NoAgentException() {
-        super("No AI service found from parent nodes. Fix this by selecting a higher level node and using `Menu -> AI -> Configure Agent`",
+        super("No AI service found from parent nodes. Fix this by selecting a higher level node and using `Menu -> AI -> Configure AI`",
                 MSG_CODE);
     }
 }

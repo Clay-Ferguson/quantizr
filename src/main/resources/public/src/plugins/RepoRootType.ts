@@ -18,8 +18,8 @@ export class RepoRootType extends TypeBase {
 
     override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         let aiConfigDiv = null;
-        if (S.props.getPropStr(J.NodeProp.AI_AGENT, node)) {
-            aiConfigDiv = new Div("AI Agent", {
+        if (S.props.getPropStr(J.NodeProp.AI_CONFIG, node)) {
+            aiConfigDiv = new Div("AI Settings", {
                 onClick: () => S.edit.configureAgent(node),
                 className: "nodeTags aiTags mb-1 float-right",
                 title: "Configure Agent Settings"

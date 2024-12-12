@@ -17,6 +17,7 @@ public enum NodeType {
     COMMENT("sn:comment"), //
     AI_QUERY("sn:aiQuery"), //
     AI_ANSWER("sn:aiAns"), //
+    AI_AGENT("sn:aiAgent"), //
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
     BLOCKED_USERS("sn:blockedUsers"), //

@@ -17,6 +17,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.model.client.SystemConfig;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
@@ -49,7 +50,7 @@ public class AIUtil extends ServiceBase {
             return true;
         }
 
-        if (node.hasProp(NodeProp.AI_AGENT.s())) {
+        if (node.hasProp(NodeProp.AI_CONFIG.s())) {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
             system.setAgentNodeId(node.getIdStr());
 
@@ -100,6 +101,9 @@ public class AIUtil extends ServiceBase {
         SubNode node = svc_mongoRead.getNodeByName(nodeName, null);
         if (node == null) {
             throw new MessageException("Node name not found: [" + nodeName + "]");
+        }
+        if (!NodeType.AI_AGENT.s().equals(node.getType())) {
+            throw new MessageException("Node is not an AI Agent Type: [" + nodeName + "]");
         }
 
         List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(node.getIdStr(), false, null);

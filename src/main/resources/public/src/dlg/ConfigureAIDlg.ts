@@ -28,7 +28,7 @@ export class ConfigureAgentDlg extends DialogBase {
     foldersToExcludeScrollPos = new ScrollPos();
 
     constructor(public node: NodeInfo) {
-        super("Configure AI Agent");
+        super("Configure AI");
         this.aiServiceState.v.onStateChange = () => this.mergeState({});
         this.mergeState({});
     }
@@ -112,10 +112,10 @@ export class ConfigureAgentDlg extends DialogBase {
 
         const aiService: AIService = S.aiUtil.getServiceByName(this.aiServiceState.getValue());
         if (aiService && aiService.name !== J.AIModel.NONE) {
-            S.props.setPropVal(J.NodeProp.AI_AGENT, this.node, "true");
+            S.props.setPropVal(J.NodeProp.AI_CONFIG, this.node, "true");
         }
         else {
-            S.props.setPropVal(J.NodeProp.AI_AGENT, this.node, "[null]");
+            S.props.setPropVal(J.NodeProp.AI_CONFIG, this.node, "[null]");
         }
 
         await S.edit.saveNode(this.node, true);

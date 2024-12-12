@@ -347,8 +347,8 @@ export class TypeBase implements TypeIntf {
 
             let aiConfigDiv: Div = null;
             if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER) {
-                if (S.props.getPropStr(J.NodeProp.AI_AGENT, node)) {
-                    aiConfigDiv = new Div("AI Agent", {
+                if (S.props.getPropStr(J.NodeProp.AI_CONFIG, node)) {
+                    aiConfigDiv = new Div("AI Settings", {
                         onClick: () => S.edit.configureAgent(node),
                         className: "nodeTags aiTags mb-1 float-right",
                         title: "Configure Agent Settings"
