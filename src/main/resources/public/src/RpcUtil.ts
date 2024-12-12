@@ -7,8 +7,8 @@ import { RpcQueueItem } from "./RpcQueueItem";
 import { Tailwind } from "./Tailwind";
 
 export class RpcUtil {
-    log: boolean = true;
-    logVerbose: boolean = true;
+    log: boolean = false;
+    logVerbose: boolean = false;
 
     rpcPath: string = null;
     rhost: string = null;
