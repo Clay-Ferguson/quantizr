@@ -460,8 +460,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (atts != null && contentType.equals("html")) {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
-                    if (att.getPosition().equals("ur") || att.getPosition().equals("ul")
-                            || att.getPosition().equals("c")) {
+                    if (svc_snUtil.hasBasicPositioning(att)) {
                         handleAttachment(node, false, null, deeperPath, targetFolder, writeFile, att, figNum);
                         figNum++;
                     }
@@ -475,8 +474,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
                     // detect case where we'll have already handle the image above
-                    if (contentType.equals("html") && (att.getPosition().equals("ur") || att.getPosition().equals("ul")
-                            || att.getPosition().equals("c"))) {
+                    if (contentType.equals("html") && svc_snUtil.hasBasicPositioning(att)) {
                         continue;
                     }
                     // Process File Tag type attachments here first
@@ -510,8 +508,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         int figNum = tn.figNumStart;
                         for (Attachment att : atts) {
                             // detect case where we'll have already handle the image above
-                            if (contentType.equals("html") && (att.getPosition().equals("ur")
-                                    || att.getPosition().equals("ul") || att.getPosition().equals("c"))) {
+                            if (contentType.equals("html") && svc_snUtil.hasBasicPositioning(att)) {
                                 continue;
                             }
 
@@ -545,8 +542,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 int figNum = tn.figNumStart;
                 for (Attachment att : atts) {
                     // detect case where we'll have already handle the image above
-                    if (contentType.equals("html") && (att.getPosition().equals("ur") || att.getPosition().equals("ul")
-                            || att.getPosition().equals("c"))) {
+                    if (contentType.equals("html") && svc_snUtil.hasBasicPositioning(att)) {
                         continue;
                     }
 
@@ -894,11 +890,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     }
 
                     String imgClass = "";
-                    if (att.getPosition().equals("ur")) {
+                    if ("ur".equals(att.getPosition())) {
                         imgClass = "class='img-upper-right'";
-                    } else if (att.getPosition().equals("ul")) {
+                    } else if ("ul".equals(att.getPosition())) {
                         imgClass = "class='img-upper-left'";
-                    } else if (att.getPosition().equals("c")) {
+                    } else if ("c".equals(att.getPosition())) {
                         imgClass = "class='img-upper-center'";
                     }
 

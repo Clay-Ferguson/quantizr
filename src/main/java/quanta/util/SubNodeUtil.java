@@ -55,6 +55,17 @@ public class SubNodeUtil extends ServiceBase {
         }
     }
 
+    public boolean hasBasicPositioning(Attachment att) {
+        if (att == null) {
+            return false;
+        }
+        String pos = att.getPosition();
+        if (pos == null) {
+            return false;
+        }
+        return pos.equals("ul") || pos.equals("ur") || pos.equals("c");
+    }
+
     public void removeProp(List<PropertyInfo> list, String name) {
         if (list == null || name == null) {
             return;
