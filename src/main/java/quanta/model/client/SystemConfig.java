@@ -1,11 +1,8 @@
 package quanta.model.client;
 
 public class SystemConfig {
-    // Holds the AI Config node id (todo-0: is this still used? and are ANY of the AI config fields
-    // still used?)
     private String agentNodeId;
-
-    private String prompt; // ex: "you are a helpful assistant"
+    private String systemPrompt; // ex: "you are a helpful assistant"
     private String foldersToInclude; // newline delimited list of file paths
     private String foldersToExclude; // newline delimited list of file paths
     private String template;
@@ -23,12 +20,12 @@ public class SystemConfig {
         this.agentNodeId = agentNodeId;
     }
 
-    public String getPrompt() {
-        return prompt;
+    public String getSystemPrompt() {
+        return systemPrompt;
     }
 
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
+    public void setSystemPrompt(String systemPrompt) {
+        this.systemPrompt = systemPrompt;
     }
 
     public String getFoldersToInclude() {

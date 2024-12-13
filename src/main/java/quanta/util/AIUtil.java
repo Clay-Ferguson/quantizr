@@ -56,7 +56,7 @@ public class AIUtil extends ServiceBase {
 
             String prompt = node.getStr(NodeProp.AI_PROMPT.s());
             prompt = composePrompt(prompt);
-            system.setPrompt(prompt);
+            system.setSystemPrompt(prompt);
             system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
             system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
             system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));

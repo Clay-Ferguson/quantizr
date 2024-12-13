@@ -81,15 +81,15 @@ public class AIService extends ServiceBase {
         }
 
         if (!svc.isAllowSystemPrompt()) {
-            system.setPrompt(null);
+            system.setSystemPrompt(null);
         } else {
-            if (StringUtils.isEmpty(system.getPrompt())) {
-                system.setPrompt("You are a helpful assistant.");
+            if (StringUtils.isEmpty(system.getSystemPrompt())) {
+                system.setSystemPrompt("You are a helpful assistant.");
             }
         }
 
         AIRequest request = new AIRequest();
-        request.setSystemPrompt(system.getPrompt());
+        request.setSystemPrompt(system.getSystemPrompt());
         request.setPrompt(input);
         request.setFoldersToInclude(system.getFoldersToInclude());
         request.setFoldersToExclude(system.getFoldersToExclude());
