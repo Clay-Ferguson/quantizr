@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class AIUtil extends ServiceBase {
             system.setAgentNodeId(node.getIdStr());
 
             String prompt = node.getStr(NodeProp.AI_PROMPT.s());
-            prompt = composePrompt(prompt);
+            prompt = composePrompt(prompt, null);
             system.setSystemPrompt(prompt);
             system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
             system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
@@ -94,8 +95,12 @@ public class AIUtil extends ServiceBase {
      * Allows the 'prompt' to have lines formatted like "::nodeName::" which will be replaced with the
      * content of the node with that name. This allows for embedding prompts within prompts. The system
      * is fully composable and can have multiple levels of embedding.
+     * 
+     * We pass nodeNames, to allow detection of dupliates.
      */
-    public String composePrompt(String prompt) {
+    public String composePrompt(String prompt, HashSet<String> nodeNames) {
+        if (nodeNames == null)
+            nodeNames = new HashSet<>();
         // split prompt into multiple lines, by tokenizing on newline
         String[] lines = prompt.split("\n");
         StringBuilder sb = new StringBuilder();
@@ -107,6 +112,12 @@ public class AIUtil extends ServiceBase {
 
                 // now put the nodeName into the expected format for a user-specific lookup
                 nodeName = TL.getSC().getUserName() + ":" + nodeName;
+
+                // add nodeName to nodeNames to detect duplicates and throw exception if it's a duplicate
+                if (nodeNames.contains(nodeName)) {
+                    throw new MessageException("Duplicate node name in prompt substitutions: [" + nodeName + "]");
+                }
+                nodeNames.add(nodeName);
                 String content = buildSystemPromptFromNode(nodeName);
                 composed = true;
                 sb.append(content + "\n\n");
@@ -119,7 +130,7 @@ public class AIUtil extends ServiceBase {
             return sb.toString();
         }
         // call again to allow embedding of prompts within prompts
-        String ret = composePrompt(sb.toString());
+        String ret = composePrompt(sb.toString(), nodeNames);
         return ret;
     }
 

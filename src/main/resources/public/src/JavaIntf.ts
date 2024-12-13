@@ -126,7 +126,7 @@ export interface SearchDefinition {
 
 export interface SystemConfig {
     agentNodeId: string;
-    prompt: string;
+    systemPrompt: string;
     foldersToInclude: string;
     foldersToExclude: string;
     template: string;
