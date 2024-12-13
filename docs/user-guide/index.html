@@ -92,6 +92,28 @@
      cursor: pointer;
  }
 
+ .img-upper-right {
+     float: right;
+     margin-left: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-left {
+     float: left;
+     margin-right: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-center {
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
  table {
      border-collapse: collapse;
      border-spacing: 2px;
@@ -247,7 +269,6 @@
 <ul>
 <li><a href="#5fa1926b6b842575d0e9259b">About Quanta</a>
 <ul>
-<li><a href="#6226614f990f3a11b5c4f7f5">What is Quanta</a></li>
 <li><a href="#5fa1926b6b842575d0e9259e">Concepts and Terminology</a></li>
 <li><a href="#622660b9990f3a11b5c4f7db">Sharing and Publishing</a></li>
 <li><a href="#6226603d990f3a11b5c4f7cf">A New Collaboration Model</a></li>
@@ -362,11 +383,28 @@
 </li>
 <li><a href="#64ebea2bc33eef3cdbdac7d2">Artificial Intelligence</a>
 <ul>
+<li><a href="#64ec1778c33eef3cdbdacf51">Uses for Quanta AI</a></li>
 <li><a href="#66e32319b49c9e3c9edb6c62">AI Modes</a>
 <ul>
 <li><a href="#66e32399b49c9e3c9edb6c64">Chat Mode</a></li>
 <li><a href="#66e323a4b49c9e3c9edb6c65">Writing Mode</a></li>
 <li><a href="#66e323afb49c9e3c9edb6c66">Agent Mode</a></li>
+</ul>
+</li>
+<li><a href="#64f79adb06a5b22fcf329542">Configure AI</a>
+<ul>
+<li><a href="#675c863cb23ae334ef9b4afc">System Prompts</a>
+<ul>
+<li><a href="#64ebf7b2c33eef3cdbdacaa1">Examples</a></li>
+<li><a href="#66d7a3927515c33b5c738076">Document Writing Example</a></li>
+<li><a href="#66d7a0ac7515c33b5c738074">Tips</a>
+<ul>
+<li><a href="#675c86c7b23ae334ef9b4afd">Including Content in Prompts</a></li>
+<li><a href="#66d7a0ba7515c33b5c738075">Supporting LaTex Math</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#65c5a8e53e8c3b6aec82835b">AI Services Supported</a>
@@ -382,18 +420,6 @@
 <li><a href="#6591ebdbc9873822b24fa632">AI Conversations</a></li>
 <li><a href="#64f9194706a5b22fcf32ed0d">A Node that Asks a Question to AI</a></li>
 <li><a href="#64f12a392506b77b95d6ad86">Questions about a Subgraph</a></li>
-<li><a href="#64f79adb06a5b22fcf329542">Custom AI Agents</a>
-<ul>
-<li><a href="#66d7a3927515c33b5c738076">System Prompt Example</a></li>
-<li><a href="#66d7a0ac7515c33b5c738074">System Prompt Tips</a></li>
-<li><a href="#64ebf7b2c33eef3cdbdacaa1">System Prompt Examples</a></li>
-</ul>
-</li>
-<li><a href="#65bc2b5acf425c5fe6f2dddf">AI Service Selection</a>
-<ul>
-<li><a href="#65bc2c1ecf425c5fe6f2dde5">AI Cloud Services Supported</a></li>
-</ul>
-</li>
 <li><a href="#64f79da806a5b22fcf329611">Generating Content with AI</a>
 <ul>
 <li><a href="#64f7a2a206a5b22fcf329784">Step 1 - Configure Document Root Node to have AI Settings</a></li>
@@ -638,12 +664,8 @@
 <div id='5fa1926b6b842575d0e9259b'></div>
 <h1 id="about-quanta"><a href="#about-quanta" id="about-quanta">About Quanta</a></h1>
 <div id='6226614f990f3a11b5c4f7f5'></div>
-<h2 id="what-is-quanta"><a href="#what-is-quanta" id="what-is-quanta">What is Quanta</a></h2>
-<div id='6037f166f0658f0360d2d451'></div>
 <p>Quanta is a web platform for creating, editing, and sharing hierarchical content, with features similar to Wikis, Content Management Systems, and Social Media platforms.</p>
-<div id='5fa1926b6b842575d0e9259c'></div>
 <p>Create hierarchically organized content that's editable like a document, blog, or wiki, and structured like a tree, or a file system. You can navigate and explore the content by browsing this tree, posting nodes onto it, searching it, sharing branches of it, viewing timelines, etc.</p>
-<div id='674114cfaa53a12b272f5963'></div>
 <p><a href="https://github.com/Clay-Ferguson/quantizr">🔵 Open Source GitHub Project</a></p>
 <p><a href="https://quanta.wiki">🔵 quanta.wiki: Live Demo Instance</a></p>
 <div id='5fa1926b6b842575d0e9259e'></div>
@@ -703,7 +725,7 @@
 <div id='64fd01f8d4bf7b4da17cf45e'></div>
 <p>The Folders tab is where you can view all the content nodes. As shown in the animated GIF below you can explore the tree by expanding sections one at a time, or you can also request a Document View at any time for a more document-centric experience if you prefer that.</p>
 <figure>
-<img id='img_64fd01f8d4bf7b4da17cf45e_p' src='attachments/64fd01f8d4bf7b4da17cf45e_p.gif' style='width:100%'/>
+<img id='img_64fd01f8d4bf7b4da17cf45e_p' src='attachments/64fd01f8d4bf7b4da17cf45e_p.gif' style='width:100%' />
 <figcaption>Fig. 1</figcaption>
 </figure>
 <div id='63f2c6e255770e1b97de0a2c'></div>
@@ -721,7 +743,7 @@
 <li>Turn <code>Menu -&gt; Options -&gt; Edit Mode and/or Node Info</code> options on only when you need them, so the page is cleaner looking. The page will render with lots more info and buttons when you enable those.</li>
 </ul>
 <figure>
-<img id='img_63f2c99055770e1b97de0b28_p' src='attachments/63f2c99055770e1b97de0b28_p.png' />
+<img id='img_63f2c99055770e1b97de0b28_p' src='attachments/63f2c99055770e1b97de0b28_p.png'  />
 <figcaption>Fig. 2</figcaption>
 </figure>
 <div id='63f2c99055770e1b97de0b29'></div>
@@ -730,14 +752,14 @@
 </ul>
 <p>In the screenshot below the <code>Folders Tab</code> is selected. Think of the &quot;Folders Tab&quot; as your &quot;Tree View&quot; of the database. All Quanta data is stored hierarchically like a file system, and the Folders Tab is how you can interact with that hierarchy.</p>
 <figure>
-<img id='img_63f2c99055770e1b97de0b29_p' src='attachments/63f2c99055770e1b97de0b29_p.png' />
+<img id='img_63f2c99055770e1b97de0b29_p' src='attachments/63f2c99055770e1b97de0b29_p.png'  />
 <figcaption>Fig. 3</figcaption>
 </figure>
 <div id='66ca78453d26ec1bae8749ad'></div>
 <h2 id="views-menu"><a href="#views-menu" id="views-menu">Views Menu</a></h2>
 <p>Under <code>Menu -&gt; View</code> here are several very commonly used views you can use to work with nodes in a particular order, or in a particular way. The View Menu looks like this:</p>
 <figure>
-<img id='img_66ca78453d26ec1bae8749ad_p' src='attachments/66ca78453d26ec1bae8749ad_p.png' />
+<img id='img_66ca78453d26ec1bae8749ad_p' src='attachments/66ca78453d26ec1bae8749ad_p.png'  />
 <figcaption>Fig. 4</figcaption>
 </figure>
 <div id='66ca78cd3d26ec1bae8749b0'></div>
@@ -758,7 +780,7 @@
 <h2 id="edit-mode"><a href="#edit-mode" id="edit-mode">Edit Mode</a></h2>
 <p>To start editing first enable &quot;Edit Mode&quot; via the menu.</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e925d8_p' src='attachments/5fa1926c6b842575d0e925d8_p.png' />
+<img id='img_5fa1926c6b842575d0e925d8_p' src='attachments/5fa1926c6b842575d0e925d8_p.png'  />
 <figcaption>Fig. 7</figcaption>
 </figure>
 <p>When edit mode is enabled you'll see a toolbar at the top of each row, with icon buttons to create new content, edit content, move nodes around, cut/paste, delete, etc.</p>
@@ -770,7 +792,7 @@
 <h2 id="edit-dialog"><a href="#edit-dialog" id="edit-dialog">Edit Dialog</a></h2>
 <p>Here's a screenshot of the Editor Dialog, which is where all editing is done. You can edit one node at a time.</p>
 <figure>
-<img id='img_6287b47ea487d37f9989df92_p' src='attachments/6287b47ea487d37f9989df92_p.png' />
+<img id='img_6287b47ea487d37f9989df92_p' src='attachments/6287b47ea487d37f9989df92_p.png'  />
 <figcaption>Fig. 8</figcaption>
 </figure>
 <div id='63f2cf4a55770e1b97de0c4d'></div>
@@ -820,7 +842,7 @@
 <h2 id="advanced-options"><a href="#advanced-options" id="advanced-options">Advanced Options</a></h2>
 <p>The &quot;Advanced&quot; section contains more features/capabilities, like entering a node name, priority, word wrap, encryption, signature setting, etc.</p>
 <figure>
-<img id='img_6287b4e5a487d37f9989df9c_p' src='attachments/6287b4e5a487d37f9989df9c_p.png' />
+<img id='img_6287b4e5a487d37f9989df9c_p' src='attachments/6287b4e5a487d37f9989df9c_p.png'  />
 <figcaption>Fig. 9</figcaption>
 </figure>
 <div id='6591f0e8c9873822b24fa772'></div>
@@ -876,7 +898,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>Under <code>Menu -&gt; Edit -&gt; Search and Replace</code> you'll find the same kind of &quot;Search and Replace&quot; feature that exists in most text editors. You can replace text under all nodes in the subgraph of the selected node.</p>
 <div id='63eda70f32831373361c49fe'></div>
 <figure>
-<img id='img_63eda70f32831373361c49fe_p' src='attachments/63eda70f32831373361c49fe_p.png' />
+<img id='img_63eda70f32831373361c49fe_p' src='attachments/63eda70f32831373361c49fe_p.png'  />
 <figcaption>Fig. 10</figcaption>
 </figure>
 <div id='63ed9d1332831373361c462c'></div>
@@ -910,12 +932,12 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <h2 id="drag-and-drop"><a href="#drag-and-drop" id="drag-and-drop">Drag and Drop</a></h2>
 <div id='6226813b990f3a11b5c54d1d'></div>
 <p>When <code>Edit Mode</code> is enabled, you can generally drag any node to any other location on the tree, by using the mouse to click the dragable icon that looks like this vertical bar of dots: <figure>
-<img id='img_6226813b990f3a11b5c54d1d_img1' src='attachments/6226813b990f3a11b5c54d1d_img1.png' /></p>
+<img id='img_6226813b990f3a11b5c54d1d_img1' src='attachments/6226813b990f3a11b5c54d1d_img1.png'  /></p>
 <figcaption>Fig. 11</figcaption>
 </figure>
 <p>After you drag and drop a node you'll be prompted about what to do as your &quot;Drop Action&quot; with a dialog like the following:</p>
 <figure>
-<img id='img_6226813b990f3a11b5c54d1d_p' src='attachments/6226813b990f3a11b5c54d1d_p.png' />
+<img id='img_6226813b990f3a11b5c54d1d_p' src='attachments/6226813b990f3a11b5c54d1d_p.png'  />
 <figcaption>Fig. 11</figcaption>
 </figure>
 <div id='63eda4fc32831373361c48fa'></div>
@@ -939,7 +961,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <div id='64f64d24f8127d7dc133a38a'></div>
 <p>The split and join functions are located at <code>Menu -&gt; Edit -&gt; ...</code> and below you can see how to use these features.</p>
 <figure>
-<img id='img_64f64d24f8127d7dc133a38a_p' src='attachments/64f64d24f8127d7dc133a38a_p.png' />
+<img id='img_64f64d24f8127d7dc133a38a_p' src='attachments/64f64d24f8127d7dc133a38a_p.png'  />
 <figcaption>Fig. 13</figcaption>
 </figure>
 <div id='5fa1926c6b842575d0e925e0'></div>
@@ -948,7 +970,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <div id='63edbb714975b001996fac99'></div>
 <p>Here's the dialog you'll see pop up when you save some text that has double spaced content, which does this for you:</p>
 <figure>
-<img id='img_63edbb714975b001996fac99_p' src='attachments/63edbb714975b001996fac99_p.png' />
+<img id='img_63edbb714975b001996fac99_p' src='attachments/63edbb714975b001996fac99_p.png'  />
 <figcaption>Fig. 14</figcaption>
 </figure>
 <div id='5fa1926c6b842575d0e925e1'></div>
@@ -961,7 +983,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>To split a node, first select the node (by clicking on it) and then choose <code>Menu -&gt; Edit -&gt; Split</code>. You'll see a dialog like in the image below.</p>
 <p>In the dialog you specify what the delimiter to split on is, as well is whether you want to keep all the nodes at the same level of the tree (inline) or whether you want the nodes split up and appended as <strong>children</strong> of the node you're splitting.</p>
 <figure>
-<img id='img_64e57b8a0d3d9d7b99ea2f55_p' src='attachments/64e57b8a0d3d9d7b99ea2f55_p.png' />
+<img id='img_64e57b8a0d3d9d7b99ea2f55_p' src='attachments/64e57b8a0d3d9d7b99ea2f55_p.png'  />
 <figcaption>Fig. 15</figcaption>
 </figure>
 <div id='6052465334b2b0382335c5d4'></div>
@@ -982,7 +1004,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <div id='6362b0a70aeca527dc83c3e4'></div>
 <p>To add a digital signature to a node (signed using your browser's signature keys), click the &quot;Sign&quot; checkbox that's available in the 'advanced' section of the editor dialog.</p>
 <figure>
-<img id='img_6362b0a70aeca527dc83c3e4_p' src='attachments/6362b0a70aeca527dc83c3e4_p.png' />
+<img id='img_6362b0a70aeca527dc83c3e4_p' src='attachments/6362b0a70aeca527dc83c3e4_p.png'  />
 <figcaption>Fig. 16</figcaption>
 </figure>
 <div id='64e651873b64e314dcd830c4'></div>
@@ -1025,7 +1047,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>To initiate a transfer, select a node that you own (by clicking it in the Tree View) and then select <code>Menu -&gt; Transfer -&gt; Transfer</code>.</p>
 <p>This will open a dialog like the one below, where you'll enter the usernames of the two persons involved in the transfer.</p>
 <figure>
-<img id='img_635de23c68a8d0147326ad4e_p' src='attachments/635de23c68a8d0147326ad4e_p.png' />
+<img id='img_635de23c68a8d0147326ad4e_p' src='attachments/635de23c68a8d0147326ad4e_p.png'  />
 <figcaption>Fig. 17</figcaption>
 </figure>
 <div id='635de40368a8d0147326adec'></div>
@@ -1039,7 +1061,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <div id='674cafb05646202d93cd537a'></div>
 <p>You can add or remove hashtags from an entire branch of the tree using the dialog below which is available at <code>Menu -&gt; Edit -&gt; Hashtags</code>. Enter one or more hashtags (separated by spaces) you want to add/remove and then click the &quot;Modify&quot; button and that operation will be performed either on the entire subgraph under the selected node, or else just the direct children of the selected node.</p>
 <figure>
-<img id='img_674cafb05646202d93cd537a_p' src='attachments/674cafb05646202d93cd537a_p.png' />
+<img id='img_674cafb05646202d93cd537a_p' src='attachments/674cafb05646202d93cd537a_p.png'  />
 <figcaption>Fig. 18</figcaption>
 </figure>
 <div id='626d58c4647a32065bdb0302'></div>
@@ -1058,25 +1080,25 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <h2 id="upload-image"><a href="#upload-image" id="upload-image">Upload Image</a></h2>
 <p>The <code>Node Editor Dialog</code> (shown below) has an upload button that you can use to add any number of attachments to the node. We'll show an example of uploading an image here,.</p>
 <figure>
-<img id='img_6287c99196d3696042d5d5cb_p' src='attachments/6287c99196d3696042d5d5cb_p.png' />
+<img id='img_6287c99196d3696042d5d5cb_p' src='attachments/6287c99196d3696042d5d5cb_p.png'  />
 <figcaption>Fig. 19</figcaption>
 </figure>
 <div id='6287cb9696d3696042d5d5f8'></div>
 <p>You'll now be in the <code>Attach File</code> dialog, where you can select files to upload. In the example below you can see one image was selected to be uploaded, by clicking in the dotted rectangle area and then selecting a file from the hard drive.</p>
 <figure>
-<img id='img_6287cb9696d3696042d5d5f8_p' src='attachments/6287cb9696d3696042d5d5f8_p.png' />
+<img id='img_6287cb9696d3696042d5d5f8_p' src='attachments/6287cb9696d3696042d5d5f8_p.png'  />
 <figcaption>Fig. 20</figcaption>
 </figure>
 <div id='63f421f4fad1d222649c6548'></div>
 <p>After clicking &quot;Upload&quot; on the dialog above we'll see that the image is now on this node and we can choose a few options for how to display it, a checkbox to select it for delete, etc.</p>
 <figure>
-<img id='img_63f421f4fad1d222649c6548_p' src='attachments/63f421f4fad1d222649c6548_p.png' />
+<img id='img_63f421f4fad1d222649c6548_p' src='attachments/63f421f4fad1d222649c6548_p.png'  />
 <figcaption>Fig. 21</figcaption>
 </figure>
 <div id='63f41f6cfad1d222649c64b8'></div>
 <p>After we save the node we uploaded to it will render displaying the image:</p>
 <figure>
-<img id='img_63f41f6cfad1d222649c64b8_p' src='attachments/63f41f6cfad1d222649c64b8_p.png' />
+<img id='img_63f41f6cfad1d222649c64b8_p' src='attachments/63f41f6cfad1d222649c64b8_p.png'  />
 <figcaption>Fig. 22</figcaption>
 </figure>
 <div id='5fa1926c6b842575d0e925ea'></div>
@@ -1087,7 +1109,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <h2 id="upload-from-various-sources"><a href="#upload-from-various-sources" id="upload-from-various-sources">Upload from Various Sources</a></h2>
 <p>As you saw in the screenshot above, are several kinds of sources from which you can upload:</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e925ed_p' src='attachments/5fa1926c6b842575d0e925ed_p.png' />
+<img id='img_5fa1926c6b842575d0e925ed_p' src='attachments/5fa1926c6b842575d0e925ed_p.png'  />
 <figcaption>Fig. 23</figcaption>
 </figure>
 <ul>
@@ -1118,37 +1140,37 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <h2 id="basic-sharing-example"><a href="#basic-sharing-example" id="basic-sharing-example">Basic Sharing Example</a></h2>
 <p>In the following we'll walk thru the process of how you'd start with this node below, which starts out un-shared, and make it public as well as share to a couple of other users, which will make it show up in their Social Media feed.</p>
 <figure>
-<img id='img_6287ccc996d3696042d5d61b_p' src='attachments/6287ccc996d3696042d5d61b_p.png' />
+<img id='img_6287ccc996d3696042d5d61b_p' src='attachments/6287ccc996d3696042d5d61b_p.png'  />
 <figcaption>Fig. 24</figcaption>
 </figure>
 <div id='6287cea096d3696042d5d640'></div>
 <p>After clicking the <code>Share</code> button on the dialog above the following dialog pops up so we can configure the sharing. In this dialog we can add or remove people who are allowed to access this node, and control various aspects of how this node is shared.</p>
 <figure>
-<img id='img_6287cea096d3696042d5d640_p' src='attachments/6287cea096d3696042d5d640_p.png' />
+<img id='img_6287cea096d3696042d5d640_p' src='attachments/6287cea096d3696042d5d640_p.png'  />
 <figcaption>Fig. 25</figcaption>
 </figure>
 <div id='63f52c51ca571559e120e477'></div>
 <p>After clicking <code>Make Public</code> to share this node to the public, we're still on the same dialog and it shows up as follows:</p>
 <figure>
-<img id='img_63f52c51ca571559e120e477_p' src='attachments/63f52c51ca571559e120e477_p.png' />
+<img id='img_63f52c51ca571559e120e477_p' src='attachments/63f52c51ca571559e120e477_p.png'  />
 <figcaption>Fig. 26</figcaption>
 </figure>
 <div id='63f52ce1ca571559e120e4bd'></div>
 <p>In addition to making this node public, let's share it to a couple of people. After clicking <code>Add People</code> in the dialog above we will be presented with our Friends List Dialog, for picking people, as shown below:</p>
 <figure>
-<img id='img_63f52ce1ca571559e120e4bd_p' src='attachments/63f52ce1ca571559e120e4bd_p.png' />
+<img id='img_63f52ce1ca571559e120e4bd_p' src='attachments/63f52ce1ca571559e120e4bd_p.png'  />
 <figcaption>Fig. 27</figcaption>
 </figure>
 <div id='63f52d0bca571559e120e4d7'></div>
 <p>After using the checkboxes in the above list of friends to pick Jetson and Adam, and clicking <code>Ok</code> (on the dialog above), we end up back at the Sharing Dialog and again it's showing the list of who it's shared to (see below).</p>
 <figure>
-<img id='img_63f52d0bca571559e120e4d7_p' src='attachments/63f52d0bca571559e120e4d7_p.png' />
+<img id='img_63f52d0bca571559e120e4d7_p' src='attachments/63f52d0bca571559e120e4d7_p.png'  />
 <figcaption>Fig. 28</figcaption>
 </figure>
 <div id='6287ceee96d3696042d5d643'></div>
 <p>Now the Node Editor is showing us that the node is public and also shared to two specific people.</p>
 <figure>
-<img id='img_6287ceee96d3696042d5d643_p' src='attachments/6287ceee96d3696042d5d643_p.png' />
+<img id='img_6287ceee96d3696042d5d643_p' src='attachments/6287ceee96d3696042d5d643_p.png'  />
 <figcaption>Fig. 29</figcaption>
 </figure>
 <div id='6287cf7596d3696042d5d64f'></div>
@@ -1159,7 +1181,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>For nodes that are &quot;Unpublished&quot; they're still visible to people you've shared them to, but they have to specifically navigate to the node to see it.</p>
 <p>The 'Unpublished' option doesn't make the node private at all, because as long as you've got sharing set on this node the people shared with <em>can</em> still see it; but what the &quot;Unpublished&quot; option will do is to stop broadcasting the real-time changes you make going forward.</p>
 <figure>
-<img id='img_628cfcd0e585752ab4b72a51_p' src='attachments/628cfcd0e585752ab4b72a51_p.png' />
+<img id='img_628cfcd0e585752ab4b72a51_p' src='attachments/628cfcd0e585752ab4b72a51_p.png'  />
 <figcaption>Fig. 30</figcaption>
 </figure>
 <div id='62268638990f3a11b5c54da6'></div>
@@ -1184,7 +1206,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <div id='672aa11aa2c28443680032d6'></div>
 <p>As you saw in the previous section on node Sharing, there was a &quot;Website&quot; checkbox on the sharing dialog that's available any time you've made the node public. Shown here:</p>
 <figure>
-<img id='img_672aa11aa2c28443680032d6_p' src='attachments/672aa11aa2c28443680032d6_p.png' />
+<img id='img_672aa11aa2c28443680032d6_p' src='attachments/672aa11aa2c28443680032d6_p.png'  />
 <figcaption>Fig. 31</figcaption>
 </figure>
 <div id='672aa1bca2c28443680032d9'></div>
@@ -1195,20 +1217,20 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p><em>In that link you'll notice there's no user name after the <code>/pub/</code> part of the URL and that's just because the User Guide node is owned by the site admin and in the special case of admin nodes the <code>/admin/</code> part is always omitted.</em></p>
 <p>Here's what the rendered Websites look like (image below). There's always a 'Table of Contents' on the left hand side, which is built from the Markdown headings. Since the Table of Contents and the Document part (right hand side) are in the same HTML file, the page loads are super fast, and all-inclusive.</p>
 <figure>
-<img id='img_672aa4bea2c28443680032e4_p' src='attachments/672aa4bea2c28443680032e4_p.png' style='width:100%'/>
+<img id='img_672aa4bea2c28443680032e4_p' src='attachments/672aa4bea2c28443680032e4_p.png' style='width:100%' />
 <figcaption>Fig. 32</figcaption>
 </figure>
 <div id='672aa2a9a2c28443680032da'></div>
 <h2 id="unpublishing-and-re-publishing"><a href="#unpublishing-and-re-publishing" id="unpublishing-and-re-publishing">Unpublishing and Re-Publishing</a></h2>
 <p>By unselecting the Website checkbox, or removing the public sharing, the website will become unavailable again (i.e. taken offline). Once you publish the website for the first time, it will be generated and cached on the server, for extremely fast access by users. This is also nice because it means while you're editing your next revision of your website you can do so privately without your edits being published until you're ready to republish. You can republish the site by clicking the <code>Build Website</code> button which will be showing up on the Node Editor dialog, as shown here:</p>
 <figure>
-<img id='img_672aa2a9a2c28443680032da_p' src='attachments/672aa2a9a2c28443680032da_p.png' />
+<img id='img_672aa2a9a2c28443680032da_p' src='attachments/672aa2a9a2c28443680032da_p.png'  />
 <figcaption>Fig. 33</figcaption>
 </figure>
 <div id='672aa453a2c28443680032e1'></div>
 <p>As shown below the main tree view will also show an orange Web Publishing Icon for any row that's the root of a published document:</p>
 <figure>
-<img id='img_672aa453a2c28443680032e1_p' src='attachments/672aa453a2c28443680032e1_p.png' />
+<img id='img_672aa453a2c28443680032e1_p' src='attachments/672aa453a2c28443680032e1_p.png'  />
 <figcaption>Fig. 34</figcaption>
 </figure>
 <div id='672aa677a2c28443680032e8'></div>
@@ -1216,7 +1238,7 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>The only other tiny files in the export will be two called <code>prism.js</code> and <code>prism.css</code> which are optional and not even needed unless there are code blocks in your Markdown that need to be nicely formatted.</p>
 <p>The way you do this download is by running an Export with the following settings:</p>
 <figure>
-<img id='img_672aa677a2c28443680032e8_p' src='attachments/672aa677a2c28443680032e8_p.png' />
+<img id='img_672aa677a2c28443680032e8_p' src='attachments/672aa677a2c28443680032e8_p.png'  />
 <figcaption>Fig. 35</figcaption>
 </figure>
 <div id='672aa78ba2c28443680032eb'></div>
@@ -1244,22 +1266,19 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>Whenever the website is generated (or an export of HTML or PDF is done) those things will be replaced with something like <code>Fig. 42</code> and <code>Fig. 43</code> (where the 42 or 43 will be different of course), and will correctly reference the two images on the node named <code>file-uploads</code>.</p>
 <div id='64ebea2bc33eef3cdbdac7d2'></div>
 <h1 id="artificial-intelligence"><a href="#artificial-intelligence" id="artificial-intelligence">Artificial Intelligence</a></h1>
-<div id='6734f7709cf0e233f26fbe78'></div>
-<p>Converse with AI, write books or documents collaboratively with the AI.</p>
-<p>In local deployments of Quanta (that you run yourself) Quanta provides an agent that's capable of directly refactoring your code projects, or answering questions about code.</p>
+<div id='64ebe6bfc33eef3cdbdac756'></div>
+<p>Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory by using the tree location as &quot;context&quot;.</p>
 <div id='64ec1778c33eef3cdbdacf51'></div>
+<h2 id="uses-for-quanta-ai"><a href="#uses-for-quanta-ai" id="uses-for-quanta-ai">Uses for Quanta AI</a></h2>
 <ul>
 <li>Get answers to general questions about anything</li>
 <li>Have conversations with the AI, that you can either keep private or share publicly</li>
 <li>Ask questions about the content of any Quanta tree branch</li>
-<li>Request Code Refactoring via the <code>Quanta Agent</code></li>
+<li>Collaborate with an AI Agent to write documents or books.</li>
+<li>Request Code Refactoring via the <code>Quanta Agent</code>. In local deployments of Quanta (that you run yourself) Quanta provides an agent that's capable of directly refactoring your code projects, or answering questions about code.</li>
 </ul>
-<div id='64ebe6bfc33eef3cdbdac756'></div>
-<p>Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as &quot;context&quot;.</p>
-<div id='65f7420dcb4027493226dd18'></div>
-<p>When you ask a question to the AI you'll automatically be switched over to the <code>Thread View</code> tab so you can see the current AI conversation thread all in a simple chronological view, and ask follow up questions, in an &quot;AI Chat&quot;. See the <a href="/n/thread-view">Thread View User Guide Section</a> for more on how the Thread View itself works.</p>
 <div id='65b073ccf7864757f844ec88'></div>
-<p>Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by <a href="https://openai.com">OpenAI</a> and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to <code>Menu -&gt; Account -&gt; Settings -&gt; Add Credit</code> to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.</p>
+<p>Since AI is provided by 3rd party Cloud LLM Providers, and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to <code>Menu -&gt; Account -&gt; Settings -&gt; Add Credit</code> to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want. One you've added funds to your account you can use those funds for any of the available AI Services you choose to.</p>
 <div id='66e32319b49c9e3c9edb6c62'></div>
 <h2 id="ai-modes"><a href="#ai-modes" id="ai-modes">AI Modes</a></h2>
 <div id='66e3232eb49c9e3c9edb6c63'></div>
@@ -1274,6 +1293,8 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <p>During any chat conversation the AI will be using all the &quot;parent nodes&quot; (up to where the initial question was asked) as it's entire &quot;context&quot; for the discussion. So if you're having a long discussion with the AI and then you realize you should've said something different or taken the discussion in a different direction than you already have, you can go to any prior location on your conversation thread and submit a <em>different</em> response or question than what you had initially done, and then under this <em>different</em> response you can have an entirely new conversation flow, and the AI will have no &quot;recollection&quot; that you ever went off on the &quot;other direction&quot;, because, as mentioned above, only the parent nodes (from both you and the AI) will exist as the AI's &quot;context&quot; (knowledge) of what has already been said in the conversation.</p>
 <div id='66e329ebb49c9e3c9edb6c6e'></div>
 <p>The actual AI Service (Anthropic, OpenAI, etc) that will be used will be whichever one you have selected in the <code>Menu -&gt; AI -&gt; Settings</code> panel.</p>
+<div id='65f7420dcb4027493226dd18'></div>
+<p>When you ask a question to the AI you'll automatically be switched over to the <code>Thread View</code> tab so you can see the current AI conversation thread all in a simple chronological view, and ask follow up questions, in an &quot;AI Chat&quot;. See the <a href="/n/thread-view">Thread View User Guide Section</a> for more on how the Thread View itself works.</p>
 <div id='66e323a4b49c9e3c9edb6c65'></div>
 <h3 id="writing-mode"><a href="#writing-mode" id="writing-mode">Writing Mode</a></h3>
 <div id='66e3247ab49c9e3c9edb6c68'></div>
@@ -1283,122 +1304,21 @@ This is the text that was hidden until you clicked the Collapsible Heading
 <h3 id="agent-mode"><a href="#agent-mode" id="agent-mode">Agent Mode</a></h3>
 <div id='66e325a0b49c9e3c9edb6c69'></div>
 <p>When <code>Agent Mode</code> is enabled that means the AI will be expecting to perform refactoring or code edits on a software/code project. This mode is not available in the online demonstration instance of Quanta at [quanta.wiki website], but can be enabled in standalone installs of the platform. Full information on how the <code>Coding Agent</code> works can be found in the section named <code>AI Agent for Code Refactoring</code></p>
-<div id='65c5a8e53e8c3b6aec82835b'></div>
-<h2 id="ai-services-supported"><a href="#ai-services-supported" id="ai-services-supported">AI Services Supported</a></h2>
-<p>By a selection in your account in <code>Menu -&gt; Account -&gt; Settings -&gt; AI -&gt; AI Service</code> you can choose which AI Service to use in your account. You can choose OpenAI, Gemini, or Perplexity.</p>
-<p>If you're doing image recognition, image generation, or speech generation, you can only use the &quot;OpenAI&quot; Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use any of the three services.</p>
-<div id='65f1f0fbe1bcaf0c420fca43'></div>
-<h3 id="anthropic"><a href="#anthropic" id="anthropic">Anthropic</a></h3>
-<p>Including both <strong>Sonnet</strong> (best combination of performance and speed), and <strong>Opus</strong> (most intelligent and advanced model) Chat models.</p>
+<div id='64f79adb06a5b22fcf329542'></div>
+<h2 id="configure-ai"><a href="#configure-ai" id="configure-ai">Configure AI</a></h2>
+<div id='65b6b364e6d38a174f58684d'></div>
+<p>Before you can start using AI, you need to Configure AI on some node in your account. Any Node can be configured to support AI, and once you configure a node with AI settings, then anywhere under it's subgraph you can post questions using the &quot;Ask AI&quot; button on the node editor.</p>
+<p>Use <code>Menu -&gt; AI -&gt; Configure AI</code> to configure a node (any node), so that all questions anywhere on the tree under that node will be answered based on the settings you define.</p>
+<p>The image below shows a simple, single sentence, <code>System Prompt</code> that tells the AI that it's a Physics expert helping out with writing tasks. All of these settings are optional except for the 'AI Service' selection.</p>
 <figure>
-<img id='img_65f1f0fbe1bcaf0c420fca43_p' src='attachments/65f1f0fbe1bcaf0c420fca43_p.png' style='width:20%'/>
+<img id='img_65b6b364e6d38a174f58684d_p' src='attachments/65b6b364e6d38a174f58684d_p.png'  />
 <figcaption>Fig. 36</figcaption>
 </figure>
-<div id='65c5a9043e8c3b6aec82835c'></div>
-<h3 id="openai"><a href="#openai" id="openai">OpenAI</a></h3>
-<p>Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)</p>
-<figure>
-<img id='img_65c5a9043e8c3b6aec82835c_img1' src='attachments/65c5a9043e8c3b6aec82835c_img1.png' style='width:20%'/>
-<figcaption>Fig. 37</figcaption>
-</figure>
-<div id='65c5a91a3e8c3b6aec82835d'></div>
-<h3 id="perplexity"><a href="#perplexity" id="perplexity">Perplexity</a></h3>
-<p>Including models: Sonar, Sonar Online, Meta's Llama 3</p>
-<figure>
-<img id='img_65c5a91a3e8c3b6aec82835d_p' src='attachments/65c5a91a3e8c3b6aec82835d_p.png' style='width:20%'/>
-<figcaption>Fig. 38</figcaption>
-</figure>
-<div id='65c5a9543e8c3b6aec82835e'></div>
-<h3 id="google-gemini"><a href="#google-gemini" id="google-gemini">Google Gemini</a></h3>
-<p>Includes google's new chat model, for interactive chats.</p>
-<figure>
-<img id='img_65c5a9543e8c3b6aec82835e_p' src='attachments/65c5a9543e8c3b6aec82835e_p.png' style='width:20%'/>
-<figcaption>Fig. 39</figcaption>
-</figure>
-<div id='673a9403c5495824d4a1e344'></div>
-<h3 id="xai-grok"><a href="#xai-grok" id="xai-grok">XAI Grok</a></h3>
-<p>Uncensored chat model from X.com</p>
-<figure>
-<img id='img_673a9403c5495824d4a1e344_p' src='attachments/673a9403c5495824d4a1e344_p.png' style='width:20%'/>
-<figcaption>Fig. 40</figcaption>
-</figure>
-<div id='6629d6a8788a362604b0e264'></div>
-<h3 id="meta-llama-3"><a href="#meta-llama-3" id="meta-llama-3">Meta Llama 3</a></h3>
-<p>Meta's best Open Source AI LLM.</p>
-<figure>
-<img id='img_6629d6a8788a362604b0e264_p' src='attachments/6629d6a8788a362604b0e264_p.png' style='width:20%'/>
-<figcaption>Fig. 41</figcaption>
-</figure>
-<div id='6591ebdbc9873822b24fa632'></div>
-<h2 id="ai-conversations"><a href="#ai-conversations" id="ai-conversations">AI Conversations</a></h2>
-<p>The screenshot below shows how to ask a question to the AI, and get it's answer back. <code>Answers</code> are always inserted as a new node directly under the <code>question</code> node. This means AI conversations are actually a tree and not a top-to-bottom list.</p>
-<figure>
-<img id='img_6591ebdbc9873822b24fa632_img1' src='attachments/6591ebdbc9873822b24fa632_img1.gif' style='width:100%'/>
-<figcaption>Fig. 42</figcaption>
-</figure>
-<div id='64f9194706a5b22fcf32ed0d'></div>
-<h2 id="a-node-that-asks-a-question-to-ai"><a href="#a-node-that-asks-a-question-to-ai" id="a-node-that-asks-a-question-to-ai">A Node that Asks a Question to AI</a></h2>
-<p>The screenshot below shows the easiest way to ask the AI a question. You just type your question and click the <code>Ask GPT</code> button. The answer to the node content will be inserted as a subnode directly under the node containing the question.</p>
-<figure>
-<img id='img_64f9194706a5b22fcf32ed0d_p' src='attachments/64f9194706a5b22fcf32ed0d_p.png' />
-<figcaption>Fig. 43</figcaption>
-</figure>
-<div id='64ebead0c33eef3cdbdac7ed'></div>
-<p>You can ask questions to ChatGPT, and it's answer will be saved as a subnode under the question node. This means you can have a more <code>hierarchical</code> way of chatting with the AI, than what most chat systems provide, where any location in this hierarchy has it's own unique &quot;context&quot;.</p>
-<div id='66ce018561c5ec64edece157'></div>
-<p>By &quot;context&quot; we mean the AI knows exactly what has been previously said during any conversation, and will resume talking to you at any point starting with that specific set of &quot;memories&quot; in it's &quot;mind&quot;.</p>
-<div id='66ce018561c5ec64edece158'></div>
-<p>In other words, if you're having a conversation (i.e. asking questions) and go back up the tree to a higher location in the conversation thread, and ask a new question under one of those 'nodes', that's like rolling back the mind of the AI to the exact state it had at that point in the conversation; and it will answer the new question based on that state of mind.</p>
-<div id='64ec08dbc33eef3cdbdacd3a'></div>
-<p>Once you've gotten an answer back from the AI, you can then select the answer node, and create another question node under it using the same process, to continue with the conversation (i.e. asking more questions).</p>
-<div id='66ce019361c5ec64edece159'></div>
-<p>You can keep asking more follow-up questions as long as you want, and that will just extend the length of that &quot;conversation branch&quot; under the tree. You can of course go back to any location in the tree and ask a different follow-up question and you will get an answer equivalent to if you had rolled-back the &quot;memory&quot; of the AI back to that point in time.</p>
-<div id='66ce019361c5ec64edece15a'></div>
-<p>This memory of the conversation state is called Hierarchical Contextual Memory (HCM). Stated another way, we could say that the &quot;context&quot; (the AI's memory and understanding of the conversation) for any question always includes all &quot;parent nodes&quot; at higher levels up in the tree, going back to when you asked your original question.</p>
-<div id='64f12a392506b77b95d6ad86'></div>
-<h2 id="questions-about-a-subgraph"><a href="#questions-about-a-subgraph" id="questions-about-a-subgraph">Questions about a Subgraph</a></h2>
-<div id='65b6b269e6d38a174f58684a'></div>
-<p>Use <code>Menu -&gt; AI -&gt; Ask about Subgraph</code> to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.</p>
-<div id='65b6b269e6d38a174f58684b'></div>
-<p>The term <em>subgraph</em>, of course means just &quot;everything under that branch&quot;. All of the text under that subgraph will be used as the context information fed to the AI for it to be able to answer the question with, in addition to all it's built-in knowledge.</p>
-<div id='65b6b269e6d38a174f58684c'></div>
-<p>If you only want to ask an AI question about a limited subset of nodes you can use the checkboxes on each node (when <code>Edit Mode</code> is enabled) to select one or more nodes and this will cause the subgraph to be filtered to only included your selected nodes as input context to the AI.</p>
-<div id='64f79adb06a5b22fcf329542'></div>
-<h2 id="custom-ai-agents"><a href="#custom-ai-agents" id="custom-ai-agents">Custom AI Agents</a></h2>
-<div id='65b6b364e6d38a174f58684d'></div>
-<p>Use <code>Menu -&gt; AI -&gt; Configure Agent</code> to configure a node (any node), to act as an AI Agent, so that all questions anywhere on the tree under that node will be answered by the Agent. You define the Agent by putting into a text field a description (i.e. instructions) for the role the AI Agent should play. The technical term for these instructions is called the <code>System Prompt</code>. All it really means is that you can describe a <code>role</code> for the AI to assume during it's answers. The AI itself is interpreting whatever you type for this role description, so you can pretty much say anything you want, to give the AI instructions on what it's task will be for how it will respond to user prompts.</p>
-<p>The image below shows a simple, single sentence, <code>System Prompt</code> that tells the Agent being defined there that it's a Physics expert helping out with writing tasks.</p>
-<figure>
-<img id='img_65b6b364e6d38a174f58684d_p' src='attachments/65b6b364e6d38a174f58684d_p.png' style='width:100%'/>
-<figcaption>Fig. 44</figcaption>
-</figure>
-<div id='66d7a3927515c33b5c738076'></div>
-<h3 id="system-prompt-example"><a href="#system-prompt-example" id="system-prompt-example">System Prompt Example</a></h3>
-<p>Here's an example of a more elaborate and useful prompt that could be used for writing technical papers and documents:</p>
-<div id='66d7a4037515c33b5c738077'></div>
-<p>Prompt:</p>
-<p>You're a world-renowned expert and university professor and researcher in the fields of both Neuroscience and Physics. Your first name is Hal. You're helping me write an academic paper called &quot;Entangled Resonance Theory&quot;. If I refer to you by name (Hal) and ask you to write something specific you will write what I asked for. If I'm not addressing you directly, by name (Hal), you'll assume I'm just giving you a piece of content for you to reword it, as necessary, to make it have the correct tone and style that would be found in an academic paper, without adding any new or different ideas.</p>
-<p>To summarize, if I mention your name (Hal) you'll write the content I'm asking for, otherwise if I don't mention your name, you will rewrite the entire prompt as if it was part of our research paper.</p>
-<div id='66d7a43d7515c33b5c738078'></div>
-<p>With the above Agent Prompt you can enter something like <code>Hal, describe what Quantum Mechanics is</code>, and click <code>Ask AI</code> and Hal will then insert that content text that you asked for.</p>
-<p>On the other hand if you just enter some text you've written yourself and click <code>Ask AI</code> without mentioning Hal at all, then the AI will know it should just rewrite your content text using the professionalism and tone of a research paper.</p>
-<div id='66d7a0ac7515c33b5c738074'></div>
-<h3 id="system-prompt-tips"><a href="#system-prompt-tips" id="system-prompt-tips">System Prompt Tips</a></h3>
-<div id='66d7a0ba7515c33b5c738075'></div>
-<p>If you're asking for or expecting LaTex math formulas in the AI's output, it's recommended to include a blurb like this in your promot so the AI will generate something guaranteed to display well in Quanta markdown:</p>
-<p>When you use LaTex math always use $$ syntax and put the $$ on a line by itself above and below the LaTex, because that's how my app knows to center it on the page which is what I want.</p>
-<p>Here's an example of how it the LaTex will look:</p>
-<pre><code>$$
-\frac{\partial^2}{\partial t^2} f(x,t) = \frac{\partial^2}{\partial x^2} f(x,t) - M^2 f(x,t)
-$$
-</code></pre>
-<p>Which displays as:</p>
-<p>$$
-\frac{\partial^2}{\partial t^2} f(x,t) = \frac{\partial^2}{\partial x^2} f(x,t) - M^2 f(x,t)
-$$</p>
+<div id='675c863cb23ae334ef9b4afc'></div>
+<h3 id="system-prompts"><a href="#system-prompts" id="system-prompts">System Prompts</a></h3>
 <div id='64ebf7b2c33eef3cdbdacaa1'></div>
-<h3 id="system-prompt-examples"><a href="#system-prompt-examples" id="system-prompt-examples">System Prompt Examples</a></h3>
-<p>Here are some other examples to give you an idea of just how flexible and intelligent the AI is at assuming various roles. The <code>System Prompt</code> is where you tell the AI what role it is going to play in the discussion. Here are some more examples:</p>
+<h4 id="examples"><a href="#examples" id="examples">Examples</a></h4>
+<p>Here are some other example System Prompts to give you an idea of just how flexible and intelligent the AI is at assuming various roles. The <code>System Prompt</code> is where you tell the AI what role it is going to play in the discussion. Here are some more examples:</p>
 <ul>
 <li>
 <p>You are a helpful assistant. <em>(This is the default System Prompt if one is not specified)</em></p>
@@ -1423,34 +1343,94 @@ $$</p>
 </li>
 </ul>
 <p>Note that all these start with <code>You will</code> or <code>You are</code>. This is not required but always makes sense, because what you're doing is describing to the AI how it will be have, and you give those instructions as if you were a person talking to it, instructing it.</p>
-<div id='65bc2b5acf425c5fe6f2dddf'></div>
-<h2 id="ai-service-selection"><a href="#ai-service-selection" id="ai-service-selection">AI Service Selection</a></h2>
-<div id='65bc2b7bcf425c5fe6f2dde2'></div>
-<p>Quanta can connect to several different AI APIs on the back end, which is what performs the actual AI services. Any time you ask the AI a question it goes to your currently active Service. You can change what service you want to use any time using the selection in your Account Settings at <code>Menu -&gt; AI -&gt; AI Settings</code>, as shown in the following image:</p>
+<div id='66d7a3927515c33b5c738076'></div>
+<h4 id="document-writing-example"><a href="#document-writing-example" id="document-writing-example">Document Writing Example</a></h4>
+<p>Assuming we have <code>Menu -&gt; AI -&gt; Mode -&gt; Writing</code> selected, and are writing a document with AI assistance. Here's an example of a more elaborate prompt that could be used for writing technical papers and documents:</p>
+<div id='66d7a4037515c33b5c738077'></div>
+<p>System Prompt:</p>
+<p>You're a world-renowned expert and university professor and researcher in the fields of both Neuroscience and Physics. Your first name is Hal. You're helping me write an academic paper called &quot;Entangled Resonance Theory&quot;. If I refer to you by name (Hal) and ask you to write something specific you will write what I asked for. If I'm not addressing you directly, by name (Hal), you'll assume I'm just giving you a piece of content for you to reword it, as necessary, to make it have the correct tone and style that would be found in an academic paper, without adding any new or different ideas.</p>
+<p>To summarize, if I mention your name (Hal) you'll write the content I'm asking for, otherwise if I don't mention your name, you will rewrite the entire prompt as if it was part of our research paper.*</p>
+<div id='66d7a43d7515c33b5c738078'></div>
+<p>With the above Agent Prompt you can enter something like <code>Hal, describe what Quantum Mechanics is</code>, and click <code>Ask AI</code> and Hal will then insert that content text that you asked for.</p>
+<p>On the other hand if you just enter some text you've written yourself and click <code>Ask AI</code> without mentioning Hal at all, then the AI will know it should just rewrite your content text using the professionalism and tone of a research paper.</p>
+<div id='66d7a0ac7515c33b5c738074'></div>
+<h4 id="tips-2"><a href="#tips-2" id="tips-2">Tips</a></h4>
+<div id='675c86c7b23ae334ef9b4afd'></div>
+<h5 id="including-content-in-prompts"><a href="#including-content-in-prompts" id="including-content-in-prompts">Including Content in Prompts</a></h5>
+<p>In cases where your System Prompt needs to be very long and involved, and perhaps even have formatted code in it (or markdown), you can embed the content of another node, by using it's Node Name, to embedded into the prompt automatically as a text substitution.</p>
+<p>Each node can be assigned a &quot;text name&quot; (inside the Node Editor Dialog). So if for example you have a large amount of text you want to include in one or more System Prompts, you can just give the root Node of all that content a name like &quot;system-prompt-pirate&quot; for example. And then for your System Prompt you could just put <code>::system-prompt-pirate::</code> to embed that node's content into the System Node automatically. Note that we have simply surrounded the Node Name with double colons (<code>::</code>).</p>
+<p>So once you've done this then when ever the AI runs it will substitute the entire content of the subgraph (under the 'system-prompt-pirate` node) directly into the System Prompt before sending it to the AI to be used.</p>
+<p>All this is doing is letting you optionally use all the content under a node  as a chunk of text substituted into your System Prompt. This substitution can happen at multiple levels, as well, meaning that if the content you're substituting also has it's own <code>double colon</code> named nodes in it, then all those substitutions are carried out as well. So in computer-language parlance this means <code>System Prompts</code> are &quot;composable&quot;. You can build prompts out of chunks of other prompts etc.</p>
+<p>This advanced composability of prompts is really only ever needed in very special use cases where perhaps your prompts need to describe different aspects of the computer code for some application, where you can define various software artifacts independently and then include (i.e. mention) these artifacts independently merely by mentioning their node name.</p>
+<div id='66d7a0ba7515c33b5c738075'></div>
+<h5 id="supporting-latex-math"><a href="#supporting-latex-math" id="supporting-latex-math">Supporting LaTex Math</a></h5>
+<p>If you're asking for or expecting LaTex math formulas in the AI's output, it's recommended to include a blurb like this in your promot so the AI will generate something guaranteed to display well in markdown:</p>
+<p><em>When you use LaTex math always use $$ syntax and put the $$ on a line by itself above and below the LaTex, because that's how my app knows to center it on the page which is what I want.</em></p>
+<p>Here's an example of how it the LaTex will look:</p>
+<pre><code>$$
+\frac{\partial^2}{\partial t^2} f(x,t) = \frac{\partial^2}{\partial x^2} f(x,t) - M^2 f(x,t)
+$$
+</code></pre>
+<p>Which displays as:</p>
+<p>$$
+\frac{\partial^2}{\partial t^2} f(x,t) = \frac{\partial^2}{\partial x^2} f(x,t) - M^2 f(x,t)
+$$</p>
+<div id='65c5a8e53e8c3b6aec82835b'></div>
+<h2 id="ai-services-supported"><a href="#ai-services-supported" id="ai-services-supported">AI Services Supported</a></h2>
+<p>By a selection in your account in <code>Menu -&gt; Account -&gt; Settings -&gt; AI -&gt; AI Service</code> you can choose which AI Service to use in your account. You can choose OpenAI, Gemini, or Perplexity.</p>
+<p>If you're doing image recognition, image generation, or speech generation, you can only use the &quot;OpenAI&quot; Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use any of the three services.</p>
+<div id='65f1f0fbe1bcaf0c420fca43'></div>
+<h3 id="anthropic"><a href="#anthropic" id="anthropic">Anthropic</a></h3>
+<p>Including both <strong>Sonnet</strong> (best combination of performance and speed), and <strong>Opus</strong> (most intelligent and advanced model) Chat models.</p>
+<div id='65c5a9043e8c3b6aec82835c'></div>
+<h3 id="openai"><a href="#openai" id="openai">OpenAI</a></h3>
+<p>Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)</p>
+<div id='65c5a91a3e8c3b6aec82835d'></div>
+<h3 id="perplexity"><a href="#perplexity" id="perplexity">Perplexity</a></h3>
+<p>Including models: Sonar, Sonar Online, Meta's Llama 3</p>
+<div id='65c5a9543e8c3b6aec82835e'></div>
+<h3 id="google-gemini"><a href="#google-gemini" id="google-gemini">Google Gemini</a></h3>
+<p>Includes google's new chat model, for interactive chats.</p>
+<div id='673a9403c5495824d4a1e344'></div>
+<h3 id="xai-grok"><a href="#xai-grok" id="xai-grok">XAI Grok</a></h3>
+<p>Uncensored chat model from X.com</p>
+<div id='6629d6a8788a362604b0e264'></div>
+<h3 id="meta-llama-3"><a href="#meta-llama-3" id="meta-llama-3">Meta Llama 3</a></h3>
+<p>Meta's best Open Source AI LLM.</p>
+<div id='6591ebdbc9873822b24fa632'></div>
+<h2 id="ai-conversations"><a href="#ai-conversations" id="ai-conversations">AI Conversations</a></h2>
+<p>The screenshot below shows how to ask a question to the AI, and get it's answer back. <code>Answers</code> are always inserted as a new node directly under the <code>question</code> node. This means AI conversations are actually a tree and not a top-to-bottom list.</p>
 <figure>
-<img id='img_65bc2b7bcf425c5fe6f2dde2_p' src='attachments/65bc2b7bcf425c5fe6f2dde2_p.png' style='width:100%'/>
-<figcaption>Fig. 45</figcaption>
+<img id='img_6591ebdbc9873822b24fa632_img1' src='attachments/6591ebdbc9873822b24fa632_img1.gif' style='width:100%' />
+<figcaption>Fig. 37</figcaption>
 </figure>
-<div id='65bc2c1ecf425c5fe6f2dde5'></div>
-<h3 id="ai-cloud-services-supported"><a href="#ai-cloud-services-supported" id="ai-cloud-services-supported">AI Cloud Services Supported</a></h3>
-<p>No matter what AI service you use, you will be charged only exactly what you consume based on OpenAI and/or Perplexity's pricing models. Quanta doesn't charge extra for use of AI, but merely passes your costs thru without any markup.</p>
-<hr />
-<p>Here's the list of the available AI Services:</p>
-<table>
-<thead>
-<tr><th>AI Service Name</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>Anthropic: Claud 3 - Opus</strong></td><td>Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks.</td></tr>
-<tr><td><strong>Anthropic: Claud 3 - Sonnet</strong></td><td>Anthropic's best combination of performance and speed for efficient, high-throughput tasks.</td></tr>
-<tr><td><strong>OpenAI: ChatGPT-4o</strong></td><td>ChatGPT-4o, the default chatbot and is widely considered the most intelligent general-purpose AI on the market.</td></tr>
-<tr><td><strong>Google: Gemini</strong></td><td>Google's best high-end powerful general-purpose AI.</td></tr>
-<tr><td><strong>XAI: Grok</strong></td><td>Uncensored AI chat model from X.com.</td></tr>
-<tr><td><strong>Meta: Llama 3</strong></td><td>Meta's best Open Source general-purpose AI.</td></tr>
-<tr><td><strong>Perplexity: Sonar</strong></td><td>Perplexity's best high-end powerful general-purpose AI.</td></tr>
-<tr><td><strong>Perplexity: Sonar Online</strong></td><td>Perplexity's AI which has access to the latest news and content from the web.</td></tr>
-</tbody>
-</table>
+<div id='64f9194706a5b22fcf32ed0d'></div>
+<h2 id="a-node-that-asks-a-question-to-ai"><a href="#a-node-that-asks-a-question-to-ai" id="a-node-that-asks-a-question-to-ai">A Node that Asks a Question to AI</a></h2>
+<p>The screenshot below shows the easiest way to ask the AI a question. You just type your question and click the <code>Ask GPT</code> button. The answer to the node content will be inserted as a subnode directly under the node containing the question.</p>
+<figure>
+<img id='img_64f9194706a5b22fcf32ed0d_p' src='attachments/64f9194706a5b22fcf32ed0d_p.png'  />
+<figcaption>Fig. 38</figcaption>
+</figure>
+<div id='64ebead0c33eef3cdbdac7ed'></div>
+<p>You can ask questions to ChatGPT, and it's answer will be saved as a subnode under the question node. This means you can have a more <code>hierarchical</code> way of chatting with the AI, than what most chat systems provide, where any location in this hierarchy has it's own unique &quot;context&quot;.</p>
+<div id='66ce018561c5ec64edece157'></div>
+<p>By &quot;context&quot; we mean the AI knows exactly what has been previously said during any conversation, and will resume talking to you at any point starting with that specific set of &quot;memories&quot; in it's &quot;mind&quot;.</p>
+<div id='66ce018561c5ec64edece158'></div>
+<p>In other words, if you're having a conversation (i.e. asking questions) and go back up the tree to a higher location in the conversation thread, and ask a new question under one of those 'nodes', that's like rolling back the mind of the AI to the exact state it had at that point in the conversation; and it will answer the new question based on that state of mind.</p>
+<div id='64ec08dbc33eef3cdbdacd3a'></div>
+<p>Once you've gotten an answer back from the AI, you can then select the answer node, and create another question node under it using the same process, to continue with the conversation (i.e. asking more questions).</p>
+<div id='66ce019361c5ec64edece159'></div>
+<p>You can keep asking more follow-up questions as long as you want, and that will just extend the length of that &quot;conversation branch&quot; under the tree. You can of course go back to any location in the tree and ask a different follow-up question and you will get an answer equivalent to if you had rolled-back the &quot;memory&quot; of the AI back to that point in time.</p>
+<div id='66ce019361c5ec64edece15a'></div>
+<p>This memory of the conversation state is called Hierarchical Contextual Memory (HCM). Stated another way, we could say that the &quot;context&quot; (the AI's memory and understanding of the conversation) for any question always includes all &quot;parent nodes&quot; at higher levels up in the tree, going back to when you asked your original question.</p>
+<div id='64f12a392506b77b95d6ad86'></div>
+<h2 id="questions-about-a-subgraph"><a href="#questions-about-a-subgraph" id="questions-about-a-subgraph">Questions about a Subgraph</a></h2>
+<div id='65b6b269e6d38a174f58684a'></div>
+<p>Use <code>Menu -&gt; AI -&gt; Ask about Subgraph</code> to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.</p>
+<div id='65b6b269e6d38a174f58684b'></div>
+<p>The term <em>subgraph</em>, of course means just &quot;everything under that branch&quot;. All of the text under that subgraph will be used as the context information fed to the AI for it to be able to answer the question with, in addition to all it's built-in knowledge.</p>
+<div id='65b6b269e6d38a174f58684c'></div>
+<p>If you only want to ask an AI question about a limited subset of nodes you can use the checkboxes on each node (when <code>Edit Mode</code> is enabled) to select one or more nodes and this will cause the subgraph to be filtered to only included your selected nodes as input context to the AI.</p>
 <div id='64f79da806a5b22fcf329611'></div>
 <h2 id="generating-content-with-ai"><a href="#generating-content-with-ai" id="generating-content-with-ai">Generating Content with AI</a></h2>
 <div id='660b43ddb2d57601ed0927db'></div>
@@ -1462,15 +1442,15 @@ $$</p>
 <p>You would then select that document root node and click <code>Menu -&gt; AI -&gt; Configure Agent</code> and enter into that dialog something like shown in the image below:</p>
 <p>The above system prompt at the root of the document gives the AI the ability to apply that system prompt across the entire document as you start generating AI content underneath. So you've sort of given this Agent responsibility to help with this entire document.</p>
 <figure>
-<img id='img_64f7a2a206a5b22fcf329784_p' src='attachments/64f7a2a206a5b22fcf329784_p.png' style='width:100%'/>
-<figcaption>Fig. 46</figcaption>
+<img id='img_64f7a2a206a5b22fcf329784_p' src='attachments/64f7a2a206a5b22fcf329784_p.png' style='width:100%' />
+<figcaption>Fig. 39</figcaption>
 </figure>
 <div id='65d6ed44d711a216791d9551'></div>
 <h3 id="step-2---turn-on-ai-writing-mode"><a href="#step-2---turn-on-ai-writing-mode" id="step-2---turn-on-ai-writing-mode">Step 2 - Turn on AI Writing Mode</a></h3>
 <p>In the AI menu, enable the <code>Writing Mode</code> checkbox. This will make it so that as long as that check box is enabled every node you insert into your content will have a text field where you describe (to the Writing Agent) the content you want to create, and then when you click the <code>Ask AI</code> button at the bottom of the editor you get whatever written content you've requested.</p>
 <figure>
-<img id='img_65d6ed44d711a216791d9551_p' src='attachments/65d6ed44d711a216791d9551_p.png' style='width:50%'/>
-<figcaption>Fig. 47</figcaption>
+<img id='img_65d6ed44d711a216791d9551_p' src='attachments/65d6ed44d711a216791d9551_p.png' style='width:50%' />
+<figcaption>Fig. 40</figcaption>
 </figure>
 <div id='66a42cc6eb755647390e0c39'></div>
 <p>After doing step #1 and #2 above you are now ready to start writing content. Any nodes you create that are tree descendants (i.e. contained under) the root node of your document can be answered by the AI Writing Agent which will act as whatever role you defined for it to do, as your writing assistant.</p>
@@ -1478,20 +1458,20 @@ $$</p>
 <div id='66a479b93035ce3a41d93a75'></div>
 <p>Now we can just create a node and ask the AI to generate some content for us as shown in the screenshot below:</p>
 <figure>
-<img id='img_66a479b93035ce3a41d93a75_p' src='attachments/66a479b93035ce3a41d93a75_p.png' style='width:100%'/>
-<figcaption>Fig. 48</figcaption>
+<img id='img_66a479b93035ce3a41d93a75_p' src='attachments/66a479b93035ce3a41d93a75_p.png' style='width:100%' />
+<figcaption>Fig. 41</figcaption>
 </figure>
 <div id='66a479f43035ce3a41d93a78'></div>
 <p>That will result in the following being generated and displayed (image below). Notice that for me, as the owner of the node, I can see the prompt that generated the paragraphs of text (as long as <code>Menu -&gt; Options -&gt; Node Info</code> checkbox is set), but no other users will be able to see that prompt.</p>
 <figure>
-<img id='img_66a479f43035ce3a41d93a78_p' src='attachments/66a479f43035ce3a41d93a78_p.png' style='width:100%'/>
-<figcaption>Fig. 49</figcaption>
+<img id='img_66a479f43035ce3a41d93a78_p' src='attachments/66a479f43035ce3a41d93a78_p.png' style='width:100%' />
+<figcaption>Fig. 42</figcaption>
 </figure>
 <div id='66a47ac13035ce3a41d93a7b'></div>
 <p>Of course now if we open the node again, we see the content that was generated, and if we want to edit that we can, but if we did another <code>Ask AI</code> on the node, rather than just a <code>Save</code> button click, then our edits would get replaced with another full response from the AI. So in Writing Mode be careful with the <code>Ask AI</code> button because you're asking it to replace the current content of the node with it's generated content.</p>
 <figure>
-<img id='img_66a47ac13035ce3a41d93a7b_p' src='attachments/66a47ac13035ce3a41d93a7b_p.png' style='width:100%'/>
-<figcaption>Fig. 50</figcaption>
+<img id='img_66a47ac13035ce3a41d93a7b_p' src='attachments/66a47ac13035ce3a41d93a7b_p.png' style='width:100%' />
+<figcaption>Fig. 43</figcaption>
 </figure>
 <div id='66a47b6b3035ce3a41d93a7e'></div>
 <h3 id="summary"><a href="#summary" id="summary">Summary</a></h3>
@@ -1525,45 +1505,45 @@ $$</p>
 <div id='660b34abb2d57601ed092794'></div>
 <p>First we create somewhere to hold our book, and in the image below, as you can see, we'll just put the book in a node we created called <code>My Books</code>. Once we click on <code>My Books</code> to make it the 'selected' node (as you can see by the blue bar on it's left), we can click the menu item called <code>Generate Book</code>.</p>
 <figure>
-<img id='img_660b34abb2d57601ed092794_p' src='attachments/660b34abb2d57601ed092794_p.png' style='width:100%'/>
-<figcaption>Fig. 51</figcaption>
+<img id='img_660b34abb2d57601ed092794_p' src='attachments/660b34abb2d57601ed092794_p.png' style='width:100%' />
+<figcaption>Fig. 44</figcaption>
 </figure>
 <div id='660b34ddb2d57601ed092797'></div>
 <p>Next we describe the book we're about to create, in as much detail as we want. You should mention in the description that you're indeed creating a book, what it's about, and who the target audience is. Then click the <code>Generate</code> button.</p>
 <figure>
-<img id='img_660b34ddb2d57601ed092797_p' src='attachments/660b34ddb2d57601ed092797_p.png' style='width:100%'/>
-<figcaption>Fig. 52</figcaption>
+<img id='img_660b34ddb2d57601ed092797_p' src='attachments/660b34ddb2d57601ed092797_p.png' style='width:100%' />
+<figcaption>Fig. 45</figcaption>
 </figure>
 <div id='660b350ab2d57601ed09279a'></div>
 <p>After the <code>Generate</code> button ran a process for a few seconds your book scaffolding (i.e. a book <code>outline</code> or <code>Table of Contents</code>) will have been created. As you can see in the image below we have the top level node representing the entire book, as well as the chapters. We can't see all the chapters without scrolling down of course), but they're there. Also we can expand any of the chapters and see even a further breakdown of each chapter into `sections', and those are there and already generated for us as well!</p>
 <figure>
-<img id='img_660b350ab2d57601ed09279a_p' src='attachments/660b350ab2d57601ed09279a_p.png' style='width:100%'/>
-<figcaption>Fig. 53</figcaption>
+<img id='img_660b350ab2d57601ed09279a_p' src='attachments/660b350ab2d57601ed09279a_p.png' style='width:100%' />
+<figcaption>Fig. 46</figcaption>
 </figure>
 <div id='660b353db2d57601ed09279d'></div>
 <p>So we expand the <code>Choosing the Right Bicycle</code> chapter to take a look at the sections. Currently the system doesn't allow you to specify the number of 'sections' in each chapter, but you can set the number of chapters, as you saw above. However you can manually add more <code>sections</code> yourself, just by creating a node anywhere you want. Nothing is <code>fixed</code> about this tree of content. It's still all editable by you and nothing is permanent. Quanta is just automatically creating nodes of content for you using AI. You can always manually edit anything that got created, add images, move nodes around, etc.</p>
 <figure>
-<img id='img_660b353db2d57601ed09279d_p' src='attachments/660b353db2d57601ed09279d_p.png' style='width:100%'/>
-<figcaption>Fig. 54</figcaption>
+<img id='img_660b353db2d57601ed09279d_p' src='attachments/660b353db2d57601ed09279d_p.png' style='width:100%' />
+<figcaption>Fig. 47</figcaption>
 </figure>
 <div id='660b3569b2d57601ed0927a3'></div>
 <p>Now we've turned &quot;Edit Mode&quot; back on in the screen shot below, and you can see the screen got a little more cluttered with buttons. We now still have <code>Types of Bicycles</code> as the selected node. So we click the <code>+</code> (Plus Button) that's right above the chapter text <code>Types of Bicycles</code> and that inserts a new node, so we can auto-generate that piece of content for the book, at that location in the book.</p>
 <figure>
-<img id='img_660b3569b2d57601ed0927a3_p' src='attachments/660b3569b2d57601ed0927a3_p.png' style='width:100%'/>
-<figcaption>Fig. 55</figcaption>
+<img id='img_660b3569b2d57601ed0927a3_p' src='attachments/660b3569b2d57601ed0927a3_p.png' style='width:100%' />
+<figcaption>Fig. 48</figcaption>
 </figure>
 <div id='660b3578b2d57601ed0927a6'></div>
 <p>Now before we start editing, we need to go to <code>Menu -&gt; AI -&gt; Writing Mode</code> and be sure that check box is checked. This puts the app in a mode where it allows you to enter a description of what content you want the AI to create for any node, and then it will populate the text content of the node with that when you click <code>Ask AI</code>.</p>
 <p><em>Note: Notice this node's AI Query was just entered as &quot;Write the content for this section&quot;, since there's enough context above it for the AI to know how to generate. However we could have also just put &quot;?&quot; as the AI Query, and that would've also worked the same. The AI knows that when you enter &quot;?&quot; you're just asking it to generate new text for your document based on the location in the document.</em></p>
 <figure>
-<img id='img_660b3578b2d57601ed0927a6_p' src='attachments/660b3578b2d57601ed0927a6_p.png' />
-<figcaption>Fig. 56</figcaption>
+<img id='img_660b3578b2d57601ed0927a6_p' src='attachments/660b3578b2d57601ed0927a6_p.png'  />
+<figcaption>Fig. 49</figcaption>
 </figure>
 <div id='660b358eb2d57601ed0927a9'></div>
 <p>So now we can see the AI has auto-generated content for this location! We can edit this content by hand, if we don't like it. We can also update the specific prompting that generated this text too, and regenerate completely new content to overwrite this content if we want.</p>
 <figure>
-<img id='img_660b358eb2d57601ed0927a9_p' src='attachments/660b358eb2d57601ed0927a9_p.png' style='width:100%'/>
-<figcaption>Fig. 57</figcaption>
+<img id='img_660b358eb2d57601ed0927a9_p' src='attachments/660b358eb2d57601ed0927a9_p.png' style='width:100%' />
+<figcaption>Fig. 50</figcaption>
 </figure>
 <div id='660c56934cd11d33319a87a3'></div>
 <p>Above we generated book content based on the <code>Book Context</code> at that location (i.e. the Chapter Title, Section Title, etc).</p>
@@ -1571,16 +1551,16 @@ $$</p>
 <p>In the image below you can see where we've created a brand new node directly under the <code>Joy of Bicycling</code> chapter itself. Note that <code>AI Query</code> is where we describe to the AI what we want to be generated as the content for this specific node. As you can see, we're asking for a bit of humor about riding with your cat.</p>
 <p>So with that AI Query entered we just click <code>Ask AI</code> button, and it will generate the content into this node for us.</p>
 <figure>
-<img id='img_660c56934cd11d33319a87a3_p' src='attachments/660c56934cd11d33319a87a3_p.png' />
-<figcaption>Fig. 58</figcaption>
+<img id='img_660c56934cd11d33319a87a3_p' src='attachments/660c56934cd11d33319a87a3_p.png'  />
+<figcaption>Fig. 51</figcaption>
 </figure>
 <div id='660b36ebb2d57601ed0927d3'></div>
 <p>We see the screenshot below after we just now generated using the <code>Ask AI</code> above.</p>
 <p>Just to be clear, in the screen shot below we've turned on &quot;Node Info&quot; again and so we can see the AI's new instructions below (i.e. the text starting with &quot;Write a humorous opening remark...&quot;) the content that those instructions created. And again, note that our readers cannot ever see the instructions. Only the author of the content (actually the owner of the node) can see these instructions.</p>
 <p>You can then go back into the node and edit the AI instructions again and regenerate if you want, or you could even directly edit what the AI had created as well.</p>
 <figure>
-<img id='img_660b36ebb2d57601ed0927d3_p' src='attachments/660b36ebb2d57601ed0927d3_p.png' style='width:100%'/>
-<figcaption>Fig. 59</figcaption>
+<img id='img_660b36ebb2d57601ed0927d3_p' src='attachments/660b36ebb2d57601ed0927d3_p.png' style='width:100%' />
+<figcaption>Fig. 52</figcaption>
 </figure>
 <div id='660b36fcb2d57601ed0927d6'></div>
 <p>Finally, let's go back and look at the larger scale instructions that are in effect during all of our editing of this book. We do this by going to the root level node (the &quot;Book&quot; node), and opening up the <code>AI Config</code> for that root node.</p>
@@ -1588,8 +1568,8 @@ $$</p>
 <p>These default instructions were carefully crafted to give the user a good book writing experience, but if you know what you're doing with AI &quot;Prompt Engineering&quot; and you know how &quot;System Prompts&quot; work (primarily using the OpenAI ChatGPT Cloud Service API), then you should be able to edit this content if you need to. Then again, it doesn't really take an engineer either, because you can see it's just giving the AI the larger overall purpose of what it's supposed to be doing so it's fairly obvious how to update that prompt if you think you can improve it, even if you're not an engineer or a rocket scientist.</p>
 <p><em>todo: This screenshot is out of date because things have slightly changed</em></p>
 <figure>
-<img id='img_660b36fcb2d57601ed0927d6_p' src='attachments/660b36fcb2d57601ed0927d6_p.png' style='width:100%'/>
-<figcaption>Fig. 60</figcaption>
+<img id='img_660b36fcb2d57601ed0927d6_p' src='attachments/660b36fcb2d57601ed0927d6_p.png' style='width:100%' />
+<figcaption>Fig. 53</figcaption>
 </figure>
 <div id='660b7f08b2d57601ed0927de'></div>
 <h3 id="why-use-book-writing-features"><a href="#why-use-book-writing-features" id="why-use-book-writing-features">Why use Book Writing Features</a></h3>
@@ -1691,8 +1671,8 @@ file(/temperature_convert.py)
 <div id='66ce0a8a0843c4114d7be58b'></div>
 <p>Here's an example of an AI Agent configured to be an SQL expert for working on a codebase. Note that since we have Coding Agents enabled for the app the additional fields for <code>Folders to Include</code> and <code>File Extensions</code> appear on the AI config panels, so that any Custom Agents you define can be given not just the specific instructions, but they also can be told which files and extensions to include and will ignore any files not on those folders or not matching the provided file extensions.</p>
 <figure>
-<img id='img_66ce0a8a0843c4114d7be58b_p' src='attachments/66ce0a8a0843c4114d7be58b_p.png' style='width:100%'/>
-<figcaption>Fig. 61</figcaption>
+<img id='img_66ce0a8a0843c4114d7be58b_p' src='attachments/66ce0a8a0843c4114d7be58b_p.png' style='width:100%' />
+<figcaption>Fig. 54</figcaption>
 </figure>
 <div id='66ce11660843c4114d7be591'></div>
 <p>To create a <code>Coding Agent</code> like the one above, create a node and enter into it's content text something like <code>SQL Coding Agent</code>. Then select that node and choose <code>Menu -&gt; AI -&gt; Configure Agent</code> which will display the dialog (shown above). Then in this dialog you'll describe an SQL Agent who knows exactly where your SQL-related code is in the project. Once you've done this, your node will be used for all questions asked in sub-branches under it.</p>
@@ -1720,47 +1700,47 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h3 id="example-layout-1"><a href="#example-layout-1" id="example-layout-1">Example Layout 1</a></h3>
 <p>Below you can see we've uploaded 4 images to a node, and set their widths to 100%, 33%, 33%, 33%.</p>
 <figure>
-<img id='img_63674119e5ff8517e39ebde7_p' src='attachments/63674119e5ff8517e39ebde7_p.png' />
-<figcaption>Fig. 62</figcaption>
+<img id='img_63674119e5ff8517e39ebde7_p' src='attachments/63674119e5ff8517e39ebde7_p.png'  />
+<figcaption>Fig. 55</figcaption>
 </figure>
 <div id='63674133e5ff8517e39ebe04'></div>
 <p>The above width settings display on the page as shown below. The first image is 100% width, and the rest are 33%. They're displayed in the order you have them arranged on the node.</p>
 <p>If you wanted a 2 column tabular layout you could set all images to 50%, 3 column label would be 33%, 4 column layout 25%, etc.</p>
 <figure>
-<img id='img_63674133e5ff8517e39ebe04_p' src='attachments/63674133e5ff8517e39ebe04_p.png' style='width:100%'/>
-<figcaption>Fig. 63</figcaption>
+<img id='img_63674133e5ff8517e39ebe04_p' src='attachments/63674133e5ff8517e39ebe04_p.png' style='width:100%' />
+<figcaption>Fig. 56</figcaption>
 </figure>
 <div id='63f2a20f55770e1b97ddfcef'></div>
 <h3 id="example-layout-2"><a href="#example-layout-2" id="example-layout-2">Example Layout 2</a></h3>
 <p>Next we'll edit the Node Attachments and set them all to 50% width.</p>
 <figure>
-<img id='img_63f2a20f55770e1b97ddfcef_p' src='attachments/63f2a20f55770e1b97ddfcef_p.png' />
-<figcaption>Fig. 64</figcaption>
+<img id='img_63f2a20f55770e1b97ddfcef_p' src='attachments/63f2a20f55770e1b97ddfcef_p.png'  />
+<figcaption>Fig. 57</figcaption>
 </figure>
 <div id='63f2a78e55770e1b97ddff53'></div>
 <p>Here's how the above settings will display the images (below). As expected, we see images displayed from left to right, top to bottom, with each one consuming 50% of the available width before wrapping to the next row.</p>
 <figure>
-<img id='img_63f2a78e55770e1b97ddff53_p' src='attachments/63f2a78e55770e1b97ddff53_p.png' style='width:100%'/>
-<figcaption>Fig. 65</figcaption>
+<img id='img_63f2a78e55770e1b97ddff53_p' src='attachments/63f2a78e55770e1b97ddff53_p.png' style='width:100%' />
+<figcaption>Fig. 58</figcaption>
 </figure>
 <div id='63f2a96c55770e1b97de0007'></div>
 <h3 id="positioning-images"><a href="#positioning-images" id="positioning-images">Positioning Images</a></h3>
 <p>If you want one or more images to appear at arbitrary locations in the content text of the node you can specify the &quot;Position&quot; option as &quot;File Tag&quot;. Here's an example of that on a node with one single image, which we've chosen to insert in the middle of some content text.</p>
 <figure>
-<img id='img_63f2a96c55770e1b97de0007_p' src='attachments/63f2a96c55770e1b97de0007_p.png' />
-<figcaption>Fig. 66</figcaption>
+<img id='img_63f2a96c55770e1b97de0007_p' src='attachments/63f2a96c55770e1b97de0007_p.png'  />
+<figcaption>Fig. 59</figcaption>
 </figure>
 <div id='63f2a9cc55770e1b97de0032'></div>
 <p>This is how that renders (below), with the image being inserted wherever you put it's tag (<code>{{file-p}}</code> in this case). Each File will have a unique name when you upload multiple files, so you can insert multiple images wherever you want them to go in your content.</p>
 <figure>
-<img id='img_63f2a9cc55770e1b97de0032_p' src='attachments/63f2a9cc55770e1b97de0032_p.png' />
-<figcaption>Fig. 67</figcaption>
+<img id='img_63f2a9cc55770e1b97de0032_p' src='attachments/63f2a9cc55770e1b97de0032_p.png'  />
+<figcaption>Fig. 60</figcaption>
 </figure>
 <div id='63f2abd255770e1b97de0086'></div>
 <p>Other positioning options are as shown in the screenshot below (<code>Center, Top Left, and Top Right</code>) and they all position images as you would expect.</p>
 <figure>
-<img id='img_63f2abd255770e1b97de0086_p' src='attachments/63f2abd255770e1b97de0086_p.png' />
-<figcaption>Fig. 68</figcaption>
+<img id='img_63f2abd255770e1b97de0086_p' src='attachments/63f2abd255770e1b97de0086_p.png'  />
+<figcaption>Fig. 61</figcaption>
 </figure>
 <div id='63f2ad2955770e1b97de00c1'></div>
 <h2 id="node-layout"><a href="#node-layout" id="node-layout">Node Layout</a></h2>
@@ -1768,24 +1748,24 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>You can also configure how subnodes are displayed under any given node, if you want something other than the normal top-to-bottom view of content.</p>
 <p>In the screenshot below you can see the 'admin' user editing the &quot;Platform Features&quot; node on the &quot;Quanta.wiki&quot; website, and you can see that the <code>Subnode Layout</code> is set to <code>2 columns</code></p>
 <figure>
-<img id='img_63f2ad4455770e1b97de00cd_p' src='attachments/63f2ad4455770e1b97de00cd_p.png' />
-<figcaption>Fig. 69</figcaption>
+<img id='img_63f2ad4455770e1b97de00cd_p' src='attachments/63f2ad4455770e1b97de00cd_p.png'  />
+<figcaption>Fig. 62</figcaption>
 </figure>
 <div id='63f2bffe55770e1b97de0732'></div>
 <p>That <code>2 columns</code> layout then ends up looking like the following image (below), where the subnodes under the &quot;Platform Features&quot; are displayed on 2 columns per row.</p>
 <figure>
-<img id='img_63f2bffe55770e1b97de0732_p' src='attachments/63f2bffe55770e1b97de0732_p.png' style='width:100%'/>
-<figcaption>Fig. 70</figcaption>
+<img id='img_63f2bffe55770e1b97de0732_p' src='attachments/63f2bffe55770e1b97de0732_p.png' style='width:100%' />
+<figcaption>Fig. 63</figcaption>
 </figure>
 <div id='63f2c06255770e1b97de0788'></div>
 <p>You can also click the option for <code>Inline Subnodes</code> which is the double down arror in this control bar:</p>
 <figure>
-<img id='img_63f2c06255770e1b97de0788_p' src='attachments/63f2c06255770e1b97de0788_p.png' />
-<figcaption>Fig. 71</figcaption>
+<img id='img_63f2c06255770e1b97de0788_p' src='attachments/63f2c06255770e1b97de0788_p.png'  />
+<figcaption>Fig. 64</figcaption>
 </figure>
 <p>which will expand the subnodes on the page with their parent so that the user can see them without expanding the tree.</p>
 <div id='64f4e06629458f1c8c9f884a'></div>
-<h2 id="tips-2"><a href="#tips-2" id="tips-2">Tips</a></h2>
+<h2 id="tips-3"><a href="#tips-3" id="tips-3">Tips</a></h2>
 <ol>
 <li>
 <p>Click on any uploaded image to view it full-screen, or navigate around between all images under the same parent node.</p>
@@ -1802,8 +1782,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>This content will be hidden until expanded.</p>
 <p>The content up until the double spaced area (two blank lines) is assumed to be the content you want in the collapsible section.</p>
 <figure>
-<img id='img_65becefadfa1d7445c56e949_p' src='attachments/65becefadfa1d7445c56e949_p.png' style='width:100%'/>
-<figcaption>Fig. 72</figcaption>
+<img id='img_65becefadfa1d7445c56e949_p' src='attachments/65becefadfa1d7445c56e949_p.png' style='width:100%' />
+<figcaption>Fig. 65</figcaption>
 </figure>
 <div id='65bed1f1dfa1d7445c56e94e'></div>
 <p>As you saw in the example above, the expand/collapse link text will be whatever text is between the <code>-**</code> and <code>**-</code>, which is a syntax that will render just as a normal bold font, on systems that don't support this non-standard Markdown syntax feature.</p>
@@ -1821,8 +1801,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='64e68fa403bc775e03560693'></div>
 <p>Use the Document Icon at the upper right of the page to display whatever you're viewing in Folders Tab as a Document View.</p>
 <figure>
-<img id='img_64e68fa403bc775e03560693_p' src='attachments/64e68fa403bc775e03560693_p.png' />
-<figcaption>Fig. 73</figcaption>
+<img id='img_64e68fa403bc775e03560693_p' src='attachments/64e68fa403bc775e03560693_p.png'  />
+<figcaption>Fig. 66</figcaption>
 </figure>
 <div id='64e68f3a03bc775e03560672'></div>
 <p>You can also use a URL parameter that will open a &quot;Document View&quot; of a node automatically, like this one:</p>
@@ -1833,16 +1813,16 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='63f2d31855770e1b97de0d1a'></div>
 <p>As shown in the image below, the <code>Document View</code> lets you read and scroll thru the content as if it were a monolithic single-page document, and with a <code>Table of Contents</code> type of index on the left hand side of the app. Notice the <code>Menu</code> option you'll have if you need to switch the left hand side of the page back to the Menu.</p>
 <figure>
-<img id='img_63f2d31855770e1b97de0d1a_p' src='attachments/63f2d31855770e1b97de0d1a_p.png' style='width:100%'/>
-<figcaption>Fig. 74</figcaption>
+<img id='img_63f2d31855770e1b97de0d1a_p' src='attachments/63f2d31855770e1b97de0d1a_p.png' style='width:100%' />
+<figcaption>Fig. 67</figcaption>
 </figure>
 <div id='63f2d3b755770e1b97de0d47'></div>
 <p>As you can see in the image above, the <code>Document Tab</code> is being displayed, and we can now scroll down thru the entire User Guide as if it were a normal single-page document.</p>
 <div id='63f2d46755770e1b97de0d6a'></div>
 <p>If we want to have more interactivity with each node, other than to just read the content like a document, we can also turn on the <code>Menu -&gt; Options -&gt; Node Info</code> Option, and then we'll see the full information and functionality for each node in the document, so we can bookmark things, read any paragraph aloud (TTS), jump directly to the node on the Tree View (Folders Tab), edit the node directly from here (if we own it), and do most of the other things you could also do from the Folders Tab.</p>
 <figure>
-<img id='img_63f2d46755770e1b97de0d6a_p' src='attachments/63f2d46755770e1b97de0d6a_p.png' style='width:100%'/>
-<figcaption>Fig. 75</figcaption>
+<img id='img_63f2d46755770e1b97de0d6a_p' src='attachments/63f2d46755770e1b97de0d6a_p.png' style='width:100%' />
+<figcaption>Fig. 68</figcaption>
 </figure>
 <div id='64e6917103bc775e035606fc'></div>
 <p>Note that in the screenshot above we had switched back to the &quot;Menu&quot; (via radio button at upper left) and so now although the <code>Table of Contents</code> is no longer visible you can still get back to it. The <code>Doc Index</code> radio button will stay available always, during your session, so you can navigate around in that document at any time.</p>
@@ -1854,8 +1834,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>This is what the Thread View is designed for. You can switch to the Thread View of any node by clicking the dropdown menu item <code>Thread History</code> on the node. This will display the Thread View which always contains a top-down chronological list of all the ancestor nodes.</p>
 <p>Here's what the menu looks like, after you click the <code>&quot;...&quot;</code> icon:</p>
 <figure>
-<img id='img_65f73a78cb4027493226dd11_p' src='attachments/65f73a78cb4027493226dd11_p.png' />
-<figcaption>Fig. 76</figcaption>
+<img id='img_65f73a78cb4027493226dd11_p' src='attachments/65f73a78cb4027493226dd11_p.png'  />
+<figcaption>Fig. 69</figcaption>
 </figure>
 <div id='65f73bfdcb4027493226dd12'></div>
 <p>Since each node has only one parent node, you can envision the process of walking up the tree node by node, always taking the parent and then the parent above that, etc, repeatedly. This process builds up the 'reply chain' above the node (if the node is part of a conversation), going back to the beginning of the conversation. Then the Thread View displays the entire conversation, from top to bottom.</p>
@@ -1874,14 +1854,14 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>Select <code>Menu -&gt; Search -&gt; New Search</code> to find text under any branch of the tree. <em>(Note: You can also use the 'magnifying glass' icon at the top of the screen to open the search dialog)</em></p>
 <p>Here's what the search dialog looks like (below). There are various options allowing you to refine your search. All you need to do, to save your search for future use, is to provide a name in the Search Name field, and then that name will begin to appear on the Search menu after you run the search. Once you've Saved a search in this way you can then click the Named Search to re-run that same search.</p>
 <figure>
-<img id='img_674ca3585646202d93cd5363_img1' src='attachments/674ca3585646202d93cd5363_img1.png' />
-<figcaption>Fig. 77</figcaption>
+<img id='img_674ca3585646202d93cd5363_p' src='attachments/674ca3585646202d93cd5363_p.png' style='width:100%' />
+<figcaption>Fig. 70</figcaption>
 </figure>
 <div id='674ca4385646202d93cd5366'></div>
 <p>After clicking the &quot;Search&quot; button in the above example, since we provided a name for that search it will now be appearing in our Search menu, which looks like this:</p>
 <figure>
-<img id='img_674ca4385646202d93cd5366_p' src='attachments/674ca4385646202d93cd5366_p.png' />
-<figcaption>Fig. 78</figcaption>
+<img id='img_674ca4385646202d93cd5366_p' src='attachments/674ca4385646202d93cd5366_p.png'  />
+<figcaption>Fig. 71</figcaption>
 </figure>
 <div id='674ca4b55646202d93cd536b'></div>
 <p>Notice there are also an 'Edit Icon' and a 'Delete Icon' on the new <strong>&quot;Find My #todos&quot;</strong> menu item, so you can modify it, or delete it.</p>
@@ -1890,29 +1870,29 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='5fa1926c6b842575d0e925f8'></div>
 <p>Selecting the <code>Node Name</code> option is used to search for nodes by looking for the identical matching node name. Each node can optionally have a 'name' set for it (using the 'Advanced Section' of the Node Editor Dialog). The main reason to name a node is to allow the node to have a more friendly URL.</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e925f8_p' src='attachments/5fa1926c6b842575d0e925f8_p.png' />
-<figcaption>Fig. 79</figcaption>
+<img id='img_5fa1926c6b842575d0e925f8_p' src='attachments/5fa1926c6b842575d0e925f8_p.png'  />
+<figcaption>Fig. 72</figcaption>
 </figure>
 <div id='674ca3f85646202d93cd5365'></div>
 <h2 id="by-node-id"><a href="#by-node-id" id="by-node-id">By Node ID</a></h2>
 <div id='5fa1926c6b842575d0e925f9'></div>
 <p>Select <code>Node ID</code> to search for the node that has a specific ID. Each node has an auto-generated unique Record ID that can always be used to reference the node.</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e925f9_p' src='attachments/5fa1926c6b842575d0e925f9_p.png' />
-<figcaption>Fig. 80</figcaption>
+<img id='img_5fa1926c6b842575d0e925f9_p' src='attachments/5fa1926c6b842575d0e925f9_p.png'  />
+<figcaption>Fig. 73</figcaption>
 </figure>
 <div id='674ca74f5646202d93cd5370'></div>
 <h2 id="my-shared-nodes"><a href="#my-shared-nodes" id="my-shared-nodes">My Shared Nodes</a></h2>
 <div id='674ca7595646202d93cd5371'></div>
-<p>The <code>Menu -&gt; Search -&gt; My Shared Nodes</code>  menu item will find and display all nodes that are owned by you which you've shared to others.</p>
+<p>The <code>Menu -&gt; View -&gt; My Shares</code>  menu item will find and display all nodes that are owned by you which you've shared to others.</p>
 <div id='674ca7a85646202d93cd5373'></div>
 <h2 id="priority-listing"><a href="#priority-listing" id="priority-listing">Priority Listing</a></h2>
 <div id='674ca7b15646202d93cd5374'></div>
-<p>The <code>Menu -&gt; Search -&gt; Priority Listing</code>  menu item will find and display all nodes that that have a Priority assigned and display them in descending order of priority.</p>
+<p>The <code>Menu -&gt; View -&gt; Priority Listing</code>  menu item will find and display all nodes that that have a Priority assigned and display them in descending order of priority.</p>
 <div id='674ca7f85646202d93cd5375'></div>
 <h2 id="unique-tagswords"><a href="#unique-tagswords" id="unique-tagswords">Unique Tags/Words</a></h2>
 <div id='674ca8045646202d93cd5376'></div>
-<p>The <code>Menu -&gt; Search -&gt; Unique Tags</code> and <code>Menu -&gt; Search -&gt; Unique Words</code> will query the subgraph under the selected node to generate a 'Top 100s List' of Tags or Words, which lists the top tags/words in order of frequency of use.</p>
+<p>The <code>Menu -&gt; View -&gt; Unique Tags</code> and <code>Menu -&gt; View -&gt; Unique Words</code> will query the subgraph under the selected node to generate a 'Top 100s List' of Tags or Words, which lists the top tags/words in order of frequency of use.</p>
 <p>Probably the most useful of these is the Top 100 tags, because this gives you a quick way to see a list of what all the hashtags are which are used under any section of the tree. Knowing which tags are in use is handy before doing searches for tags, so you can make sure you're searching for the right ones, that do exist.</p>
 <p>The Top 100s Tags view will also display each tag with a checkbox beside it so you can easily select one or more to search for and then do a search directly from the To 100s View, using the <code>Search</code> button at the bottom of the view.</p>
 <div id='5fa1926c6b842575d0e925fa'></div>
@@ -1933,32 +1913,32 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>Below shows our test node I created to demonstrate how we can find it again using a Timeline View. The node that starts with <code>&quot;I'm adding this node...&quot;</code> (in the image below) was created at a random location just to prove we can easily find it again.</p>
 <p>Since this node is the newest (when these screenshots were taken) the newest node should appear at the top of any timeline which would contain it, as we see below.</p>
 <figure>
-<img id='img_6287d57896d3696042d5d75a_p' src='attachments/6287d57896d3696042d5d75a_p.png' style='width:100%'/>
-<figcaption>Fig. 81</figcaption>
+<img id='img_6287d57896d3696042d5d75a_p' src='attachments/6287d57896d3696042d5d75a_p.png' style='width:100%' />
+<figcaption>Fig. 74</figcaption>
 </figure>
 <div id='6287d5f996d3696042d5d773'></div>
 <p>Now we go all the way up to the root node of the book <code>War and Peace</code> and Click the <code>Clock Icon (to generate a Timeline)</code></p>
 <figure>
-<img id='img_6287d5f996d3696042d5d773_p' src='attachments/6287d5f996d3696042d5d773_p.png' style='width:100%'/>
-<figcaption>Fig. 82</figcaption>
+<img id='img_6287d5f996d3696042d5d773_p' src='attachments/6287d5f996d3696042d5d773_p.png' style='width:100%' />
+<figcaption>Fig. 75</figcaption>
 </figure>
 <div id='6287d6bb96d3696042d5d792'></div>
 <p>As expected, the newest node is always at the top of the rev-chron list, so this has found the most recent content, and it's what we just added of course. You'll also notice the app switched over to the <code>Timeline Tab</code>, but we can always go back to the Folders tab any time.</p>
 <figure>
-<img id='img_6287d6bb96d3696042d5d792_p' src='attachments/6287d6bb96d3696042d5d792_p.png' style='width:100%'/>
-<figcaption>Fig. 83</figcaption>
+<img id='img_6287d6bb96d3696042d5d792_p' src='attachments/6287d6bb96d3696042d5d792_p.png' style='width:100%' />
+<figcaption>Fig. 76</figcaption>
 </figure>
 <div id='6287d73d96d3696042d5d79c'></div>
 <p>We could have also searched from anywhere else on the tree that's still above the node in question, in the hierarchy. So let's do that. We'll go directly to Book 7 and run a Timeline again on Book 7. Since our latest change was indeed somewhere down inside Book 7 as well, we can use Timeline again to find the node again.</p>
 <figure>
-<img id='img_6287d73d96d3696042d5d79c_p' src='attachments/6287d73d96d3696042d5d79c_p.png' style='width:100%'/>
-<figcaption>Fig. 84</figcaption>
+<img id='img_6287d73d96d3696042d5d79c_p' src='attachments/6287d73d96d3696042d5d79c_p.png' style='width:100%' />
+<figcaption>Fig. 77</figcaption>
 </figure>
 <div id='6287d7c896d3696042d5d7a3'></div>
 <p>So here is our node again, in a different set of results, but still at the top since it's still the most recent thing under Book 7.</p>
 <figure>
-<img id='img_6287d7c896d3696042d5d7a3_p' src='attachments/6287d7c896d3696042d5d7a3_p.png' style='width:100%'/>
-<figcaption>Fig. 85</figcaption>
+<img id='img_6287d7c896d3696042d5d7a3_p' src='attachments/6287d7c896d3696042d5d7a3_p.png' style='width:100%' />
+<figcaption>Fig. 78</figcaption>
 </figure>
 <div id='61116f7e2ef5fd09501a6937'></div>
 <h2 id="practical-use-cases"><a href="#practical-use-cases" id="practical-use-cases">Practical Use Cases</a></h2>
@@ -2008,8 +1988,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>To find the URL for the <code>Chat Room</code> that you can share with other users, first select the node itself (by clicking on it) and then click &quot;Links&quot; from the node menu for that node (visible of you've set <code>Menu -&gt; Options -&gt; NodeInfo</code>) and then you can see the link as shown in the image below. It will be the one below <code>Timeline View (By Name)</code>.</p>
 <p>If you look at the URL itself you can also see all it's really doing is appending <code>view=timeline</code> to the URL, so that when users go to that node they're immediately presented with it's Timeline View.</p>
 <figure>
-<img id='img_65c13322a14be04b61ad43d0_p' src='attachments/65c13322a14be04b61ad43d0_p.png' style='width:100%'/>
-<figcaption>Fig. 86</figcaption>
+<img id='img_65c13322a14be04b61ad43d0_p' src='attachments/65c13322a14be04b61ad43d0_p.png' style='width:100%' />
+<figcaption>Fig. 79</figcaption>
 </figure>
 <div id='5fa1bc24e698393a70b67899'></div>
 <h1 id="playing-audio-or-video"><a href="#playing-audio-or-video" id="playing-audio-or-video">Playing Audio or Video</a></h1>
@@ -2018,14 +1998,14 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='628acfde938318131bfcafa8'></div>
 <p>Screenshot of the Audio Player</p>
 <figure>
-<img id='img_628acfde938318131bfcafa8_p' src='attachments/628acfde938318131bfcafa8_p.png' style='width:100%'/>
-<figcaption>Fig. 87</figcaption>
+<img id='img_628acfde938318131bfcafa8_p' src='attachments/628acfde938318131bfcafa8_p.png' style='width:100%' />
+<figcaption>Fig. 80</figcaption>
 </figure>
 <div id='628ad070938318131bfcafb4'></div>
 <p>Here's an example of the video player:</p>
 <figure>
-<img id='img_628ad070938318131bfcafb4_p' src='attachments/628ad070938318131bfcafb4_p.png' style='width:100%'/>
-<figcaption>Fig. 88</figcaption>
+<img id='img_628ad070938318131bfcafb4_p' src='attachments/628ad070938318131bfcafb4_p.png' style='width:100%' />
+<figcaption>Fig. 81</figcaption>
 </figure>
 <div id='628ad0f1938318131bfcafd9'></div>
 <p>To see live examples of the Audio and Video players go here:</p>
@@ -2038,8 +2018,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>You can record Audio or Video directly thru your browser, and automatically have the recording saved as an attachment.</p>
 <p>The A/V recording option is available in the <code>File Attachment Dialog</code> accessible from the <code>Node Editor Dialog</code>, via the <code>Mic</code> (Audio) and <code>Web Cam</code> buttons. (see image)</p>
 <figure>
-<img id='img_5f8b75db9d8e1d1be249e48b_p' src='attachments/5f8b75db9d8e1d1be249e48b_p.png' />
-<figcaption>Fig. 89</figcaption>
+<img id='img_5f8b75db9d8e1d1be249e48b_p' src='attachments/5f8b75db9d8e1d1be249e48b_p.png'  />
+<figcaption>Fig. 82</figcaption>
 </figure>
 <div id='6036bb5980c75f22b25fd3f6'></div>
 <h1 id="node-info"><a href="#node-info" id="node-info">Node Info</a></h1>
@@ -2053,8 +2033,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>To find the URL of a node, click the node, and then choose <code>Menu -&gt; Tools -&gt; Show URLs</code>. By default each node will have a URL based on its database record ID. If the node has a custom 'name' there will be an additional URL for this same node based on the name.</p>
 <p>Here's an example of that dialog, showing the URLs for a node:</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e92616_p' src='attachments/5fa1926c6b842575d0e92616_p.png' />
-<figcaption>Fig. 90</figcaption>
+<img id='img_5fa1926c6b842575d0e92616_p' src='attachments/5fa1926c6b842575d0e92616_p.png'  />
+<figcaption>Fig. 83</figcaption>
 </figure>
 <div id='5fac6852d46e084b326ff2ad'></div>
 <p>See also: The &quot;Custom URLs&quot; section of this User Guide.</p>
@@ -2068,8 +2048,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>Select <code>Menu -&gt; Tools -&gt; Node Info</code> to generate a statistics report for the selected node, that sums up various bits of information about the entire contained subgraph of nodes.</p>
 <p>Here's an example of what it dispalys:</p>
 <figure>
-<img id='img_6037cf2ab5095505e9763aa7_p' src='attachments/6037cf2ab5095505e9763aa7_p.png' />
-<figcaption>Fig. 91</figcaption>
+<img id='img_6037cf2ab5095505e9763aa7_p' src='attachments/6037cf2ab5095505e9763aa7_p.png'  />
+<figcaption>Fig. 84</figcaption>
 </figure>
 <div id='5fa1c0d2e698393a70b6789e'></div>
 <h1 id="rss-and-podcasts"><a href="#rss-and-podcasts" id="rss-and-podcasts">RSS and Podcasts</a></h1>
@@ -2081,30 +2061,30 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h3 id="set-the-node-type"><a href="#set-the-node-type" id="set-the-node-type">Set the Node Type</a></h3>
 <p>First click the <code>Node Type</code> icon in the editor on a node where you want to host the RSS Subscription from, and then pick <code>RSS Feed</code> as the new node type.</p>
 <figure>
-<img id='img_65722797fc3f094a7cc0ae1a_p' src='attachments/65722797fc3f094a7cc0ae1a_p.png' />
-<figcaption>Fig. 92</figcaption>
+<img id='img_65722797fc3f094a7cc0ae1a_p' src='attachments/65722797fc3f094a7cc0ae1a_p.png'  />
+<figcaption>Fig. 85</figcaption>
 </figure>
 <div id='657227f9fc3f094a7cc0ae3c'></div>
 <h3 id="enter-rss-urls"><a href="#enter-rss-urls" id="enter-rss-urls">Enter RSS URLs</a></h3>
 <p>After changing a node to <code>RSS Feed</code> type it will automatically display a place for you to enter the URLs you want to subscribe to.</p>
 <figure>
-<img id='img_657227f9fc3f094a7cc0ae3c_p' src='attachments/657227f9fc3f094a7cc0ae3c_p.png' />
-<figcaption>Fig. 93</figcaption>
+<img id='img_657227f9fc3f094a7cc0ae3c_p' src='attachments/657227f9fc3f094a7cc0ae3c_p.png'  />
+<figcaption>Fig. 86</figcaption>
 </figure>
 <div id='65722839fc3f094a7cc0ae4c'></div>
 <h3 id="request-to-view-feeds"><a href="#request-to-view-feeds" id="request-to-view-feeds">Request to View Feeds</a></h3>
 <p>After saving the node you'll see a <code>View Feeds</code> button appearing on the node which you can click to retrieve all the latest RSS content.</p>
 <figure>
-<img id='img_65722839fc3f094a7cc0ae4c_p' src='attachments/65722839fc3f094a7cc0ae4c_p.png' />
-<figcaption>Fig. 94</figcaption>
+<img id='img_65722839fc3f094a7cc0ae4c_p' src='attachments/65722839fc3f094a7cc0ae4c_p.png'  />
+<figcaption>Fig. 87</figcaption>
 </figure>
 <div id='6572288dfc3f094a7cc0ae67'></div>
 <h3 id="have-fun-reading-the-news"><a href="#have-fun-reading-the-news" id="have-fun-reading-the-news">Have Fun Reading the News</a></h3>
 <p>After clicking <code>View Feed</code> the app will switch over to the <code>RSS Feed Tab</code> to display the RSS. You can always click <code>Folders Tab</code> to get back to your tree. The contents of this Feed view will be the merged and sorted (newest on top) aggregate view of all feeds you had listed.</p>
 <p>You can update your list of URLs any time, and everything will just continue to work. There's no need to go thru the process again of creating a new node whenever you want to modify your subscriptions, because you can edit the list of URLs any time, using the Node Editor.</p>
 <figure>
-<img id='img_6572288dfc3f094a7cc0ae67_p' src='attachments/6572288dfc3f094a7cc0ae67_p.png' style='width:100%'/>
-<figcaption>Fig. 95</figcaption>
+<img id='img_6572288dfc3f094a7cc0ae67_p' src='attachments/6572288dfc3f094a7cc0ae67_p.png' style='width:100%' />
+<figcaption>Fig. 88</figcaption>
 </figure>
 <div id='5fa1926c6b842575d0e92624'></div>
 <h1 id="encryption"><a href="#encryption" id="encryption">Encryption</a></h1>
@@ -2150,15 +2130,15 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='5fa1e204b4bd3b0a753229e5'></div>
 <p>Example of a Node Graph, created by a search for the word &quot;Nicholas&quot; in the book War and Peace.</p>
 <figure>
-<img id='img_5fa1e204b4bd3b0a753229e5_p' src='attachments/5fa1e204b4bd3b0a753229e5_p.gif' style='width:100%'/>
-<figcaption>Fig. 96</figcaption>
+<img id='img_5fa1e204b4bd3b0a753229e5_p' src='attachments/5fa1e204b4bd3b0a753229e5_p.gif' style='width:100%' />
+<figcaption>Fig. 89</figcaption>
 </figure>
 <div id='5fa1e420b4bd3b0a753229e9'></div>
 <p>The nodes that are filled in with green are the actual nodes containing the word &quot;Nicholas&quot; (the search results) and the other nodes are automatically added to show the path to the root of the searched node (i.e. to fill in enough of the tree to make its structure clear).</p>
 <p>All graphs contain the node you selected to search under as their center (root). The tree nodes in the graph are color coded based on 'tree level' (depth relative to the root).</p>
 <figure>
-<img id='img_5fa1e420b4bd3b0a753229e9_p' src='attachments/5fa1e420b4bd3b0a753229e9_p.png' />
-<figcaption>Fig. 97</figcaption>
+<img id='img_5fa1e420b4bd3b0a753229e9_p' src='attachments/5fa1e420b4bd3b0a753229e9_p.png'  />
+<figcaption>Fig. 90</figcaption>
 </figure>
 <div id='64e778bc03bc775e03563856'></div>
 <p>Graphs like the one above are also highly interactive. You can use the mouse to click any node to jump to that node on the tree view. The Graphs are automatically positioned using a gravitational &quot;Physics&quot; simulation, so you can drag things around with the mouse and they will render in an attractive non-overlapping way as shown above.</p>
@@ -2171,15 +2151,15 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>As the TTS Tab reads content aloud the current sentence of text being spoken will be highlighted in blue as the reading goes along. You can also click anywhere in the text content to make it jump to that location and start reading from there. You can easily skip around in the content by clicking different areas you want to read.</p>
 <p>You can choose your preferred Voice (American Accent, British, etc), and you can also select the speed of the speech, using the dropdown menus at the top.</p>
 <figure>
-<img id='img_63ae6cb49e10b95fe6502341_p' src='attachments/63ae6cb49e10b95fe6502341_p.png' style='width:100%'/>
-<figcaption>Fig. 98</figcaption>
+<img id='img_63ae6cb49e10b95fe6502341_p' src='attachments/63ae6cb49e10b95fe6502341_p.png' style='width:100%' />
+<figcaption>Fig. 91</figcaption>
 </figure>
 <div id='64e77bdd03bc775e03563948'></div>
 <h2 id="tts-from-any-node"><a href="#tts-from-any-node" id="tts-from-any-node">TTS from any Node</a></h2>
 <p>If you have <code>Node Info</code> enabled, every node will have a TTS Button (Speaker Icon) displaying that you can click to have the node content narrated aloud to you.</p>
 <figure>
-<img id='img_64e77bdd03bc775e03563948_p' src='attachments/64e77bdd03bc775e03563948_p.png' style='width:100%'/>
-<figcaption>Fig. 99</figcaption>
+<img id='img_64e77bdd03bc775e03563948_p' src='attachments/64e77bdd03bc775e03563948_p.png' style='width:100%' />
+<figcaption>Fig. 92</figcaption>
 </figure>
 <div id='64e77c4c03bc775e03563954'></div>
 <h2 id="tts-via-drag-and-drop"><a href="#tts-via-drag-and-drop" id="tts-via-drag-and-drop">TTS via Drag-and-Drop</a></h2>
@@ -2191,8 +2171,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h2 id="export"><a href="#export" id="export">Export</a></h2>
 <p>Select <code>Menu -&gt; Tools -&gt; Export</code> to export any node (and all its subnodes) into a downloadable archive file, or PDF.</p>
 <figure>
-<img id='img_5fa1926c6b842575d0e9261c_p' src='attachments/5fa1926c6b842575d0e9261c_p.png' />
-<figcaption>Fig. 100</figcaption>
+<img id='img_5fa1926c6b842575d0e9261c_p' src='attachments/5fa1926c6b842575d0e9261c_p.png'  />
+<figcaption>Fig. 93</figcaption>
 </figure>
 <div id='666b4a0c33a2596eb786353a'></div>
 <h2 id="file-types"><a href="#file-types" id="file-types">File Types</a></h2>
@@ -2243,15 +2223,15 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h2 id="user-profile"><a href="#user-profile" id="user-profile">User Profile</a></h2>
 <p>Edit your user profile using <code>Menu -&gt; Account -&gt; Profile</code>. This is how you setup your display name, bio text, avatar image, and heading image. Here's how it looks:</p>
 <figure>
-<img id='img_63f30ee855770e1b97de196e_p' src='attachments/63f30ee855770e1b97de196e_p.png' />
-<figcaption>Fig. 101</figcaption>
+<img id='img_63f30ee855770e1b97de196e_p' src='attachments/63f30ee855770e1b97de196e_p.png'  />
+<figcaption>Fig. 94</figcaption>
 </figure>
 <div id='6407e6c57d69fa44622efd4c'></div>
 <h2 id="account-settings"><a href="#account-settings" id="account-settings">Account Settings</a></h2>
 <p>The Account Settings Tab can be accessed by <code>Menu -&gt; Account -&gt; Settings</code> as shown here:</p>
 <figure>
-<img id='img_6407e6c57d69fa44622efd4c_p' src='attachments/6407e6c57d69fa44622efd4c_p.png' />
-<figcaption>Fig. 102</figcaption>
+<img id='img_6407e6c57d69fa44622efd4c_p' src='attachments/6407e6c57d69fa44622efd4c_p.png'  />
+<figcaption>Fig. 95</figcaption>
 </figure>
 <div id='6509f8c2494fe43e40fd52c5'></div>
 <h2 id="settings"><a href="#settings" id="settings">Settings</a></h2>
@@ -2279,8 +2259,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h2 id="storage-space"><a href="#storage-space" id="storage-space">Storage Space</a></h2>
 <p>Shows how much of your allotted space on the server you've consumed:</p>
 <figure>
-<img id='img_63f30fcc55770e1b97de19c2_p' src='attachments/63f30fcc55770e1b97de19c2_p.png' />
-<figcaption>Fig. 103</figcaption>
+<img id='img_63f30fcc55770e1b97de19c2_p' src='attachments/63f30fcc55770e1b97de19c2_p.png'  />
+<figcaption>Fig. 96</figcaption>
 </figure>
 <div id='635f5081bc58d344086fa1ed'></div>
 <h2 id="manage-keys"><a href="#manage-keys" id="manage-keys">Manage Keys</a></h2>
@@ -2292,13 +2272,17 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>The <code>Publish Public Key</code> button let's you ensure the server has the current key from the browser, which it will need in order to let you securely share content, but this is normally not needed and should happen automatically without you clicking the button.</p>
 <p>The <code>Import Key</code> lets you update the Selected Key type, from text content that you can paste in. This text content will be something you had previously gotten just by selecting the key JSON shown in the dialog. So there's no <code>Export Key</code> feature currently and you have to just cut-and-paste the JSON yourself. This process will be made easier in a future version of the app.</p>
 <figure>
-<img id='img_6572050efc3f094a7cc0a2eb_p' src='attachments/6572050efc3f094a7cc0a2eb_p.png' />
-<figcaption>Fig. 104</figcaption>
+<img id='img_6572050efc3f094a7cc0a2eb_p' src='attachments/6572050efc3f094a7cc0a2eb_p.png'  />
+<figcaption>Fig. 97</figcaption>
 </figure>
 <div id='6418e294a4db9e5e43bb72a1'></div>
 <h1 id="semantic-web"><a href="#semantic-web" id="semantic-web">Semantic Web</a></h1>
 <div id='6570f456fc3f094a7cc06483'></div>
 <p>Quanta doesn't require you to know about <code>Data Types</code>, because every node is just automatically the &quot;Markdown Type&quot; (i.e. assumed to contain markdown text). However we do fully support the Semantic Web types.</p>
+<figure>
+<img id='img_6418e2ffa4db9e5e43bb72b2_p' src='attachments/6418e2ffa4db9e5e43bb72b2_p.png' style='width:25%' class='img-upper-left'/>
+<figcaption>Fig. 98</figcaption>
+</figure>
 <div id='6418e2ffa4db9e5e43bb72b2'></div>
 <h2 id="semantic-web-basics"><a href="#semantic-web-basics" id="semantic-web-basics">Semantic Web Basics</a></h2>
 <p>The <code>Semantic Web</code> is a set of standards that allow data on the web to have specific <code>Data Types</code> (i.e. Objects with Properties), so that computers can automatically parse and understand the data. The goal of the <code>Semantic Web</code> is to make internet data machine-readable.</p>
@@ -2310,37 +2294,33 @@ in the Coding Agent project contains all the docs on how to use it.</p>
     givenName: &quot;Leonard&quot;
 }
 </code></pre>
-<figure>
-<img id='img_6418e2ffa4db9e5e43bb72b2_p' src='attachments/6418e2ffa4db9e5e43bb72b2_p.png' style='width:25%'/>
-<figcaption>Fig. 105</figcaption>
-</figure>
 <div id='64193b62dfa8e71dac2b1018'></div>
 <h2 id="person-type-example"><a href="#person-type-example" id="person-type-example">Person Type Example</a></h2>
 <p>Here's an example (below) of how to create a <code>Person object</code>, then edit it, and see how it displays. We can select <code>Menu -&gt; Create -&gt; Choose Type...</code> which will lead to the following selection list where we can select <code>Person</code> as the type of the thing we want to create.</p>
 <figure>
-<img id='img_64193b62dfa8e71dac2b1018_p' src='attachments/64193b62dfa8e71dac2b1018_p.png' />
-<figcaption>Fig. 106</figcaption>
+<img id='img_64193b62dfa8e71dac2b1018_p' src='attachments/64193b62dfa8e71dac2b1018_p.png'  />
+<figcaption>Fig. 99</figcaption>
 </figure>
 <div id='64193c39dfa8e71dac2b1040'></div>
 <h2 id="editing-a-person"><a href="#editing-a-person" id="editing-a-person">Editing a Person</a></h2>
 <p>We're now editing the Person type we just created (above) and can <code>enter the properties</code> as shown in the image below:</p>
 <figure>
-<img id='img_64193c39dfa8e71dac2b1040_p' src='attachments/64193c39dfa8e71dac2b1040_p.png' />
-<figcaption>Fig. 107</figcaption>
+<img id='img_64193c39dfa8e71dac2b1040_p' src='attachments/64193c39dfa8e71dac2b1040_p.png'  />
+<figcaption>Fig. 100</figcaption>
 </figure>
 <div id='64193c7fdfa8e71dac2b104e'></div>
 <h2 id="object-display"><a href="#object-display" id="object-display">Object Display</a></h2>
 <p>After clicking <code>Save</code> in the record editor dialog (above) the node will be saved, and will be displayed as shown below:</p>
 <figure>
-<img id='img_64193c7fdfa8e71dac2b104e_p' src='attachments/64193c7fdfa8e71dac2b104e_p.png' style='width:100%'/>
-<figcaption>Fig. 108</figcaption>
+<img id='img_64193c7fdfa8e71dac2b104e_p' src='attachments/64193c7fdfa8e71dac2b104e_p.png' style='width:100%' />
+<figcaption>Fig. 101</figcaption>
 </figure>
 <div id='64193cf4dfa8e71dac2b1066'></div>
 <h2 id="adding-more-properties"><a href="#adding-more-properties" id="adding-more-properties">Adding more Properties</a></h2>
 <p>As shown above, there are only a handful of properties that are assigned to the Person object by default in this experimental feature, but we can add more properties, by going back into the <code>Node Editor</code> at any time and clicking the <code>Plus Icon</code> to add more properties and pick from the full list of all <code>Schema.org</code> Person properties (or any other type of object's properties):</p>
 <figure>
-<img id='img_64193cf4dfa8e71dac2b1066_p' src='attachments/64193cf4dfa8e71dac2b1066_p.png' style='width:100%'/>
-<figcaption>Fig. 109</figcaption>
+<img id='img_64193cf4dfa8e71dac2b1066_p' src='attachments/64193cf4dfa8e71dac2b1066_p.png' style='width:100%' />
+<figcaption>Fig. 102</figcaption>
 </figure>
 <div id='6419ecdddfa8e71dac2b37f8'></div>
 <h2 id="technical-info"><a href="#technical-info" id="technical-info">Technical Info</a></h2>
@@ -2392,16 +2372,16 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>Arbitrary <code>Key/Value</code> pairs can also be added to any node including properties that are not part of schema.org. In the example below we have added <code>'prop1', 'prop2', and 'prop3'</code> to demonstrate this.</p>
 <p>Those properties could've been named anything, and they could've been assigned any values we want.</p>
 <figure>
-<img id='img_6419e044dfa8e71dac2b33ba_p' src='attachments/6419e044dfa8e71dac2b33ba_p.png' />
-<figcaption>Fig. 110</figcaption>
+<img id='img_6419e044dfa8e71dac2b33ba_p' src='attachments/6419e044dfa8e71dac2b33ba_p.png'  />
+<figcaption>Fig. 103</figcaption>
 </figure>
 <div id='6419e457dfa8e71dac2b353f'></div>
 <h3 id="default-property-display"><a href="#default-property-display" id="default-property-display">Default Property Display</a></h3>
 <p>Since those properties are not part of an object that has been configured to display in some special way (referring to the YAML approach talked about earlier), they display on the page as a vertical list, as shown in the image below:</p>
 <p><em>Note: You'll need to select the <code>Menu -&gt; Account -&gt; Settings -&gt; View Options -&gt; Properties</code> checkbox to see these properties displayed.</em></p>
 <figure>
-<img id='img_6419e457dfa8e71dac2b353f_p' src='attachments/6419e457dfa8e71dac2b353f_p.png' />
-<figcaption>Fig. 111</figcaption>
+<img id='img_6419e457dfa8e71dac2b353f_p' src='attachments/6419e457dfa8e71dac2b353f_p.png'  />
+<figcaption>Fig. 104</figcaption>
 </figure>
 <div id='6419e500dfa8e71dac2b35a5'></div>
 <h3 id="semantic-web-references"><a href="#semantic-web-references" id="semantic-web-references">Semantic Web References</a></h3>
@@ -2432,18 +2412,18 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='65bbdbeecf425c5fe6f2ddcf'></div>
 <p>The images below show the basic concept of an RDF Tripe. It's called a <code>triple</code> because you have a Subject, Predicate, and Object. However in Quanta you can think of these as a <code>Source Node</code>, verb, and <code>Object Node</code>.</p>
 <figure>
-<img id='img_65bbdbeecf425c5fe6f2ddcf_img1' src='attachments/65bbdbeecf425c5fe6f2ddcf_img1.png' style='width:75%'/>
-<figcaption>Fig. 112</figcaption>
+<img id='img_65bbdbeecf425c5fe6f2ddcf_img1' src='attachments/65bbdbeecf425c5fe6f2ddcf_img1.png' style='width:75%' />
+<figcaption>Fig. 105</figcaption>
 </figure>
 <figure>
-<img id='img_65bbdbeecf425c5fe6f2ddcf_p' src='attachments/65bbdbeecf425c5fe6f2ddcf_p.png' style='width:75%'/>
-<figcaption>Fig. 113</figcaption>
+<img id='img_65bbdbeecf425c5fe6f2ddcf_p' src='attachments/65bbdbeecf425c5fe6f2ddcf_p.png' style='width:75%' />
+<figcaption>Fig. 106</figcaption>
 </figure>
 <div id='65bbdd3bcf425c5fe6f2ddd4'></div>
 <h2 id="how-to-link-two-nodes"><a href="#how-to-link-two-nodes" id="how-to-link-two-nodes">How to Link two Nodes</a></h2>
 <figure>
-<img id='img_65bbdd3bcf425c5fe6f2ddd4_p' src='attachments/65bbdd3bcf425c5fe6f2ddd4_p.png' />
-<figcaption>Fig. 114</figcaption>
+<img id='img_65bbdd3bcf425c5fe6f2ddd4_p' src='attachments/65bbdd3bcf425c5fe6f2ddd4_p.png'  />
+<figcaption>Fig. 107</figcaption>
 </figure>
 <div id='65be7ee0cf425c5fe6f2de0d'></div>
 <p>Under <code>Menu -&gt; RDF Triple</code> menu item is where you will find the RDF Triple options. To link two nodes together, use the following four step process:</p>
@@ -2460,8 +2440,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>The <code>Create Triple</code> function mentioned above leads to the following dialog where you can enter the Triple Information. The default Predicate is always <code>link</code> so that your association is a link from one node to another, but as stated above you can change that to some other word/relationship.</p>
 <p>The <code>Embed Content</code> option can be selected if you want to actually also <strong>display</strong> the linked node content right inline on the page just below the node that links to it. You can access <code>RDF Link</code> dialog from the Node Editor dialog as well to change the predicate configuration any time, or delete it.</p>
 <figure>
-<img id='img_65be7c46cf425c5fe6f2de07_p' src='attachments/65be7c46cf425c5fe6f2de07_p.png' />
-<figcaption>Fig. 115</figcaption>
+<img id='img_65be7c46cf425c5fe6f2de07_p' src='attachments/65be7c46cf425c5fe6f2de07_p.png'  />
+<figcaption>Fig. 108</figcaption>
 </figure>
 <div id='65bbdffbcf425c5fe6f2dddc'></div>
 <h2 id="find-subjects"><a href="#find-subjects" id="find-subjects">Find Subjects</a></h2>
@@ -2490,53 +2470,53 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <p>You can also pre-define various hashtags or groups of hashtags so you can rapidly pick from them when editing nodes, so let's look at a example of that first. Suppose we want to invent a system that has <code>#todo</code> as a hashtag and also <code>#complete</code> and <code>#incomplete</code> as a basic todo app categorization.</p>
 <p>First we create a new node, and click the &quot;Tags&quot; button at the bottom as shown here:</p>
 <figure>
-<img id='img_673bcb15f0c42c7fc61e4245_p' src='attachments/673bcb15f0c42c7fc61e4245_p.png' />
-<figcaption>Fig. 116</figcaption>
+<img id='img_673bcb15f0c42c7fc61e4245_p' src='attachments/673bcb15f0c42c7fc61e4245_p.png'  />
+<figcaption>Fig. 109</figcaption>
 </figure>
 <div id='673bdadef0c42c7fc61e4253'></div>
 <p>Now we'll be looking at the <strong>Add Hashtags Dialog</strong>, and we can see we have three already defined but we want to define some new ones and put them under a heading to make them grouped, so we click <strong>Edit Tags</strong> button.</p>
 <figure>
-<img id='img_673bdadef0c42c7fc61e4253_p' src='attachments/673bdadef0c42c7fc61e4253_p.png' />
-<figcaption>Fig. 117</figcaption>
+<img id='img_673bdadef0c42c7fc61e4253_p' src='attachments/673bdadef0c42c7fc61e4253_p.png'  />
+<figcaption>Fig. 110</figcaption>
 </figure>
 <div id='673bdb2cf0c42c7fc61e4256'></div>
 <h2 id="pre-defining-hashtags"><a href="#pre-defining-hashtags" id="pre-defining-hashtags">Pre-Defining Hashtags</a></h2>
 <p>We'll now be in the <strong>Edit Hashtags Dialog</strong> where we can define whatever we want our hashtags to be. This is kind of like our library of available hashtags, and this is an ordinary multi-line text field we can enter them into. Note that any lines of text that aren't hashtags are assumed to be descriptive text, so we have a line at the top as <strong>TODOs</strong> with our todos hashtags below it. We now click <strong>Save</strong>.</p>
 <figure>
-<img id='img_673bdb2cf0c42c7fc61e4256_p' src='attachments/673bdb2cf0c42c7fc61e4256_p.png' />
-<figcaption>Fig. 118</figcaption>
+<img id='img_673bdb2cf0c42c7fc61e4256_p' src='attachments/673bdb2cf0c42c7fc61e4256_p.png'  />
+<figcaption>Fig. 111</figcaption>
 </figure>
 <div id='673bdb51f0c42c7fc61e4259'></div>
 <p>After clicking &quot;Save&quot; in our Tags editing dialog we'll now be back at the <strong>Add Hashtags</strong> again but now can see it's changed, and contains the new tags for us to choose from, so we select a couple of tags and click <strong>Ok</strong></p>
 <figure>
-<img id='img_673bdb51f0c42c7fc61e4259_p' src='attachments/673bdb51f0c42c7fc61e4259_p.png' />
-<figcaption>Fig. 119</figcaption>
+<img id='img_673bdb51f0c42c7fc61e4259_p' src='attachments/673bdb51f0c42c7fc61e4259_p.png'  />
+<figcaption>Fig. 112</figcaption>
 </figure>
 <div id='673bdb7ff0c42c7fc61e425c'></div>
 <p>Now we'll be back at our Node Editor Dialog and we can see it showing the two hashtags that have been set for this node. Of course the next time we need to add tags we won't have to define the tags again we'll just be able to pick them from the list again, as shown in the <em>Search</em> example next.</p>
 <figure>
-<img id='img_673bdb7ff0c42c7fc61e425c_p' src='attachments/673bdb7ff0c42c7fc61e425c_p.png' />
-<figcaption>Fig. 120</figcaption>
+<img id='img_673bdb7ff0c42c7fc61e425c_p' src='attachments/673bdb7ff0c42c7fc61e425c_p.png'  />
+<figcaption>Fig. 113</figcaption>
 </figure>
 <div id='673bdb98f0c42c7fc61e425f'></div>
 <h2 id="searching-hashtags"><a href="#searching-hashtags" id="searching-hashtags">Searching Hashtags</a></h2>
 <p>One of the main reasons you'd ever assign hashtags to a node is of course for searching purposes, so you can find things later based on tags categories. So as you'll see if we open the <strong>Search Dialog</strong> it has a <strong>Hashtags Button</strong> on it.</p>
 <figure>
-<img id='img_673bdb98f0c42c7fc61e425f_p' src='attachments/673bdb98f0c42c7fc61e425f_p.png' />
-<figcaption>Fig. 121</figcaption>
+<img id='img_673bdb98f0c42c7fc61e425f_p' src='attachments/673bdb98f0c42c7fc61e425f_p.png'  />
+<figcaption>Fig. 114</figcaption>
 </figure>
 <div id='673bdbb0f0c42c7fc61e4262'></div>
 <p>So after clicking the Hashtags button on the Search Dialog it opens the Tags picker dialog again, and we can pick something to search for, like <code>#todo</code>, and then click <strong>Ok Button</strong></p>
 <figure>
-<img id='img_673bdbb0f0c42c7fc61e4262_p' src='attachments/673bdbb0f0c42c7fc61e4262_p.png' />
-<figcaption>Fig. 122</figcaption>
+<img id='img_673bdbb0f0c42c7fc61e4262_p' src='attachments/673bdbb0f0c42c7fc61e4262_p.png'  />
+<figcaption>Fig. 115</figcaption>
 </figure>
 <div id='673bdbd2f0c42c7fc61e4265'></div>
 <p>So that added the hashtag to our search, automatically surrounding in quotes which is required and important. Special characters like the pound sign (<code>#</code>) aren't considered an important part of the search text unless quoted so that's why we need quotes.</p>
 <p>If we click <strong>Search</strong> now that would find all the nodes that have the <code>#todo</code> hashtag.</p>
 <figure>
-<img id='img_673bdbd2f0c42c7fc61e4265_p' src='attachments/673bdbd2f0c42c7fc61e4265_p.png' />
-<figcaption>Fig. 123</figcaption>
+<img id='img_673bdbd2f0c42c7fc61e4265_p' src='attachments/673bdbd2f0c42c7fc61e4265_p.png'  />
+<figcaption>Fig. 116</figcaption>
 </figure>
 <div id='673bdfc2f0c42c7fc61e4268'></div>
 <p>NOTE: Most of the above was all about showing how we can pre-define hashtags for consistent use and for easy picking both for attaching them onto nodes and for searching for them, but of course directly entering hashtags into the content text works fine too.</p>
@@ -2548,21 +2528,21 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <div id='673f9605aa53a12b272f594b'></div>
 <p>As an example suppose we have created the node in the image below. The button to rapidly turn this node into a calendar due date is highlighted in yellow.</p>
 <figure>
-<img id='img_673f9605aa53a12b272f594b_p' src='attachments/673f9605aa53a12b272f594b_p.png' />
-<figcaption>Fig. 124</figcaption>
+<img id='img_673f9605aa53a12b272f594b_p' src='attachments/673f9605aa53a12b272f594b_p.png'  />
+<figcaption>Fig. 117</figcaption>
 </figure>
 <div id='673f9668aa53a12b272f594e'></div>
 <p>After clicking the button we now see that the 'date' property has been added to the node, initialized with the current time, and also the &quot;due&quot; tag has been assigned making this an item that's considered to have this as it's due date. You can click the &quot;due&quot; tag to remove it, if you didn't intend for this item to ever come due, which would be rare.</p>
 <figure>
-<img id='img_673f9668aa53a12b272f594e_p' src='attachments/673f9668aa53a12b272f594e_p.png' />
-<figcaption>Fig. 125</figcaption>
+<img id='img_673f9668aa53a12b272f594e_p' src='attachments/673f9668aa53a12b272f594e_p.png'  />
+<figcaption>Fig. 118</figcaption>
 </figure>
 <div id='673f972caa53a12b272f5952'></div>
 <p>Once you have one or more calendar items (i.e. any nodes with a 'date' property assigned), you can then use the <code>Menu -&gt; View -&gt; Calendar: ...</code> menu items at any tree level above them to collect just the contained calendar items and present them.</p>
 <p>Here's what that menu looks like:</p>
 <figure>
-<img id='img_673f972caa53a12b272f5952_p' src='attachments/673f972caa53a12b272f5952_p.png' />
-<figcaption>Fig. 126</figcaption>
+<img id='img_673f972caa53a12b272f5952_p' src='attachments/673f972caa53a12b272f5952_p.png'  />
+<figcaption>Fig. 119</figcaption>
 </figure>
 <div id='673f97c3aa53a12b272f5955'></div>
 <h2 id="calendar-menu-options"><a href="#calendar-menu-options" id="calendar-menu-options">Calendar Menu Options</a></h2>
@@ -2573,8 +2553,8 @@ in the Coding Agent project contains all the docs on how to use it.</p>
 <h3 id="display"><a href="#display" id="display">Display</a></h3>
 <p>Shows a graphical Calendar view (image below). You can click to add new nodes directly from this calendar view, as well as edit or delete any of the nodes that appear. When you click items the full Edit Node Dialog opens right on top of the Calendar View while you edit them, so you never need to leave the Calendar View while editing calendar items.</p>
 <figure>
-<img id='img_673f97e7aa53a12b272f5956_p' src='attachments/673f97e7aa53a12b272f5956_p.png' style='width:100%'/>
-<figcaption>Fig. 127</figcaption>
+<img id='img_673f97e7aa53a12b272f5956_p' src='attachments/673f97e7aa53a12b272f5956_p.png' style='width:100%' />
+<figcaption>Fig. 120</figcaption>
 </figure>
 <div id='673f97ffaa53a12b272f5957'></div>
 <h3 id="past"><a href="#past" id="past">Past</a></h3>
