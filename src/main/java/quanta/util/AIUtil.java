@@ -99,6 +99,8 @@ public class AIUtil extends ServiceBase {
      * We pass nodeNames, to allow detection of dupliates.
      */
     public String composePrompt(String prompt, HashSet<String> nodeNames) {
+        if (prompt == null)
+            return null;
         if (nodeNames == null)
             nodeNames = new HashSet<>();
         // split prompt into multiple lines, by tokenizing on newline
