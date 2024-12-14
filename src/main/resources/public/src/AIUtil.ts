@@ -34,20 +34,6 @@ export class AIUtil {
                 description: "OpenAI: ChatGPT-4o Mini",
                 longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI (128K context, max $0.6/megatoken)"
             });
-
-            // todo-2: Need to have a way to define in the configs which AI services are available. We have the code to support 'o1' models complete
-            // and simply uncommenting these lines will fully enable it. However the requirement is an expendature of $1000 to gain access to these
-            // models via the API as of October 2024, and Quanta.wiki has not yet qualified for that, so we have to disable these models for now.
-            // this.aiServices.push({
-            //     name: J.AIModel.OPENAI_O1_PREVIEW,
-            //     description: "OpenAI: ChatGPT o1 Preview",
-            //     longDescription: "The most powerful version of OpenAI's intelligent general-purpose AI, with reasoning capabilities (128K context)"
-            // });
-            // this.aiServices.push({
-            //     name: J.AIModel.OPENAI_O1_MINI,
-            //     description: "OpenAI: ChatGPT o1 Mini",
-            //     longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI, with reasoning capabilities (128K context)"
-            // });
         }
 
         if (S.quanta.config.useGeminiAi) {

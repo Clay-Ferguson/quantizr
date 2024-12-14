@@ -2,9 +2,15 @@
 
 # Quanta Web Platform
 
-[Live Demo Instance: https://quanta.wiki](https://quanta.wiki)
+Quanta is a Hierarchical Content Management System
 
-Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
+Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
+
+Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. 
+
+These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
+
+## Features
 
 * AI Chat & Agents
 * Wikis & micro-blogging
@@ -15,14 +21,6 @@ Quanta is a new kind of Content Management platform, with powerful [features](ht
 * File sharing
 * Podcatcher (RSS Reader)
 * Many other features related to managing hierarchical content
-
----
-
-Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
-
-Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. 
-
-These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
 
 ## Documentation
 

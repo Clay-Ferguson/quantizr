@@ -98,8 +98,6 @@ export class AppState {
     speechRate: string = "normal"; // slow, normal, fast
     ttsRan: boolean = false;
 
-    // if the URL is like 'https://quanta.wiki' and no path or query on the url then default
-    // to showing this LHS menu always.
     anonShowLHSMenu: boolean = (!window.location.pathname || window.location.pathname.length == 1) && !window.location.search;
     showSchemaOrgProps: boolean = false;
     showRecentProps: boolean = false;
