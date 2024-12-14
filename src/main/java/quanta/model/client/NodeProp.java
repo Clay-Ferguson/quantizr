@@ -10,7 +10,6 @@ public enum NodeProp {
      * key to decrypt this key and gain access to the actual data.
      */
     ENC_KEY("sn:encKey", null), //
-    CRYPTO_SIG("sn:sig", null), //
 
     // stands for "[r]ecursive SHA256" of all children of node.
     SUBGRAPH_HASH("sn:rSHA256", null), //
@@ -23,7 +22,6 @@ public enum NodeProp {
     AUDIO_URL("sn:audioUrl", null), //
 
     USER_PREF_PUBLIC_KEY("sn:publicKey", null), //
-    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey", null), //
 
     USER_PREF_EDIT_MODE("sn:editMode", null), //
     USER_PREF_AI_MODE("sn:aiMode", null), //
@@ -128,7 +126,6 @@ public enum NodeProp {
     AI_TEMPERATURE("aiTemp", null), //
     DURATION("duration", null), //
     IN_PENDING_PATH("pendingPath", null), //
-    SIG_FAIL("sigFail", null), //
 
     OPEN_GRAPH("sn:og", null), //
     TRUNCATED("trunc", null); //

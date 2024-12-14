@@ -308,7 +308,6 @@ export interface GetNodePrivilegesRequest extends RequestBase {
 
 export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
-    signatureVerify: boolean;
     getWords: boolean;
     getTags: boolean;
 }
@@ -409,7 +408,6 @@ export interface LoginRequest extends RequestBase {
     userName: string;
     password: string;
     asymEncKey: string;
-    sigKey: string;
     tzOffset: number;
     dst: boolean;
 }
@@ -479,10 +477,6 @@ export interface RemovePrivilegeRequest extends RequestBase {
     privilege: string;
 }
 
-export interface RemoveSignaturesRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface RenderCalendarRequest extends RequestBase {
     nodeId: string;
 }
@@ -520,7 +514,6 @@ export interface SaveNodeRequest extends RequestBase {
 
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
-    sigKey: string;
 }
 
 export interface SaveUserPreferencesRequest extends RequestBase {
@@ -578,16 +571,6 @@ export interface SetSharingOptionRequest extends RequestBase {
     nodeId: string;
     unpublished: boolean;
     website: boolean;
-}
-
-export interface SignNodesRequest extends RequestBase {
-    workloadId: number;
-    listToSign: NodeSigData[];
-}
-
-export interface SignSubGraphRequest extends RequestBase {
-    nodeId: string;
-    signUnsigned: boolean;
 }
 
 export interface SignupRequest extends RequestBase {
@@ -885,16 +868,6 @@ export interface NodeSearchResponse extends ResponseBase {
     node: NodeInfo;
 }
 
-export interface NodeSigData {
-    nodeId: string;
-    data: string;
-}
-
-export interface NodeSigPushInfo extends ServerPushInfo {
-    workloadId: number;
-    listToSign: NodeSigData[];
-}
-
 export interface NotificationMessage extends ServerPushInfo {
     nodeId: string;
     fromUser: string;
@@ -922,9 +895,6 @@ export interface RePublishWebsiteResponse extends ResponseBase {
 }
 
 export interface RemovePrivilegeResponse extends ResponseBase {
-}
-
-export interface RemoveSignaturesResponse extends ResponseBase {
 }
 
 export interface RenderCalendarResponse extends ResponseBase {
@@ -996,12 +966,6 @@ export interface SetNodePositionResponse extends ResponseBase {
 }
 
 export interface SetSharingOptionResponse extends ResponseBase {
-}
-
-export interface SignNodesResponse extends ResponseBase {
-}
-
-export interface SignSubGraphResponse extends ResponseBase {
 }
 
 export interface SignupResponse extends ResponseBase {
@@ -1184,12 +1148,10 @@ export const enum ConstantInt {
 
 export const enum NodeProp {
     ENC_KEY = "sn:encKey",
-    CRYPTO_SIG = "sn:sig",
     SUBGRAPH_HASH = "sn:rSHA256",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
-    USER_PREF_PUBLIC_SIG_KEY = "sn:publicSigKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_AI_MODE = "sn:aiMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
@@ -1252,7 +1214,6 @@ export const enum NodeProp {
     AI_TEMPERATURE = "aiTemp",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
-    SIG_FAIL = "sigFail",
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
 }

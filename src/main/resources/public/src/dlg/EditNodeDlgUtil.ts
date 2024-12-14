@@ -76,22 +76,6 @@ export class EditNodeDlgUtil {
 
         this.savePropsToNode(editNode);
         this.saveAttFileNamesToNode(editNode);
-
-        /*
-        Note: if this is an encrypted node we will be signing the cipher text (encrypted string),
-        because content has already  been encrypted just above. */
-
-        if (this.dlg.getState<EditNodeDlgState>().signCheckboxVal) {
-            if (S.crypto.avail) {
-                // Note: this needs to come AFTER the 'savePropsToNode' call above because we're
-                // overriding what was possibly in there.
-                await S.crypto.signNode(editNode);
-            }
-        }
-        else {
-            S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
-        }
-
         this.dlg.resetAutoSaver();
         const ret = await S.edit.saveNode(editNode, true);
         return ret;

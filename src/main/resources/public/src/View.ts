@@ -309,8 +309,7 @@ export class View {
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node.id,
             getWords,
-            getTags,
-            signatureVerify: false
+            getTags
         });
 
         dispatch("showNodeStats", s => {
@@ -326,50 +325,6 @@ export class View {
             s.activeTab = C.TAB_STATS;
             s.statsNodeId = node.id;
         });
-    }
-
-    async signSubGraph(signUnsigned: boolean): Promise<any> {
-        if (!S.crypto.sigKeyOk()) {
-            return null;
-        }
-        const node = S.nodeUtil.getHighlightedNode();
-        await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
-            nodeId: node ? node.id : null,
-            signUnsigned
-        });
-        S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
-    }
-
-    async getNodeSignatureVerify(): Promise<any> {
-        const node = S.nodeUtil.getHighlightedNode();
-        const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
-            nodeId: node ? node.id : null,
-            getWords: false,
-            getTags: false,
-            signatureVerify: true
-        });
-
-        dispatch("showNodeStats", s => {
-            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_STATS);
-            data.props.res = res;
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_STATS);
-            s.activeTab = C.TAB_STATS;
-            s.statsNodeId = node.id;
-        });
-    }
-
-    _removeSignatures = async (): Promise<any> => {
-        const node = S.nodeUtil.getHighlightedNode();
-        const res = await S.rpcUtil.rpc<J.RemoveSignaturesRequest, J.RemoveSignaturesResponse>("removeSignatures", {
-            nodeId: node ? node.id : null
-        });
-
-        if (res) {
-            S.quanta.refresh();
-            setTimeout(() => {
-                S.util.showMessage("Finished Removing Signatures", "Signatures");
-            }, 1000);
-        }
     }
 
     async runServerCommand(command: string, parameter: string, dlgTitle: string, dlgDescription: string) {

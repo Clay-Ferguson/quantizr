@@ -73,13 +73,6 @@ export class ServerPush {
             this.nodePushed(data.nodeInfo);
         }, false);
 
-        // This is where we receive signing requests pushed from the server to be signed by the
-        // browser and pushed back up.
-        this.eventSource.addEventListener("sigPush", async (e: any) => {
-            const data: J.NodeSigPushInfo = JSON.parse(e.data);
-            await S.crypto.generateAndSendSigs(data);
-        }, false);
-
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {
             const data: J.PushPageMessage = JSON.parse(e.data);
             if (data.subType == "rssProgressText") {

@@ -137,9 +137,6 @@ export class RpcUtil {
                 }
 
                 if (this.logVerbose) {
-                    if (!S.crypto.userSignature) {
-                        console.warn("Request will have no signature.");
-                    }
                     console.log("   RET: " + S.util.prettyPrint(postData));
                 }
 
@@ -248,7 +245,6 @@ export class RpcUtil {
                 headers: {
                     "Content-Type": "application/json",
                     Bearer: S.quanta.authToken || "",
-                    Sig: S.crypto.userSignature || "",
                     callId: callId.toString()
                 },
                 mode: "cors", // no-cors, *cors, same-origin

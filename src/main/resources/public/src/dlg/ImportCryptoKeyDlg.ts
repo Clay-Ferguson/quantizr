@@ -36,9 +36,6 @@ export class ImportCryptoKeyDlg extends DialogBase {
         try {
             let success = false;
             switch (this.keyType) {
-                case "sig":
-                    success = await S.crypto.importSigKeyPair(keyText);
-                    break;
                 case "asym":
                     success = await S.crypto.importAsymKeyPair(keyText);
                     break;

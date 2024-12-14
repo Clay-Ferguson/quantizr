@@ -18,7 +18,6 @@ public class ThreadLocalsContext {
     private Boolean hasAdminAuthority;
     private ResponseBase response;
     private String reqBearerToken;
-    private String reqSig;
     private HashMap<ObjectId, SubNode> dirtyNodes;
     private Boolean parentCheckEnabled;
 
@@ -29,7 +28,6 @@ public class ThreadLocalsContext {
         hasAdminAuthority = TL.getHasAdminAuthority();
         response = TL.getResponse();
         reqBearerToken = TL.getReqBearerToken();
-        reqSig = TL.getReqSig();
         dirtyNodes = null; // Use thread's own private scope of dirty nodes.
         parentCheckEnabled = TL.getParentCheckEnabled();
     }
@@ -41,7 +39,6 @@ public class ThreadLocalsContext {
         TL.setHasAdminAuthority(hasAdminAuthority);
         TL.setResponse(response);
         TL.setReqBearerToken(reqBearerToken);
-        TL.setReqSig(reqSig);
         TL.setDirtyNodes(dirtyNodes);
         TL.setParentCheckEnabled(parentCheckEnabled);
     }

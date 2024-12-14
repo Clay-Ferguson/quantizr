@@ -71,7 +71,6 @@ export class User {
                 password: callPwd,
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util._daylightSavingsTime,
-                sigKey: S.crypto.sigKey,
                 asymEncKey: S.crypto.asymEncKey
             }, false, true);
             S.quanta.authToken = res.authToken;
@@ -127,9 +126,6 @@ export class User {
 
         S.quanta.loggingOut = true;
         S.push.close();
-
-        // Call this before calling "setUser(anon)" below becasue we want to make sure the "Sig" is 
-        // in the header and if anon we won't have a Sig
         await S.rpcUtil.rpc<J.LogoutRequest, J.LogoutResponse>("logout");
 
         // set user to know they're logged out

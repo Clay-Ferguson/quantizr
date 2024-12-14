@@ -152,9 +152,6 @@ export class MenuPanel extends Comp {
     static nodeStats = () => S.view.getNodeStats(false, false);
     static uniqueWords = () => S.view.getNodeStats(true, false);
     static uniqueTags = () => S.view.getNodeStats(false, true);
-    static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
-    static signAllSubGraph = () => S.view.signSubGraph(false);
-    static signUnsignedSubGraph = () => S.view.signSubGraph(true);
 
     override preRender(): boolean | null {
         const ast = getAs();
@@ -395,16 +392,6 @@ export class MenuPanel extends Comp {
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
             ], null));
-
-            // S.crypto.avail
-            if (S.crypto.avail) {
-                children.push(new Menu("Signature", [
-                    new MenuItem("Sign All", MenuPanel.signAllSubGraph, selNodeIsMine, null, true), //
-                    new MenuItem("Sign Unsigned", MenuPanel.signUnsignedSubGraph, selNodeIsMine, null, true), //
-                    new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
-                    new MenuItem("Remove", S.view._removeSignatures, onMainTab && selNodeIsMine, null, true), //
-                ], null));
-            }
         }
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {

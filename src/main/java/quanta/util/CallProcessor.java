@@ -30,7 +30,7 @@ public class CallProcessor extends ServiceBase {
      * `token` in the requests url, or in the session (see AppFilter.getToken() for details), or else we
      * fail with a security error.
      */
-    public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
+    public Object run(String command, boolean authBearer, RequestBase req, HttpSession httpSession,
             Supplier<Object> runner) {
         if (AppServer.isShuttingDown()) {
             throw new RuntimeEx("Server not available.");
@@ -41,16 +41,6 @@ public class CallProcessor extends ServiceBase {
 
         if (authBearer) {
             svc_user.authBearer();
-        }
-
-        /*
-         * #sig: exception to inform the user that when their key on their browser is different than
-         * expected, which CAN even happen simply from using a different browser that hasn't had the
-         * signature key imported into it. And also all the flow around how this can be encountered during
-         * login/logout needs to be tested and more well thought out.
-         */
-        if (authSig && TL.hasAdminPrivileges()) {
-            svc_crypto.authSig();
         }
 
         if (logRequests) {

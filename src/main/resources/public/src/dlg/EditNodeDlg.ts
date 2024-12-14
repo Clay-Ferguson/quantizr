@@ -35,7 +35,6 @@ export interface LS {
     selectedProps?: Set<string>;
     selectedAttachments?: Set<string>;
     speechActive?: boolean;
-    signCheckboxVal?: boolean;
     encryptCheckboxVal?: boolean;
     rerenderAfterClose?: boolean
 }
@@ -81,12 +80,10 @@ export class EditNodeDlg extends DialogBase {
         EditNodeDlg.dlg = this;
         this.utl = new EditNodeDlgUtil(this);
 
-        let signCheckboxVal = false;
         let encryptCheckboxVal = false;
         if (S.crypto.avail) {
             // set checkbox to always on if this is admin user, otherwise set based on if it's
             // already signed or not
-            signCheckboxVal = ast.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, ast.editNode);
             encryptCheckboxVal = S.props.isEncrypted(ast.editNode);
         }
 
@@ -94,7 +91,6 @@ export class EditNodeDlg extends DialogBase {
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>(),
             selectedAttachments: new Set<string>(),
-            signCheckboxVal,
             encryptCheckboxVal
         });
 
@@ -240,20 +236,6 @@ export class EditNodeDlg extends DialogBase {
 
     override getExtraTitleBarComps(): Comp[] {
         let comps: Comp[] = null;
-
-        if (this.getState<LS>().signCheckboxVal) {
-            comps = comps || [];
-
-            const sigIcon: Icon = S.render.getSignatureIcon(getAs().editNode);
-            if (sigIcon) {
-                comps.push(sigIcon);
-            }
-
-            if (getAs().isAdminUser) {
-                comps.push(new Span("<-Admin"));
-            }
-        }
-
         if (this.getState<LS>().encryptCheckboxVal) {
             comps = comps || [];
             comps.push(new Icon({
@@ -643,15 +625,6 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
         }) : null;
 
-        const signCheckBox = S.crypto.avail ? new Checkbox("Sign", null, {
-            setValue: (checked: boolean) => {
-                if (checked && S.crypto.sigKeyOk()) {
-                    this.mergeState({ signCheckboxVal: checked });
-                }
-            },
-            getValue: (): boolean => this.getState<LS>().signCheckboxVal
-        }) : null;
-
         const wordWrapCheckbox = advancedOpts.wordWrap ? new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
@@ -663,7 +636,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, ast.editNode) !== "1"
         }) : null;
 
-        return [wordWrapCheckbox, encryptCheckBox, signCheckBox];
+        return [wordWrapCheckbox, encryptCheckBox];
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {

@@ -229,7 +229,6 @@ export class Props {
             J.NodeProp.WEBSITE, //
             J.NodeProp.BIN_WEBSITE, //
             J.NodeProp.UNPUBLISHED, //
-            J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
             J.NodeProp.AI_MAX_WORDS, //

@@ -501,11 +501,6 @@ public class NodeSearchService extends ServiceBase {
         sb.append("User Shares: " + stats.userShareCount + "\n");
         sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
 
-        if (req.isSignatureVerify()) {
-            sb.append("Signed: " + stats.signedNodeCount + ", Unsigned: " + stats.unsignedNodeCount + ", FAILED SIGS: "
-                    + stats.failedSigCount);
-        }
-
         res.setStats(sb.toString());
         if (wordList != null) {
             ArrayList<String> topWords = new ArrayList<>();
@@ -554,21 +549,7 @@ public class NodeSearchService extends ServiceBase {
 
         // set to hold all hashtags in this node only
         HashSet<String> tags = null;
-
         stats.nodeCount++;
-        if (req.isSignatureVerify()) {
-            String sig = node.getStr(NodeProp.CRYPTO_SIG);
-            if (sig != null) {
-                stats.signedNodeCount++;
-                // we can add a node cache here to this line? third arg.
-                if (!svc_crypto.nodeSigVerify(node, sig)) {
-                    stats.failedSigCount++;
-                }
-            } else {
-                // log.debug("UNSIGNED: " + XString.prettyPrint(node));
-                stats.unsignedNodeCount++;
-            }
-        }
 
         // PART 1: Process sharing info
         HashMap<String, AccessControl> aclEntry = node.getAc();

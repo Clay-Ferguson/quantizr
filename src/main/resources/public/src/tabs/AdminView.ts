@@ -58,10 +58,6 @@ export class AdminView extends AppTab<any> {
                             await S.crypto.encryptionTest();
                             S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
                         }),
-                        this.settingsLink("WebCrypto Signatures", async () => {
-                            await S.crypto.signatureTest();
-                            S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
-                        }),
                         this.settingsLink("Text to Speech", async () => {
                             const tts = window.speechSynthesis;
                             // /// let voices = tts.getVoices(); /// for (let i = 0; i <

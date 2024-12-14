@@ -5,16 +5,11 @@ import quanta.rest.request.base.RequestBase;
 
 public class GetNodeStatsRequest extends RequestBase {
     private String nodeId;
-    private boolean signatureVerify;
     private boolean getWords;
     private boolean getTags;
 
     public String getNodeId() {
         return this.nodeId;
-    }
-
-    public boolean isSignatureVerify() {
-        return this.signatureVerify;
     }
 
     public boolean isGetWords() {
@@ -27,10 +22,6 @@ public class GetNodeStatsRequest extends RequestBase {
 
     public void setNodeId(final String nodeId) {
         this.nodeId = nodeId;
-    }
-
-    public void setSignatureVerify(final boolean signatureVerify) {
-        this.signatureVerify = signatureVerify;
     }
 
     public void setGetWords(final boolean getWords) {

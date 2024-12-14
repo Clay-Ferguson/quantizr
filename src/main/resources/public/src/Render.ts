@@ -14,7 +14,6 @@ import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
-import { Icon } from "./comp/core/Icon";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -826,23 +825,5 @@ export class Render {
                 onClick: S.edit._endDelete
             })
         ]);
-    }
-
-    getSignatureIcon(node: NodeInfo) {
-        const sigFail: string = S.props.getClientPropStr(J.NodeProp.SIG_FAIL, node);
-        if (sigFail) {
-            return new Icon({
-                title: "Crypto Signature Verification Failed",
-                className: "fa fa-certificate fa-lg failedSignatureIcon mediumMarginRight"
-            });
-        } else {
-            const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, node);
-            if (signed) {
-                return new Icon({
-                    title: "Crypto Signature Verified",
-                    className: "fa fa-certificate fa-lg signatureIcon mediumMarginRight"
-                });
-            }
-        }
     }
 }

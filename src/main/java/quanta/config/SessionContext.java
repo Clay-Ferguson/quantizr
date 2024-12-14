@@ -20,7 +20,6 @@ import quanta.service.UserManagerService;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionContext {
     private String command;
-    private String pubSigKeyJson;
     private boolean live = true;
 
     /*
@@ -57,14 +56,6 @@ public class SessionContext {
     private HashMap<String, Boolean> nodeExpandStates = new HashMap<>();
 
     public SessionContext() {}
-
-    public String getPubSigKeyJson() {
-        return pubSigKeyJson;
-    }
-
-    public void setPubSigKeyJson(String pubSigKeyJson) {
-        this.pubSigKeyJson = pubSigKeyJson;
-    }
 
     // Extra layer of security to invalidate this session object
     public void forceAnonymous() {

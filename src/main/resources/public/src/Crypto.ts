@@ -47,16 +47,6 @@ export class Crypto {
     // 'Public Key' AES Encryption algo.
     ASYM_ALGO = "RSA-OAEP";
 
-    SIG_ALGO = "RSASSA-PKCS1-v1_5";
-
-    // todo-2: need to vet these parameters
-    SIG_ALGO_OBJ: any = {
-        name: this.SIG_ALGO,
-        modulusLength: 2048,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: { name: "SHA-256" }
-    };
-
     // Symmetric Algo. We use GCM mode of AES because it detects data corruptions during decryption
     SYM_ALGO = "AES-GCM";
 
@@ -67,10 +57,6 @@ export class Crypto {
         hash: "SHA-256"
     };
 
-    OP_SIGN_VERIFY: KeyUsage[] = ["sign", "verify"];
-    OP_SIGN: KeyUsage[] = ["sign"];
-    OP_VERIFY: KeyUsage[] = ["verify"];
-
     OP_ENC_DEC: KeyUsage[] = ["encrypt", "decrypt"];
     OP_ENC: KeyUsage[] = ["encrypt"];
     OP_DEC: KeyUsage[] = ["decrypt"];
@@ -78,9 +64,7 @@ export class Crypto {
     vector: Uint8Array = null;
     logKeys: boolean = false;
 
-    sigKey: string = null;
     asymEncKey: string = null;
-    userSignature: string = null;
 
     // Set of nodeId to NodeInfo of all nodes pending decryption. Don't be tempted to make this a map with perhaps nodeId
     // as key becasue we can have various different NodeInfo objects that are the same node, so we need to use the NodeInfo
@@ -161,9 +145,6 @@ export class Crypto {
 
     invalidateKeys() {
         console.log("Setting crypto keys to all null");
-        this.sigKey = null;
-        this.userSignature = null;
-
         this.privateEncKey = null;
         this.publicEncKey = null;
         this.privateSigKey = null;
@@ -182,41 +163,6 @@ export class Crypto {
         await this.secureMessagingTest();
         console.log("All Encryption Tests: OK");
         return "";
-    }
-
-    async signatureTest(): Promise<string> {
-        const myData = "Data to be Signed";
-        const signature = await this.sign(null, myData);
-        console.log("Signature: " + signature);
-        const verified = await this.verify(null, signature, myData);
-        console.log("signatureTest Encryption Tests: Verified=" + verified);
-        return "";
-    }
-
-    /* Returns hex string representing the signature data */
-    async sign(privateKey: CryptoKey, data: string): Promise<string> {
-        if (!this.avail) return null;
-        if (!privateKey) {
-            privateKey = await this.getPrivateSigKey();
-        }
-
-        if (!privateKey) return null;
-
-        const sigBuf: ArrayBuffer = await crypto.subtle.sign(this.SIG_ALGO,
-            privateKey,
-            new TextEncoder().encode(data));
-
-        return S.util.buf2hex(new Uint8Array(sigBuf));
-    }
-
-    async verify(publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> {
-        if (!this.avail) return null;
-        publicKey = publicKey || await this.getPublicSigKey();
-
-        return await crypto.subtle.verify(this.SIG_ALGO,
-            publicKey,
-            S.util.hex2buf(sigBuf),
-            new TextEncoder().encode(data));
     }
 
     async secureMessagingTest() {
@@ -310,11 +256,6 @@ export class Crypto {
         return crypto.subtle.importKey("jwk", key, algos, extractable, keyUsages);
     }
 
-    async importSigKeyPair(keyJson: string): Promise<boolean> {
-        return this.importKeyPair(keyJson, this.STORE_SIGKEY, this.SIG_ALGO_OBJ,
-            this.OP_VERIFY as KeyUsage[], this.OP_SIGN as KeyUsage[]);
-    }
-
     async importAsymKeyPair(keyJson: string): Promise<boolean> {
         return this.importKeyPair(keyJson, this.STORE_ASYMKEY, this.ASYM_IMPORT_ALGO,
             this.OP_ENC as KeyUsage[], this.OP_DEC as KeyUsage[]);
@@ -349,9 +290,6 @@ export class Crypto {
         }
 
         let newAsymEncKey = null;
-        let newSigKey = null;
-        let newUserSignature = null;
-
         if (keyType === "all" || keyType === "asym") {
             newAsymEncKey = await this.initAsymetricKeys(forceUpdate);
         }
@@ -360,19 +298,10 @@ export class Crypto {
             await this.initSymetricKey(forceUpdate);
         }
 
-        if (keyType === "all" || keyType === "sig") {
-            newSigKey = await this.initSigKeys(forceUpdate);
-            newUserSignature = await S.crypto.sign(null, user);
-
-            S.crypto.sigKey = newSigKey;
-            S.crypto.userSignature = newUserSignature;
-        }
-
-        if (republish && (newAsymEncKey || newSigKey)) {
+        if (republish && newAsymEncKey) {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-2: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
-                sigKey: newSigKey
             });
 
             if (res.code == C.RESPONSE_CODE_OK) {
@@ -380,11 +309,6 @@ export class Crypto {
                 // side will still definitely have the new keys in the LocalDB already
                 if (newAsymEncKey) {
                     S.crypto.asymEncKey = newAsymEncKey;
-                }
-
-                if (newSigKey) {
-                    S.crypto.sigKey = newSigKey;
-                    S.crypto.userSignature = newUserSignature;
                 }
 
                 if (showConfirm) {
@@ -398,11 +322,6 @@ export class Crypto {
         else {
             if (newAsymEncKey) {
                 S.crypto.asymEncKey = newAsymEncKey;
-            }
-
-            if (newSigKey) {
-                S.crypto.sigKey = newSigKey;
-                S.crypto.userSignature = newUserSignature;
             }
         }
     }
@@ -476,57 +395,6 @@ export class Crypto {
             const key: CryptoKey = await this.genSymKey();
             await S.localDB.setVal(this.STORE_SYMKEY, key);
         }
-    }
-
-    /*
-    Initialize keys for sign/verify.
-    Note: a 'forceUpdate' always triggers the 'republish'
-    */
-    async initSigKeys(forceUpdate: boolean = false): Promise<string> {
-        if (!this.avail) {
-            console.log("crypto not available.");
-            return null;
-        }
-        let keyPair: CryptoKeyPair = null;
-        let pubKeyStr: string = null;
-
-        if (!forceUpdate) {
-            /* Check to see if there is a key stored, and if not force it to be created
-               val.val is the EncryptionKeyPair here.
-            */
-            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
-            if (!val) {
-                // console.log("Forcing sig key update: key not found.");
-                forceUpdate = true;
-            }
-            else {
-                // console.log("key found ok for user " + S.localDB.userName);
-                keyPair = val.v;
-            }
-        }
-
-        if (forceUpdate || !keyPair) {
-            keyPair = await crypto.subtle.generateKey(this.SIG_ALGO_OBJ, true, this.OP_SIGN_VERIFY);
-
-            await S.localDB.setVal(this.STORE_SIGKEY, keyPair);
-
-            const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            pubKeyStr = JSON.stringify(pubKeyDat);
-            console.log("Exporting key string jwk: " + pubKeyStr);
-        }
-
-        if (!keyPair) {
-            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
-            keyPair = val.v;
-            // console.log("tried to get sigkey");
-        }
-
-        if (!pubKeyStr) {
-            const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            pubKeyStr = JSON.stringify(publicKeyDat);
-        }
-
-        return pubKeyStr;
     }
 
     /*
@@ -844,74 +712,6 @@ export class Crypto {
             str += String.fromCharCode(buffer[i]);
         }
         return str;
-    }
-
-    /* This method will simply sign all the strings in 'dataToSign' and then send it up to the
-    server when done */
-    async generateAndSendSigs(dataToSign: J.NodeSigPushInfo): Promise<void> {
-
-        if (!this.sigKeyOk()) {
-            return null;
-        }
-
-        for (const dat of dataToSign.listToSign) {
-            // convert all the data to be signed into the signatures
-            dat.data = await S.crypto.sign(null, dat.data);
-        }
-
-        // then we can send this same object right back up with all signatures.
-        await S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", {
-            workloadId: dataToSign.workloadId,
-            listToSign: dataToSign.listToSign
-        });
-        console.log("Sent Signatures: " + S.util.prettyPrint(dataToSign));
-        return null;
-    }
-
-    async signNode(node: NodeInfo): Promise<void> {
-        if (!this.sigKeyOk()) {
-            return null;
-        }
-
-        if (!this.avail) {
-            throw new Error("Crypto not available.");
-        }
-
-        let path: string = node.path;
-        // convert any 'pending (p)' path to a final version of the path (no '/p/')
-        if (path.startsWith("/r/p/")) {
-            path = "/r/" + path.substring(5);
-        }
-
-        // see: #signature-format (in Java)
-        let signData: string = path + "-" + node.ownerId;
-        if (node.content) {
-            signData += "-" + node.content;
-        }
-
-        if (node.attachments) {
-            S.props.getOrderedAtts(node).forEach(att => {
-                if (att.bin) {
-                    signData += "-" + att.bin;
-                }
-                if (att.binData) {
-                    signData += "-" + att.binData;
-                }
-            });
-        }
-
-        // we need to concat the path+content
-        try {
-            const sig: string = await S.crypto.sign(null, signData);
-            // console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
-            // const verified = await S.crypto.verify(null, sig, signData);
-            // console.log("local verify: " + verified);
-            S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
-        } catch (e) {
-            S.util.logErr(e, "Failed to sign data.");
-            throw e;
-        }
-        return null;
     }
 
     cryptoWarning() {

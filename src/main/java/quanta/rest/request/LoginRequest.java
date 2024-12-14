@@ -8,7 +8,6 @@ public class LoginRequest extends RequestBase {
     private String userName;
     private String password;
     private String asymEncKey;
-    private String sigKey;
 
     /* timezone offset */
     @Nullable
@@ -28,10 +27,6 @@ public class LoginRequest extends RequestBase {
 
     public String getAsymEncKey() {
         return this.asymEncKey;
-    }
-
-    public String getSigKey() {
-        return this.sigKey;
     }
 
     @Nullable
@@ -54,10 +49,6 @@ public class LoginRequest extends RequestBase {
 
     public void setAsymEncKey(final String asymEncKey) {
         this.asymEncKey = asymEncKey;
-    }
-
-    public void setSigKey(final String sigKey) {
-        this.sigKey = sigKey;
     }
 
     public void setTzOffset(@Nullable final Integer tzOffset) {

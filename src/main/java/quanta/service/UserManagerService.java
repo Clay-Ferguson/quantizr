@@ -215,7 +215,7 @@ public class UserManagerService extends ServiceBase {
         sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
         res.setAnonUserLandingPageNode(svc_prop.getUserLandingPageNode());
         if (sc.getUserToken() != null) {
-            processLogin(res, userNodeVal.getVal(), sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
+            processLogin(res, userNodeVal.getVal(), sc.getUserName(), req.getAsymEncKey());
             log.debug("login: user=" + sc.getUserName());
         } else {
             res.setUserPreferences(getDefaultUserPreferences());
@@ -263,8 +263,7 @@ public class UserManagerService extends ServiceBase {
      * caller can optionally pass userNode if it's already available, or else it will be looked up using
      * userName
      */
-    public void processLogin(LoginResponse res, AccountNode userNode, String userName, String asymEncKey,
-            String sigKey) {
+    public void processLogin(LoginResponse res, AccountNode userNode, String userName, String asymEncKey) {
         SessionContext sc = TL.getSC();
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
@@ -288,9 +287,7 @@ public class UserManagerService extends ServiceBase {
         userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
         if (!StringUtils.isEmpty(asymEncKey))
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
-        if (!StringUtils.isEmpty(sigKey))
-            userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
-        TL.getSC().setPubSigKeyJson(null);
+
         res.setUserProfile(svc_user.getUserProfile(userNode.getIdStr(), userNode, true));
 
         @SuppressWarnings("unused")

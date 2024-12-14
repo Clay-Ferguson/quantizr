@@ -50,36 +50,6 @@ public class Convert extends ServiceBase {
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, SubNode node, boolean initNodeEdit,
             long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean getFollowers,
             boolean loadLikes, HashMap<String, AccountNode> accountNodeMap) {
-        String sig = node.getStr(NodeProp.CRYPTO_SIG);
-
-        // if we have a signature, check it.
-        boolean sigFail = false;
-        if (sig != null && !Constant.SIG_TBD.s().equals(sig) && !svc_crypto.nodeSigVerify(node, sig, accountNodeMap)) {
-            sigFail = true;
-        }
-
-        // #sig: need a config setting that specifies which path(s) are required to be signed so
-        // this can be enabled/disabled easily by admin
-        if (svc_prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
-                (sig == null || sigFail) && !TL.hasAdminPrivileges()) {
-            /*
-             * Note: This is designed to silently fail here and not show the nodes where a signature is failing
-             * and a possible database hack, however on a clean install when an anon user visits the site and
-             * the 'home' node is not yet signed we get this error with no explaination of why.
-             */
-            // This will cause an email to be sent to admin as well as show up in the Server Info panel
-            svc_crypto.getFailedSigNodes().add(node.getIdStr());
-
-            log.error("Bad Sig on Node: " + node.getIdStr());
-            /*
-             * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
-             * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
-             * of a server DB being potentially hacked so we completely refuse to display this content to the
-             * user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
-             * admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
-             */
-            return null;
-        }
 
         // if we know we should only be including admin node then throw an error if this is not an admin
         // node, but only if we ourselves are not admin.
@@ -88,7 +58,7 @@ public class Convert extends ServiceBase {
         }
 
         boolean hasChildren = svc_mongoRead.hasChildren(node);
-        List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
+        List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit);
         List<AccessControlInfo> acList = svc_acl.buildAccessControlList(sc, node);
         if (node.getOwner() == null) {
             throw new RuntimeEx("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
@@ -159,10 +129,6 @@ public class Convert extends ServiceBase {
         // allow client to know if this node is not yet saved by user
         if (node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
-        }
-
-        if (sigFail) {
-            nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.SIG_FAIL.s(), "1"));
         }
 
         if (allowInlineChildren) {
@@ -253,19 +219,12 @@ public class Convert extends ServiceBase {
         return imageSize;
     }
 
-    public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, boolean initNodeEdit,
-            boolean sigFail) {
+    public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, boolean initNodeEdit) {
         List<PropertyInfo> props = null;
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
             for (String propName : propMap.keySet()) {
                 Object propVal = propMap.get(propName);
-
-                // indicate to the client the signature is no good by not even sending the bad signature to client.
-                // But leave the SIG_TBD so the client can know it's due to be signed immediately
-                if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName) && !Constant.SIG_TBD.s().equals(propVal)) {
-                    continue;
-                }
                 // lazy create props
                 if (props == null) {
                     props = new LinkedList<>();

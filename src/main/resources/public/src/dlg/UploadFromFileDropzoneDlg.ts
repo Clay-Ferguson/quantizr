@@ -174,8 +174,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             progressBarWidth: "100%",
             url,
             headers: {
-                Bearer: S.quanta.authToken || "",
-                Sig: S.crypto.userSignature || ""
+                Bearer: S.quanta.authToken || ""
             },
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,

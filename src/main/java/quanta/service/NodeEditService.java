@@ -154,12 +154,8 @@ public class NodeEditService extends ServiceBase {
             }
         }
 
-        String sig = null;
         if (nodeInfo.getProperties() != null) {
             for (PropertyInfo property : nodeInfo.getProperties()) {
-                if (NodeProp.CRYPTO_SIG.s().equals(property.getName())) {
-                    sig = (String) property.getValue();
-                }
                 if ("[null]".equals(property.getValue())) {
                     node.delete(property.getName());
                 } else {
@@ -192,31 +188,13 @@ public class NodeEditService extends ServiceBase {
 
         // If the node being saved is currently in the pending area /p/ then we publish it now, and move
         // it out of pending.
-        boolean reSigning = false;
         String newPath = svc_mongoUtil.setPendingPathState(node.getPath(), false);
 
         // Is this a changed path?
         if (!node.getPath().equals(newPath)) {
             node.setPath(newPath);
-            /*
-             * If we had a signature on this node, and we know the path has just changed as a result of moving
-             * from 'pending path' to real path then we set the signature to TBD and the client will detect this
-             * and initiate a reSign of the node.
-             */
-            if (node.hasProp(NodeProp.CRYPTO_SIG.s())) {
-                node.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
-                reSigning = true;
-            }
         }
 
-        // for now only admin user is REQUIRED to have signed nodes.
-        if (!reSigning && svc_prop.isRequireCrypto() && TL.hasAdminPrivileges()) {
-            if (!svc_crypto.nodeSigVerify(node, sig)) {
-                // stop this node from being saved with 'clean'
-                TL.clean(node);
-                throw new RuntimeEx("Signature failed.");
-            }
-        }
         svc_openGraph.parseNode(node, true);
 
         TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
@@ -293,10 +271,6 @@ public class NodeEditService extends ServiceBase {
     public SplitNodeResponse splitNode(SplitNodeRequest req) {
         HashSet<String> nodesModified = new HashSet<String>();
         SplitNodeResponse ret = svc_mongoTrans.cm_splitNode(req, nodesModified);
-
-        if (nodesModified.size() > 0) {
-            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
-        }
         return ret;
     }
 

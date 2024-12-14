@@ -116,8 +116,6 @@ public class SystemService extends ServiceBase {
     // metadata: <boolean> // Optional, added in MongoDB 5.0.4
     // })
     public String validateDb() {
-        svc_system.systemAutoCheck();
-
         // String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
         // new Document("validate", "nodes").append("full", true).append("repair", true));
 
@@ -166,10 +164,6 @@ public class SystemService extends ServiceBase {
         sb.append("Daemons Enabed: " + String.valueOf(svc_prop.isDaemonsEnabled()) + "\n");
         sb.append("\n```\n");
 
-        if (svc_prop.isRequireCrypto()) {
-            sb.append(getFailedSigInfo());
-        }
-
         sb.append(getRedisReport());
 
         Runtime runtime = Runtime.getRuntime();
@@ -216,68 +210,6 @@ public class SystemService extends ServiceBase {
             sb.append(sc.getUserName() + " " + sc.getUserToken() + "\n");
         }
         sb.append("\n```\n");
-        return sb.toString();
-    }
-
-    boolean systemAutoCheckRunning = false;
-
-    /* Every two hours, if there's a problem send email out to admin */
-    @Scheduled(fixedDelay = 2 * DateUtil.HOUR_MILLIS)
-    public void systemAutoCheck() {
-        if (systemAutoCheckRunning || !svc_prop.isRequireCrypto())
-            return;
-
-        svc_arun.run(() -> {
-            try {
-                systemAutoCheckRunning = true;
-                svc_crypto.sigCheckScan();
-
-                if (svc_crypto.getFailedSigNodes().isEmpty() && svc_crypto.getUnsignedPublicNodes().isEmpty())
-                    return null;
-
-                String msg = getFailedSigInfo();
-
-                svc_email.sendDevEmail("Signature Node Problems", msg);
-
-                svc_crypto.getFailedSigNodes().clear();
-                svc_crypto.getUnsignedPublicNodes().clear();
-            } finally {
-                systemAutoCheckRunning = false;
-            }
-            return null;
-        });
-    }
-
-    public String getFailedSigInfo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Signature Node Problems\n");
-        sb.append("\n```\n");
-
-        if (!svc_crypto.getFailedSigNodes().isEmpty()) {
-            sb.append("\n ********** Failed Signature Node IDs ********** \n");
-            int count = 0;
-            for (String nodeId : svc_crypto.getFailedSigNodes()) {
-                sb.append("  " + nodeId + "\n");
-                if (++count > 100) {
-                    sb.append(" ...list truncated\n");
-                    break;
-                }
-            }
-        }
-
-        if (!svc_crypto.getUnsignedPublicNodes().isEmpty()) {
-            sb.append("\n ********** Unsigned Public Node IDs ********** \n");
-            int count = 0;
-            for (String nodeId : svc_crypto.getUnsignedPublicNodes()) {
-                sb.append("  " + nodeId + "\n");
-                if (++count > 100) {
-                    sb.append(" ...list truncated\n");
-                    break;
-                }
-            }
-        }
-        sb.append("\n```\n");
-
         return sb.toString();
     }
 

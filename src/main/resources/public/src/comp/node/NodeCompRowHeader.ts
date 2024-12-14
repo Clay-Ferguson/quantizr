@@ -65,11 +65,6 @@ export class NodeCompRowHeader extends Comp {
             }));
         }
 
-        const sigIcon: Icon = S.render.getSignatureIcon(this.node);
-        if (sigIcon) {
-            children.push(sigIcon);
-        }
-
         if (S.props.isEncrypted(this.node)) {
             children.push(new Icon({
                 className: "fa fa-lock fa-lg lockIcon mediumMarginRight",

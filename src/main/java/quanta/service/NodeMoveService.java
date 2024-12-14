@@ -47,16 +47,6 @@ public class NodeMoveService extends ServiceBase {
     public MoveNodesResponse moveNodes(MoveNodesRequest req) {
         HashSet<String> nodesModified = new HashSet<String>();
         MoveNodesResponse ret = svc_mongoTrans.cm_moveNodes(req, nodesModified);
-
-        /*
-         * if any nodes were signed and are now dirty signatures, we need to resign them. We allow the above
-         * code to actually update the DB, but ending up with "tbd" in the signature, for consistency,
-         * because the process of resigning the nodes is slightly elaborate and could fail so we run it all
-         * now as a separate process.
-         */
-        if (nodesModified.size() > 0) {
-            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
-        }
         return ret;
     }
 
@@ -146,10 +136,6 @@ public class NodeMoveService extends ServiceBase {
     public JoinNodesResponse cm_joinNodes(JoinNodesRequest req) {
         HashSet<String> nodesModified = new HashSet<String>();
         JoinNodesResponse ret = svc_mongoTrans.joinNodes(req, nodesModified);
-
-        if (nodesModified.size() > 0) {
-            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
-        }
         return ret;
     }
 
@@ -440,19 +426,6 @@ public class NodeMoveService extends ServiceBase {
             crit = svc_auth.addWriteSecurity(crit);
             Query query = new Query().addCriteria(crit);
             Update update = new Update().set(SubNode.PATH, newPath);
-
-            // if node is signed, we need to invalidate the signature, if not already invalidated (via tbd)
-            String nodeSig = node.getStr(NodeProp.CRYPTO_SIG);
-            if (nodeSig != null) {
-                nodesModified.add(node.getIdStr());
-
-                if (!nodeSig.equals(Constant.SIG_TBD.s())) {
-                    // Since we're about to sign nodes below, setting to "tbd" is not necessary but is safer
-                    // in case anything does go wrong, including even the user closing their browser as a thing that
-                    // could break this, but by setting to "tbd" we're safe.
-                    update = update.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
-                }
-            }
 
             bops.updateOne(query, update);
             if (++batchSize > Const.MAX_BULK_OPS) {

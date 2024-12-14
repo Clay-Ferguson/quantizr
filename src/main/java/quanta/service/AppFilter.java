@@ -34,7 +34,7 @@ import quanta.util.XString;
  * Filter for logging details of any request/response
  */
 // See AppConfiguration.java for Bean Registration
-@Component 
+@Component
 public class AppFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
@@ -83,7 +83,6 @@ public class AppFilter extends GenericFilterBean {
             }
 
             token = getToken(httpReq, session);
-            TL.setReqSig(httpReq.getHeader("Sig"));
             sc = getScFromRedis(token, sc, session);
 
             boolean newSc = false;
@@ -94,7 +93,7 @@ public class AppFilter extends GenericFilterBean {
                 newSc = true;
             }
             // else {
-            //     log.debug("Redis has SessionContext with user: " + sc.getUserName());
+            // log.debug("Redis has SessionContext with user: " + sc.getUserName());
             // }
             Date now = new Date();
             sc.setLastActiveTime(now.getTime());
@@ -164,7 +163,6 @@ public class AppFilter extends GenericFilterBean {
         // bypass locking for these
         switch (httpReq.getRequestURI()) {
             case AppController.API_PATH + "/serverPush":
-            case AppController.API_PATH + "/signNodes":
             case AppController.API_PATH + "/getOpenGraph":
             case AppController.API_PATH + "/health":
             case AppController.API_PATH + "/bin":

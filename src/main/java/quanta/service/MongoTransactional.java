@@ -23,14 +23,11 @@ import quanta.rest.request.ModifySubGraphRequest;
 import quanta.rest.request.MoveNodesRequest;
 import quanta.rest.request.PasteAttachmentsRequest;
 import quanta.rest.request.RemovePrivilegeRequest;
-import quanta.rest.request.RemoveSignaturesRequest;
 import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveUserProfileRequest;
 import quanta.rest.request.SearchAndReplaceRequest;
 import quanta.rest.request.SetNodePositionRequest;
 import quanta.rest.request.SetSharingOptionRequest;
-import quanta.rest.request.SignNodesRequest;
-import quanta.rest.request.SignSubGraphRequest;
 import quanta.rest.request.SignupRequest;
 import quanta.rest.request.SplitNodeRequest;
 import quanta.rest.request.TransferNodeRequest;
@@ -55,7 +52,6 @@ import quanta.rest.response.SaveUserProfileResponse;
 import quanta.rest.response.SearchAndReplaceResponse;
 import quanta.rest.response.SetNodePositionResponse;
 import quanta.rest.response.SetSharingOptionResponse;
-import quanta.rest.response.SignNodesResponse;
 import quanta.rest.response.SignupResponse;
 import quanta.rest.response.SplitNodeResponse;
 import quanta.rest.response.TransferNodeResponse;
@@ -110,20 +106,8 @@ public class MongoTransactional extends ServiceBase {
         return svc_attach.pasteAttachments(req);
     }
 
-    public SignNodesResponse cm_signNodes(SignNodesRequest req) {
-        return svc_crypto.signNodes(req);
-    }
-
-    public Object cm_signSubGraph(SignSubGraphRequest req) {
-        return svc_crypto.signSubGraph(req);
-    }
-
     public String deleteNodeOrphans() {
         return svc_mongoDelete.deleteNodeOrphans();
-    }
-
-    public Object cm_removeSignatures(RemoveSignaturesRequest req) {
-        return svc_crypto.removeSignatures(req);
     }
 
     public DeleteFriendResponse cm_deleteFriend(String delUserNodeId, String parentType) {

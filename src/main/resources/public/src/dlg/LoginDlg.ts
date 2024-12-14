@@ -83,7 +83,6 @@ export class LoginDlg extends DialogBase {
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util._daylightSavingsTime,
-                sigKey: S.crypto.sigKey,
                 asymEncKey: S.crypto.asymEncKey
             }, false, true);
             S.quanta.authToken = res.authToken;

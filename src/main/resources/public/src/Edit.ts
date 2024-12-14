@@ -69,14 +69,6 @@ export class Edit {
             returnInlineChildren
         });
 
-        const tbd = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, res.node);
-        // if node prop has tbd in crypto sig, then we need to sign the node
-        if (tbd == J.Constant.SIG_TBD) {
-            // this can happen when the node goes from the pending path to the final path
-            console.log("Signing node: " + res.node.id);
-            await S.crypto.signNode(res.node);
-        }
-
         S.nodeUtil.processInboundNode(res.node);
         if (res?.code != C.RESPONSE_CODE_OK) {
             return false;
