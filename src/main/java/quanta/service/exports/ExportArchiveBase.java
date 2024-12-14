@@ -147,12 +147,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
 
         Criteria criteria = null;
-        if (publishing) {
-            criteria = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
-        }
+
+        /*
+         * NOTE: I decided to query ALL nodes, and we'll throw an exception if any are not public, this way
+         * the user knows that the export failed because of a non-public node. This is better than silently
+         * skipping non-public, and we do this check in preProcessTree() method.
+         */
+        // if (publishing) {
+        // criteria = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+        // }
 
         TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, criteria, null, null);
-        figNumStart = ExportUtil.prePocessTree(treeItemsByNodeName, figNumStart, rootNode);
+
+        boolean requirePublic = publishing || contentType.equals("html");
+        figNumStart = ExportUtil.prePocessTree(treeItemsByNodeName, figNumStart, rootNode, requirePublic);
         node = rootNode.node;
         baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 

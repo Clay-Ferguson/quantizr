@@ -268,12 +268,12 @@ export class RpcUtil {
                         reject({ response: res });
                         S.util.showMessage("Content not visible to you.", "Message");
                     }
-                    else if (res.status !== C.RESPONSE_CODE_OK) {
-                        console.log("reject: res: " + S.util.prettyPrint(res) + " PATH=" + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
-                        reject({ response: res });
-                    }
                     else if (res.status === C.RESPONSE_CODE_SEE_OTHER) {
                         console.error("Message Error: " + postName + " RES: " + res);
+                        reject({ response: res });
+                    }
+                    else if (res.status !== C.RESPONSE_CODE_OK) {
+                        console.log("reject: res: " + S.util.prettyPrint(res) + " PATH=" + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                         reject({ response: res });
                     }
                     else {
@@ -336,6 +336,7 @@ export class RpcUtil {
                 //   AccountNode, and then open ConfigurAIDlg with that node. (todo-1)
                 // }
                 // else {
+                (res as any).errorShown = true;
                 S.util.showMessage(res.message, "Message");
                 // }
                 return;

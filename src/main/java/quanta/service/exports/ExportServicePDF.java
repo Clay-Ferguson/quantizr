@@ -76,7 +76,7 @@ public class ExportServicePDF extends ServiceBase {
         TreeNode rootNode = req.isThreadAsPDF() ? svc_mongoRead.getThreadGraphTree(nodeId) : //
                 svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
 
-        figNumStart = ExportUtil.prePocessTree(treeItemsByNodeName, figNumStart, rootNode);
+        figNumStart = ExportUtil.prePocessTree(treeItemsByNodeName, figNumStart, rootNode, true);
 
         SubNode exportNode = rootNode.node;
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), exportNode);

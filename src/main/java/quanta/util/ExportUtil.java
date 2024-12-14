@@ -5,7 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quanta.exception.MessageException;
 import quanta.model.TreeNode;
+import quanta.service.AclService;
 
 public class ExportUtil {
     private static Logger log = LoggerFactory.getLogger(ExportUtil.class);
@@ -54,7 +56,14 @@ public class ExportUtil {
 
     // This method is used to pre-process the tree and set the figNumStart for each node
     // and returns the current global figNumStart.
-    public static int prePocessTree(HashMap<String, TreeNode> treeItemsByNodeName, int figNumStart, TreeNode root) {
+    public static int prePocessTree(HashMap<String, TreeNode> treeItemsByNodeName, int figNumStart, TreeNode root,
+            boolean requirePublic) {
+        // if we're publishing and this node is NOT public then throw exception
+        if (requirePublic && !AclService.isPublic(root.node)) {
+            throw new MessageException(
+                    "This export checks for only public nodes. This node is not public: " + root.node.getIdStr());
+        }
+
         if (root.node.getAttachments() != null && root.node.getAttachments().size() > 0) {
             root.figNumStart = figNumStart;
             figNumStart += root.node.getAttachments().size();
@@ -73,7 +82,7 @@ public class ExportUtil {
             return figNumStart;
 
         for (TreeNode c : root.children) {
-            figNumStart = prePocessTree(treeItemsByNodeName, figNumStart, c);
+            figNumStart = prePocessTree(treeItemsByNodeName, figNumStart, c, requirePublic);
         }
         return figNumStart;
     }
