@@ -18,19 +18,18 @@ public class SaveNodeResponse extends ResponseBase {
 	public NodeInfo getNode() {
 		return this.node;
 	}
-	
+
 	public List<AccessControlInfo> getAclEntries() {
 		return this.aclEntries;
 	}
-	
+
 	public void setNode(final NodeInfo node) {
 		this.node = node;
 	}
-	
+
 	public void setAclEntries(final List<AccessControlInfo> aclEntries) {
 		this.aclEntries = aclEntries;
 	}
-	
-	public SaveNodeResponse() {
-	}
+
+	public SaveNodeResponse() {}
 }

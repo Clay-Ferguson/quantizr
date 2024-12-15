@@ -1,6 +1,5 @@
 package quanta.service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -99,6 +98,7 @@ public class NodeEditService extends ServiceBase {
         NodeInfo nodeInfo = req.getNode();
         String nodeId = nodeInfo.getId();
         SubNode node = svc_mongoRead.getNode(nodeId);
+
         svc_auth.ownerAuth(node);
         svc_mongoRead.forceCheckHasChildren(node);
 
@@ -182,7 +182,9 @@ public class NodeEditService extends ServiceBase {
         String encKey = node.getStr(NodeProp.ENC_KEY);
         if (encKey == null) {
             svc_mongoUtil.removeAllEncryptionKeys(node);
-        } else /* if node is currently encrypted */ {
+        }
+        /* if node is currently encrypted */
+        else {
             res.setAclEntries(svc_auth.getAclEntries(node));
         }
 

@@ -1490,6 +1490,10 @@ export class Edit {
 
         // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
         const cipherKey = S.props.getPropStr(J.NodeProp.ENC_KEY, node);
+        if (!cipherKey) {
+            console.warn("No cipher key found on node.");
+            return;
+        }
 
         // get this broswer's private key from browser storage
         const privateKey: CryptoKey = await S.crypto.getPrivateEncKey();

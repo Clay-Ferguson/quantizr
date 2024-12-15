@@ -71,7 +71,7 @@ export class PluginMgr {
         this.addType(ordinal++, new AIQueryType());
         this.addType(ordinal++, new CalcType());
 
-        // todo-0: not activating this yet. We may end up just using "composible System Prompts" for this instead.
+        // todo-1: not activating this yet. We may end up just using "composible System Prompts" for this instead.
         // this.addType(ordinal++, new AIAgentType());
         this.addType(ordinal++, new RepoRootType());
         this.addType(ordinal++, new AccountType());

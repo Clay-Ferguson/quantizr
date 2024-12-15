@@ -132,11 +132,21 @@ public class AclService extends ServiceBase {
         boolean success = true;
 
         for (String principal : req.getPrincipals()) {
-            principal = XString.stripIfStartsWith(principal, "@");
             if (!addPrivilege(null, node, principal, null, req.getPrivileges(), res)) {
                 success = false;
             }
         }
+
+        // If removing encryption, remove it from all the ACL entries too.
+        String encKey = node.getStr(NodeProp.ENC_KEY);
+        if (encKey == null) {
+            svc_mongoUtil.removeAllEncryptionKeys(node);
+        }
+        /* if node is currently encrypted */
+        else {
+            res.setAclEntries(svc_auth.getAclEntries(node));
+        }
+
         res.setCode(success ? 200 : HttpServletResponse.SC_EXPECTATION_FAILED);
         return res;
     }

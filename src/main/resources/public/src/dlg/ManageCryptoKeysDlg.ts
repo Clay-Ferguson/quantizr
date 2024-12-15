@@ -1,7 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Selection } from "../comp/core/Selection";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -10,37 +9,22 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./ImportCryptoKeyDlg";
 
 interface LS { // Local State
-    keyType?: string;
     keyJson?: string;
 }
 
 export class ManageCryptoKeysDlg extends DialogBase {
 
     constructor() {
-        super("Security Keys");
-        this.mergeState({ keyType: "sig" });
+        super("Encryption Keys");
     }
 
     renderDlg(): Comp[] {
         const state: LS = this.getState<LS>();
         return [
-            new Selection(null, "Select Key", [
-                { key: "sig", val: this.getKeyTypeName("sig") }, // STORE_SIGKEY
-                { key: "asym", val: this.getKeyTypeName("asym") } // STORE_ASYMKEY
-
-                // currently not sing SYMKEY for anything.
-                // { key: "sym", val: this.getKeyTypeName("sym") } // STORE_SYMKEY
-            ], "selectKeyTypeDropDown", {
-                setValue: (val: string) => {
-                    this.mergeState<LS>({ keyType: val, keyJson: "Loading..." });
-                    setTimeout(() => { this.preLoad(); }, 500);
-                },
-                getValue: (): string => this.getState<LS>().keyType
-            }),
             new ButtonBar([
                 new Button("New Key", this._newKey),
                 // new Button("Remove Key", this.removeKey),
-                state.keyType !== "sym" ? new Button("Publish Public Key", this._publishKey) : null,
+                new Button("Publish Public Key", this._publishKey),
                 new Button("Import Key", this._importKey)
             ], "mb-3"),
             new TextContent(state.keyJson, "cryptoKeyTextContent", true),
@@ -60,19 +44,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
             "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
-        const state: LS = this.getState<LS>();
-        switch (state.keyType) {
-            case "sig":
-                await S.localDB.removeByKey(S.crypto.STORE_SIGKEY);
-                break;
-            case "asym":
-                await S.localDB.removeByKey(S.crypto.STORE_ASYMKEY);
-                break;
-            case "sym":
-                await S.localDB.removeByKey(S.crypto.STORE_SYMKEY);
-                break;
-            default: break;
-        }
+        await S.localDB.removeByKey(S.crypto.STORE_ASYMKEY);
         this.preLoad();
     }
 
@@ -81,8 +53,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
             "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
-        const state: LS = this.getState<LS>();
-        await S.crypto.initKeys(S.quanta.userName, true, true, true, state.keyType);
+        await S.crypto.initKeys(S.quanta.userName, true, true, true, "asym");
         this.preLoad();
     }
 
@@ -91,44 +62,18 @@ export class ManageCryptoKeysDlg extends DialogBase {
             "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
-        const state: LS = this.getState<LS>();
-        S.crypto.initKeys(S.quanta.userName, false, true, false, state.keyType);
+        S.crypto.initKeys(S.quanta.userName, false, true, false, "asym");
     }
 
     _importKey = async (): Promise<void> => {
-        const state: LS = this.getState<LS>();
-        const dlg = new ImportCryptoKeyDlg(state.keyType, this.getKeyTypeName(state.keyType));
+        const dlg = new ImportCryptoKeyDlg("asym", "Asymmetric Key");
         await dlg.open();
         this.preLoad();
     }
 
-    getKeyTypeName(abbrev: string): string {
-        switch (abbrev) {
-            case "sig": return "Signature Key";
-            case "asym": return "Asymmetric Key";
-            case "sym": return "Symmetric Key";
-            default: break;
-        }
-    }
-
     override async preLoad(): Promise<void> {
-        const state: LS = this.getState<LS>();
         let keyJson: string = null;
-        switch (state.keyType) {
-            case "sig":
-                keyJson = await S.crypto.exportSigKeys();
-                this.mergeState<LS>({ keyJson });
-                break;
-            case "asym":
-                keyJson = await S.crypto.exportAsymKeys();
-                this.mergeState<LS>({ keyJson });
-                break;
-            case "sym":
-                keyJson = await S.crypto.exportSymKey();
-                this.mergeState<LS>({ keyJson });
-                break;
-            default:
-                this.mergeState<LS>({ keyJson: "" });
-        }
+        keyJson = await S.crypto.exportAsymKeys();
+        this.mergeState<LS>({ keyJson });
     }
 }

@@ -100,11 +100,12 @@ export class SharingDlg extends DialogBase {
 
     async shareImmediate(names: string[]) {
         const ast = getAs();
-        await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        const res = await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: ast.editNode.id,
             principals: names,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
+        await S.edit.distributeKeys(ast.editNode, res.aclEntries);
         this.reload();
     }
 

@@ -262,9 +262,9 @@ public class MongoAuth extends ServiceBase {
         }
 
         if (!TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
-            throw new ForbiddenException("Unable to save Node (expected ownerId " + TL.getSC().getUserNodeObjId().toHexString()
-                    + ") but found ownerId " + node.getIdStr() + " on the session) for node: "
-                    + XString.prettyPrint(node));
+            throw new ForbiddenException("Unable to save Node (expected ownerId "
+                    + TL.getSC().getUserNodeObjId().toHexString() + ") but found ownerId " + node.getIdStr()
+                    + " on the session) for node: " + XString.prettyPrint(node));
         }
     }
 
@@ -419,6 +419,11 @@ public class MongoAuth extends ServiceBase {
         return false;
     }
 
+    /*
+     * todo-0: this appears to return "rd,wr" as a single string in the privileges.privilegeName,
+     * whereas the SubNode itself I think stores them as separate strings in the AccessControl.prvs
+     * field. This is a bit confusing.
+     */
     public List<AccessControlInfo> getAclEntries(SubNode node) {
         HashMap<String, AccessControl> aclMap = node.getAc();
         if (aclMap == null) {
@@ -448,6 +453,7 @@ public class MongoAuth extends ServiceBase {
         }
         // else we need the user name
         else {
+            // todo-0: this can be AccountNode here?
             SubNode principalNode = svc_mongoRead.getNodeAP(principalId);
             if (principalNode == null) {
                 return null;

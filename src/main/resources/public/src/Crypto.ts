@@ -126,7 +126,7 @@ export class Crypto {
             // check if we have decrypted this content before
             clearText = this.clearTextCache.get(node.content);
 
-            // if now, then decrypt it now
+            // if not, then decrypt it now
             if (!clearText) {
                 const cipherText = node.content.substring(J.Constant.ENC_TAG.length);
                 const cipherKey = S.props.getCryptoKey(node);
@@ -558,7 +558,7 @@ export class Crypto {
     }
 
     /**
-     * Does a simplel symmetric encryption of the data using the given key, and if the key
+     * Does a simple symmetric encryption of the data using the given key, and if the key
      * is not provided assumes the STORE_SYMKEY
      */
     async symEncryptString(key: CryptoKey, data: string): Promise<string> {

@@ -627,6 +627,7 @@ export interface AddFriendResponse extends ResponseBase {
 export interface AddPrivilegeResponse extends ResponseBase {
     principalPublicKey: string;
     principalNodeId: string;
+    aclEntries: AccessControlInfo[];
 }
 
 export interface AskSubGraphResponse extends ResponseBase {
