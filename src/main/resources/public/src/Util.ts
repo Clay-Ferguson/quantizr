@@ -782,8 +782,9 @@ export class Util {
                 await S.nav._messagesToFromMe();
             }
             else {
+                const nodeId = S.quanta.config.initialNodeId || "/r/public/home";
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
-                    nodeId: S.quanta.config.initialNodeId || "/r/public/home",
+                    nodeId,
                     upLevel: false,
                     siblingOffset: 0,
                     forceRenderParent: false,

@@ -65,9 +65,10 @@ export class NodeCompRowHeader extends Comp {
             }));
         }
 
-        if (S.props.isEncrypted(this.node)) {
+        if (S.props.getPropStr(J.NodeProp.ENC_KEY, this.node)) {
+            const lockIcon = S.props.isEncrypted(this.node) ? "fa-lock" : "fa-lock-open";
             children.push(new Icon({
-                className: "fa fa-lock fa-lg lockIcon mediumMarginRight",
+                className: `fa ${lockIcon} fa-lg lockIcon mediumMarginRight`,
                 title: "Node is Encrypted."
             }));
         }
