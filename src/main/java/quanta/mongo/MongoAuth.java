@@ -94,7 +94,7 @@ public class MongoAuth extends ServiceBase {
                     name = PrincipalName.PUBLIC.s();
                 } //
                 else if (userNodeId != null) {
-                    SubNode accountNode = svc_mongoRead.getNode(userNodeId);
+                    AccountNode accountNode = svc_user.getAccountNode(userNodeId);
                     if (accountNode != null) {
                         name = accountNode.getStr(NodeProp.USER);
                     }
@@ -420,7 +420,7 @@ public class MongoAuth extends ServiceBase {
     }
 
     /*
-     * todo-0: this appears to return "rd,wr" as a single string in the privileges.privilegeName,
+     * todo-1: this appears to return "rd,wr" as a single string in the privileges.privilegeName,
      * whereas the SubNode itself I think stores them as separate strings in the AccessControl.prvs
      * field. This is a bit confusing.
      */
@@ -453,8 +453,7 @@ public class MongoAuth extends ServiceBase {
         }
         // else we need the user name
         else {
-            // todo-0: this can be AccountNode here?
-            SubNode principalNode = svc_mongoRead.getNodeAP(principalId);
+            AccountNode principalNode = svc_user.getAccountNodeAP(principalId);
             if (principalNode == null) {
                 return null;
             }

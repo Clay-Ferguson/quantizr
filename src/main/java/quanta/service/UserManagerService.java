@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -423,7 +424,7 @@ public class UserManagerService extends ServiceBase {
 
             // we disallow dupliate emails via this codepath, but by design we do allow them in the DB, and
             // even all the 'test accounts' will normally have the same email address.
-            SubNode ownerNode = svc_mongoRead.getUserNodeByPropAP(NodeProp.EMAIL.s(), email, false);
+            AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), email, false);
             if (ownerNode != null) {
                 res.setEmailError("Email already in use.");
                 res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -540,7 +541,7 @@ public class UserManagerService extends ServiceBase {
 
     public Tran addCreditByEmail(String emailAdr, BigDecimal amount, Long timestamp) {
         PgTranMgr.ensureTran();
-        SubNode ownerNode = svc_mongoRead.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
+        AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
         if (ownerNode != null) {
             String userName = ownerNode.getStr(NodeProp.USER);
             Tran tran = addCreditInternal(ownerNode.getIdStr(), amount, timestamp);
@@ -1245,6 +1246,28 @@ public class UserManagerService extends ServiceBase {
             svc_email.sendDevEmail("Feedback from " + TL.getSC().getUserName(), req.getMessage());
             return res;
         });
+    }
+
+    public AccountNode getUserNodeByPropAP(String propName, String propVal, boolean caseSensitive) {
+        return svc_arun.run(() -> getUserNodeByProp(propName, propVal, caseSensitive));
+    }
+
+    public AccountNode getUserNodeByProp(String propName, String propVal, boolean caseSensitive) {
+        if (StringUtils.isEmpty(propVal))
+            return null;
+        // Otherwise for ordinary users root is based off their username
+        Query q = new Query();
+        Criteria crit;
+        if (caseSensitive) {
+            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName).is(propVal);
+        } else {
+            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName)
+                    .regex("^" + Pattern.quote(propVal) + "$", "i");
+        }
+
+        crit = svc_auth.addReadSecurity(crit);
+        q.addCriteria(crit);
+        return svc_ops.findOne(q, AccountNode.class);
     }
 
     public AccountNode getAccountNode(String id) {

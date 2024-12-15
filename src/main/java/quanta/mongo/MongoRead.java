@@ -991,28 +991,6 @@ public class MongoRead extends ServiceBase {
         return node;
     }
 
-    public SubNode getUserNodeByPropAP(String propName, String propVal, boolean caseSensitive) {
-        return svc_arun.run(() -> getUserNodeByProp(propName, propVal, caseSensitive));
-    }
-
-    public SubNode getUserNodeByProp(String propName, String propVal, boolean caseSensitive) {
-        if (StringUtils.isEmpty(propVal))
-            return null;
-        // Otherwise for ordinary users root is based off their username
-        Query q = new Query();
-        Criteria crit;
-        if (caseSensitive) {
-            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName).is(propVal);
-        } else {
-            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName)
-                    .regex("^" + Pattern.quote(propVal) + "$", "i");
-        }
-
-        crit = svc_auth.addReadSecurity(crit);
-        q.addCriteria(crit);
-        return svc_ops.findOne(q);
-    }
-
     /*
      * Finds and returns the first node matching userName and type as direct child of 'node', or null if
      * not existing. Caller can pass userNode if its available, or else userName will be used to look it

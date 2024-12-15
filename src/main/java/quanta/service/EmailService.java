@@ -18,6 +18,7 @@ import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoRepository;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.util.LimitedInputStream;
 import quanta.util.TL;
@@ -206,9 +207,9 @@ public class EmailService extends ServiceBase {
     /**
      * Sends an email notification to the user associated with 'toUserNode' (a person's account root
      * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
-     * shared node in the email.
+     * shared node in the email. (Not currently usee)
      */
-    public void sendEmailNotification(String fromUserName, SubNode toUserNode, SubNode node) {
+    public void sendEmailNotification(String fromUserName, AccountNode toUserNode, SubNode node) {
         String email = toUserNode.getStr(NodeProp.EMAIL);
         String toUserName = toUserNode.getStr(NodeProp.USER);
         String nodeUrl = svc_snUtil.getFriendlyNodeUrl(node);
