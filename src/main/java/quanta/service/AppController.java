@@ -669,10 +669,8 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/addCredit", method = RequestMethod.POST)
     @ResponseBody
     public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
-        return null;
-        // todo-0: implement this
-        // return svc_callProc.run("addCredit", true, req, session,
-        // () -> svc_pgTrans.cm_addCredit(req.getUserId(), req.getAmount()));
+        return svc_callProc.run("addCredit", true, req, session,
+                () -> svc_user.cm_addCredit(req.getUserId(), req.getAmount()));
     }
 
     @RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)

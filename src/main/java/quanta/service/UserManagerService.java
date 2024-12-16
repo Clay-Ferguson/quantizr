@@ -1,8 +1,6 @@
 package quanta.service;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,7 +33,6 @@ import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
-import quanta.model.client.AIModel;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -75,10 +72,8 @@ import quanta.rest.response.SaveUserPreferencesResponse;
 import quanta.rest.response.SaveUserProfileResponse;
 import quanta.rest.response.SendFeedbackResponse;
 import quanta.rest.response.SignupResponse;
-import quanta.rest.response.UpdateAccountInfo;
 import quanta.util.Const;
 import quanta.util.DateUtil;
-import quanta.util.ExUtil;
 import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -723,6 +718,23 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
+    public AddCreditResponse cm_addCredit(String userId, BigDecimal amount) {
+        AddCreditResponse res = new AddCreditResponse();
+        AccountNode userNode = svc_user.getAccountNodeAP(userId);
+        if (userNode != null) {
+            BigDecimal balance = null;
+            try {
+                balance = new BigDecimal(userNode.getStr(NodeProp.USER_AI_BALANCE));
+            } catch (Exception e) {
+                balance = new BigDecimal(0);
+            }
+            balance = balance.add(amount);
+            userNode.set(NodeProp.USER_AI_BALANCE, balance.toString());
+            res.setBalance(balance);
+        }
+        return res;
+    }
+
     /*
      * Abbreviated flag means don't get ALL the info for the user but an abbreviated object that's
      * faster to generate like what we need when someone is logging in and the login endpoint needs
@@ -755,8 +767,12 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
 
-                BigDecimal balance = new BigDecimal(1); // svc_tranRepo.getBalByMongoId(userNode.getIdStr()); // todo-0:
-                                                        // implement
+                BigDecimal balance = null;
+                try {
+                    balance = new BigDecimal(userNode.getStr(NodeProp.USER_AI_BALANCE));
+                } catch (Exception e) {
+                    balance = new BigDecimal(0);
+                }
                 userProfile.setBalance(balance);
 
                 Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);

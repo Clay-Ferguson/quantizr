@@ -59,6 +59,7 @@ public enum NodeProp {
     USER_SEACH_DEFINITIONS("sn:searchDefs", SearchDefinition.class), //
     USER_BLOCK_WORDS("sn:blockWords", null), //
     USER_RECENT_TYPES("sn:recentTypes", null), //
+    USER_AI_BALANCE("sn:aiBalance", null), // funds available for AI services
 
     PWD_HASH("sn:pwdHash", null), //
     VOTE("vote", null), //

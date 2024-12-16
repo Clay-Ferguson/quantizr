@@ -23,7 +23,6 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
-import quanta.model.UserPreferences;
 import quanta.model.client.AIModel;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;

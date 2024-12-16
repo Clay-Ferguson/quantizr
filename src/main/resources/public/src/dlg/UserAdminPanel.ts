@@ -26,6 +26,7 @@ export class UserAdminPanel extends Comp {
                     await dlg.open();
                     if (dlg.amtState.getValue()) {
                         const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
+                        // This is how the Admin user can add credit to another user's account
                         const ret = await S.rpcUtil.rpc<J.AddCreditRequest, J.AddCreditResponse>("addCredit", {
                             userId: userProfile.userNodeId,
                             amount: dlg.amtState.getValue()
@@ -37,6 +38,7 @@ export class UserAdminPanel extends Comp {
                         }
                     }
                 }),
+                // todo-0: I think this is no longer needed (deleteUserTransactions can be removed)
                 new Button("Clear Transactions", async () => {
                     const dlg = new ConfirmDlg("Are you sure you want to clear transactions?", "Clear Transactions");
                     await dlg.open();

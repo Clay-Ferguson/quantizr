@@ -95,6 +95,7 @@ export class ServerPush {
             // new InboxNotifyDlg("Your Inbox has updates!").open();
         }, false);
 
+        /* This is a push from the server that tells us to update the user's account info */
         this.eventSource.addEventListener("accountInfo", async (e: any) => {
             dispatch("AccountInfoPushUpdate", s => {
                 const data: J.UpdateAccountInfo = JSON.parse(e.data);

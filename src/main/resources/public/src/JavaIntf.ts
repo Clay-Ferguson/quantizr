@@ -1175,6 +1175,7 @@ export const enum NodeProp {
     USER_SEACH_DEFINITIONS = "sn:searchDefs",
     USER_BLOCK_WORDS = "sn:blockWords",
     USER_RECENT_TYPES = "sn:recentTypes",
+    USER_AI_BALANCE = "sn:aiBalance",
     PWD_HASH = "sn:pwdHash",
     VOTE = "vote",
     FILE_SYNC_LINK = "fs:link",
