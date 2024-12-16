@@ -12,19 +12,14 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import jakarta.persistence.EntityManagerFactory;
-import quanta.postgres.PgTranMgr;
 import quanta.service.AppController;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
@@ -146,15 +141,6 @@ public class AppConfiguration implements WebMvcConfigurer {
         viewResolver.setTemplateEngine(templateEngine());
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
-    }
-
-    // *** WARNING *** DO NOT rename this to anything other than "transactionManager" or it will not
-    // work. This is some strange aspect of String I don't understand, but it seems true.
-    @Bean(name = "transactionManager")
-    @Primary
-    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-        // We return our wrapper class here, which will wrap the actual JpaTransactionManager
-        return new PgTranMgr(new JpaTransactionManager(entityManagerFactory));
     }
 
     // DO NOT DELETE (keep for future reference)

@@ -296,7 +296,8 @@ public class SystemService extends ServiceBase {
                 break;
             case "transactionsReport":
                 res.setFormat("html");
-                res.getMessages().add(new InfoMessage(svc_financialReport.getReport(), null));
+                // todo-0: implement (should show status to admin of all user account financials)
+                // res.getMessages().add(new InfoMessage(svc_financialReport.getReport(), null));
                 break;
             case "clearPerformanceData":
                 res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));

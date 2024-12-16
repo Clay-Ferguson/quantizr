@@ -35,9 +35,6 @@ mkdir -p ./log
 mkdir -p ./config
 mkdir -p ./data
 
-sudo mkdir -p ${PGADMIN_DATA}
-sudo chown -R 5050:5050 ${PGADMIN_DATA}
-
 # Use this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
 # WARNING: This will expose your passwords in the output file!

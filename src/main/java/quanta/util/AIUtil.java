@@ -1,8 +1,6 @@
 package quanta.util;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,18 +16,13 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NodeType;
 import quanta.model.client.SystemConfig;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
-import quanta.postgres.PgTranMgr;
-import quanta.postgres.table.Tran;
-import quanta.postgres.table.UserAccount;
 import quanta.rest.request.AskSubGraphRequest;
 import quanta.rest.request.GenerateBookByAIRequest;
 import quanta.rest.response.AskSubGraphResponse;
 import quanta.rest.response.GenerateBookByAIResponse;
-import quanta.service.UserManagerService;
 import quanta.util.val.Val;
 
 @Component
@@ -254,47 +247,50 @@ public class AIUtil extends ServiceBase {
     }
 
     public BigDecimal getBalance(AccountNode userNode) {
-        BigDecimal balance = null;
-        String userName = userNode.getStr(NodeProp.USER);
-        if (svc_pgTrans.initialGrant(userNode.getIdStr(), userName)) {
-            balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
-        } else {
-            balance = svc_tranRepo.getBalByMongoId(TL.getSC().getUserNodeObjId().toHexString());
-            if (balance == null) {
-                throw new RuntimeEx("Sorry, you have no more credit.");
-            }
-            int comparisonResult = balance.compareTo(BigDecimal.ZERO);
-            if (comparisonResult <= 0) {
-                throw new RuntimeEx("Sorry, you have no more credit.");
-            }
-        }
+        BigDecimal balance = BigDecimal.ONE;
+        // String userName = userNode.getStr(NodeProp.USER);
+        // todo-0: implement this
+        // if (svc_pgTrans.initialGrant(userNode.getIdStr(), userName)) {
+        // balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
+        // } else {
+        // balance = svc_tranRepo.getBalByMongoId(TL.getSC().getUserNodeObjId().toHexString());
+        // if (balance == null) {
+        // throw new RuntimeEx("Sorry, you have no more credit.");
+        // }
+        // int comparisonResult = balance.compareTo(BigDecimal.ZERO);
+        // if (comparisonResult <= 0) {
+        // throw new RuntimeEx("Sorry, you have no more credit.");
+        // }
+        // }
         return balance;
     }
 
     // updates the user's credit, and returns new balance
     public BigDecimal updateUserCredit(AccountNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
-        PgTranMgr.ensureTran();
-        UserAccount user = svc_userRepo.findByMongoId(userNode.getIdStr());
+        // todo-0: implement this
+        // PgTranMgr.ensureTran();
+        // UserAccount user = svc_userRepo.findByMongoId(userNode.getIdStr());
 
-        if (user == null) {
-            // creating here should never be necessary but we do it anyway
-            log.debug("User not found, creating...");
-            String userName = userNode.getStr(NodeProp.USER);
-            user = svc_userRepo.save(new UserAccount(userNode.getIdStr(), userName));
-            svc_userRepo.flush();
-        }
+        // if (user == null) {
+        // // creating here should never be necessary but we do it anyway
+        // log.debug("User not found, creating...");
+        // String userName = userNode.getStr(NodeProp.USER);
+        // user = svc_userRepo.save(new UserAccount(userNode.getIdStr(), userName));
+        // svc_userRepo.flush();
+        // }
 
-        Tran debit = new Tran();
-        debit.setAmt(cost);
-        debit.setTransType("D");
-        debit.setTs(Timestamp.from(Instant.now()));
-        debit.setDescCode(serviceCode);
-        debit.setUserAccount(user);
+        // Tran debit = new Tran();
+        // debit.setAmt(cost);
+        // debit.setTransType("D");
+        // debit.setTs(Timestamp.from(Instant.now()));
+        // debit.setDescCode(serviceCode);
+        // debit.setUserAccount(user);
 
-        // Eventually we will add to this information about the gpt request too. Entire Q & A
-        // debit.setDetail(mapper.valueToTree(res));
-        svc_tranRepo.save(debit);
-        return curBal.subtract(cost);
+        // // Eventually we will add to this information about the gpt request too. Entire Q & A
+        // // debit.setDetail(mapper.valueToTree(res));
+        // svc_tranRepo.save(debit);
+        // return curBal.subtract(cost);
+        return BigDecimal.ONE;
     }
 
     public AskSubGraphResponse cm_askSubGraph(AskSubGraphRequest req) {

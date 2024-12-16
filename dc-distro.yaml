@@ -73,55 +73,11 @@ services:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
-    pgdb-distro:
-        image: postgres:16
-        deploy:
-            # Don't want a restart policy for DEV!
-            # restart_policy:
-            #     condition: on-failure
-            #     # delay is time between restart attempts
-            #     delay: 10s
-            #     max_attempts: 4
-            #     window: 120s
-            replicas: 1
-        hostname: pgdb-host-distro
-        networks:
-            bridge:
-                aliases:
-                    - pgdb-host-distro
-        environment:
-            - POSTGRES_USER=quanta-pg
-            - POSTGRES_PASSWORD=${pgPassword}
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
-        # expose to host machine for management.
-        ports:
-            - '5432:5432'
-        volumes: 
-            - '${POSTGRES_DATA}:/var/lib/postgresql/data'
-
-    pgadmin4:
-        image: dpage/pgadmin4:latest
-        depends_on:
-            - pgdb-distro
-        environment:
-            PGADMIN_DEFAULT_EMAIL: ${pgAdminEmail}
-            PGADMIN_DEFAULT_PASSWORD: ${pgAdminPassword}
-        ports:
-            - '${PGADMIN_PORT}:80'
-        networks:
-            - bridge
-        volumes:
-            - '${PGADMIN_DATA}/:/var/lib/pgadmin'
-
     quanta-distro:
         image: ${DOCKER_IMAGE}
         depends_on:
             - redis-distro
             - mongo-distro
-            - pgdb-distro
             - qai-distro
         build: 
             context: ${PRJROOT}
@@ -178,10 +134,6 @@ services:
             REDIS_HOST: "${REDIS_HOST}"
             REDIS_PORT: "${REDIS_PORT}"
             REDIS_PASSWORD: "${REDIS_PASSWORD}"
-
-            SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-distro:5432/quanta-pg"
-            SPRING_DATASOURCE_USERNAME: "quanta-pg"
-            SPRING_DATASOURCE_PASSWORD: ${pgPassword}
 
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"

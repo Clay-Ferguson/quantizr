@@ -121,8 +121,10 @@ public class AIService extends ServiceBase {
             throw new RuntimeEx(aiRes.getError());
         }
 
-        BigDecimal cost = new BigDecimal(aiRes.getCost());
-        userCredit.setVal(svc_pgTrans.updateUserCredit(userNode, balance, cost, svc.getCostCode()));
+        // BigDecimal cost = new BigDecimal(aiRes.getCost());
+        // todo-0: implement this
+        userCredit.setVal(new BigDecimal(1));
+
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
     }

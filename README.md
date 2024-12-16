@@ -33,7 +33,6 @@ These nodes are the main elements of the app, similar to Facebook Posts or Twitt
 * TypeScript, ReactJS, Vite (front end)
 * Spring Boot 3 FAT Jar with embedded Tomcat (back end)
 * MongoDB as primary data store
-* PostgreSQL for financial transaction storage
 * Redis for Session Data
 * Python Microservice using LangChain for AI functions
 * Deployment: Docker Compose (Swarm Mode)

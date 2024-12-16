@@ -54,9 +54,6 @@ export MONGO_KEY=/mongo-key-distro
 
 export INIT_REPLICA=${DEPLOY_TARGET}/init-replica-distro.sh
 
-export POSTGRES_DATA=${DEPLOY_TARGET}/postgres
-export PGADMIN_DATA=${DEPLOY_TARGET}/pgadmin
-
 export DOCKER_DOWN_DELAY=30s
 export DOCKER_UP_DELAY=30s
 
@@ -79,10 +76,6 @@ export devEmail=somebody@someserver.com
 # this password is used in the yaml as the root password for MongoDB.
 export adminPassword=password
 export mongoPassword=password
-export pgPassword=password
-
-export pgAdminPassword=password
-export pgAdminEmail=user@domain.com
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.

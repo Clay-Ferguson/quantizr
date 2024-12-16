@@ -47,9 +47,6 @@ import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
-import quanta.postgres.PgTranMgr;
-import quanta.postgres.table.Tran;
-import quanta.postgres.table.UserAccount;
 import quanta.rest.request.BlockUserRequest;
 import quanta.rest.request.ChangePasswordRequest;
 import quanta.rest.request.CloseAccountRequest;
@@ -504,89 +501,51 @@ public class UserManagerService extends ServiceBase {
     }
 
     public boolean initialGrant(String userId, String userName) {
-        PgTranMgr.ensureTran();
-        UserAccount user = svc_userRepo.findByMongoId(userId);
-        if (user == null) {
-            log.debug("UserAccount not found, creating...");
-            user = svc_userRepo.saveAndFlush(new UserAccount(userId, userName));
-
-            Tran credit = new Tran();
-            credit.setAmt(new BigDecimal(INITIAL_GRANT_AMOUNT));
-            credit.setTransType("C");
-            credit.setDescCode("NEW");
-            credit.setTs(Timestamp.from(Instant.now()));
-            credit.setUserAccount(user);
-            svc_tranRepo.saveAndFlush(credit);
-            return true;
-        }
-        return false;
+        // todo-0: add to user account INITIAL_GRANT_AMOUNT of funds
+        return true;
     }
 
+    // todo-0: this is probably no longer needed.
     public DeleteUserTransactionsResponse cm_deleteUserTransactions(DeleteUserTransactionsRequest req) {
         TL.requireAdmin();
         DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
-        svc_userRepo.deleteByMongoId(req.getUserId());
+        // svc_userRepo.deleteByMongoId(req.getUserId()); // todo-0: implement this
         return res;
     }
 
     public AddCreditResponse addCredit(String userId, BigDecimal amount) {
-        PgTranMgr.ensureTran();
         TL.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
-        addCreditInternal(userId, amount, null);
+        // addCreditInternal(userId, amount, null); // todo-0: implement this
         // calculate new balance and return it.
-        res.setBalance(svc_tranRepo.getBalByMongoId(userId));
+        // res.setBalance(svc_tranRepo.getBalByMongoId(userId)); // todo-0: implement this
         return res;
     }
 
-    public Tran addCreditByEmail(String emailAdr, BigDecimal amount, Long timestamp) {
-        PgTranMgr.ensureTran();
-        AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
-        if (ownerNode != null) {
-            String userName = ownerNode.getStr(NodeProp.USER);
-            Tran tran = addCreditInternal(ownerNode.getIdStr(), amount, timestamp);
+    // public Tran addCreditByEmail(String emailAdr, BigDecimal amount, Long timestamp) {
+    // PgTranMgr.ensureTran();
+    // AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
+    // if (ownerNode != null) {
+    // String userName = ownerNode.getStr(NodeProp.USER);
+    // Tran tran = addCreditInternal(ownerNode.getIdStr(), amount, timestamp);
 
-            if (!StringUtils.isEmpty(svc_prop.getMailHost())) {
-                String brandingAppName = svc_prop.getConfigText("brandingAppName");
-                String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment of $"
-                        + amount + " has been applied to your account.";
+    // if (!StringUtils.isEmpty(svc_prop.getMailHost())) {
+    // String brandingAppName = svc_prop.getConfigText("brandingAppName");
+    // String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment
+    // of $"
+    // + amount + " has been applied to your account.";
 
-                svc_email.queueEmail(emailAdr, brandingAppName + " - Account Credit", content);
-            }
+    // svc_email.queueEmail(emailAdr, brandingAppName + " - Account Credit", content);
+    // }
 
-            BigDecimal credit = svc_tranRepo.getBalByMongoId(ownerNode.getIdStr());
-            UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
-            svc_push.pushInfo(TL.getSC(), pushInfo);
-            return tran;
-        } else {
-            throw new RuntimeEx("addCreditByEmail: user not found for email: " + emailAdr);
-        }
-    }
-
-    public Tran addCreditInternal(String userId, BigDecimal amount, Long timestamp) {
-        UserAccount user = svc_userRepo.findByMongoId(userId);
-        if (user == null) {
-            log.debug("User not found, creating...");
-            AccountNode userNode = svc_user.getAccountNode(userId);
-            String userName = userNode.getStr(NodeProp.USER);
-            user = new UserAccount(userId, userName);
-            user = svc_userRepo.save(user);
-            svc_userRepo.flush();
-        }
-
-        Tran credit = new Tran();
-        credit.setAmt(amount);
-        credit.setTransType("C");
-        credit.setDescCode("PAY");
-        if (timestamp == null) {
-            credit.setTs(Timestamp.from(Instant.now()));
-        } else {
-            credit.setTs(new Timestamp(timestamp));
-        }
-        credit.setUserAccount(user);
-        credit = svc_tranRepo.save(credit);
-        return credit;
-    }
+    // BigDecimal credit = svc_tranRepo.getBalByMongoId(ownerNode.getIdStr());
+    // UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
+    // svc_push.pushInfo(TL.getSC(), pushInfo);
+    // return tran;
+    // } else {
+    // throw new RuntimeEx("addCreditByEmail: user not found for email: " + emailAdr);
+    // }
+    // }
 
     public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {
         SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
@@ -796,7 +755,8 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
 
-                BigDecimal balance = svc_tranRepo.getBalByMongoId(userNode.getIdStr());
+                BigDecimal balance = new BigDecimal(1); // svc_tranRepo.getBalByMongoId(userNode.getIdStr()); // todo-0:
+                                                        // implement
                 userProfile.setBalance(balance);
 
                 Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);

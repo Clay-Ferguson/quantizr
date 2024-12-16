@@ -96,55 +96,11 @@ services:
         #     timeout: 5s
         #     retries: 30
 
-    pgdb-dev:
-        image: postgres:16
-        deploy:
-            # Don't want a restart policy for DEV!
-            # restart_policy:
-            #     condition: on-failure
-            #     # delay is time between restart attempts
-            #     delay: 10s
-            #     max_attempts: 4
-            #     window: 120s
-            replicas: 1
-        hostname: pgdb-host-dev
-        networks:
-            bridge:
-                aliases:
-                    - pgdb-host-dev
-        environment:
-            - POSTGRES_USER=quanta-pg
-            - POSTGRES_PASSWORD=${pgPassword}
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
-        # expose to host machine for management.
-        ports:
-            - '${POSTGRES_PORT}:5432'
-        volumes: 
-            - '${POSTGRES_DATA}:/var/lib/postgresql/data'
-
-    pgadmin4:
-        image: dpage/pgadmin4:latest
-        depends_on:
-            - pgdb-dev
-        environment:
-            PGADMIN_DEFAULT_EMAIL: ${pgAdminEmail}
-            PGADMIN_DEFAULT_PASSWORD: ${pgAdminPassword}
-        ports:
-            - '${PGADMIN_PORT}:80'
-        networks:
-            - bridge
-        volumes:
-            - '${PGADMIN_DATA}:/var/lib/pgadmin'
-
     quanta-dev:
         image: ${DOCKER_IMAGE}
         depends_on:
             - redis-dev
             - mongo-dev
-            - pgdb-dev
             - qai-dev
         build: 
             context: ${PRJROOT}
@@ -237,10 +193,6 @@ services:
             REDIS_HOST: "${REDIS_HOST}"
             REDIS_PORT: "${REDIS_PORT}"
             REDIS_PASSWORD: "${REDIS_PASSWORD}"
-
-            SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-dev:5432/quanta-pg"
-            SPRING_DATASOURCE_USERNAME: "quanta-pg"
-            SPRING_DATASOURCE_PASSWORD: ${pgPassword}
 
             # Instead of setting this flag, it may be easier to just click 
             # "Run JUnit Tests" in the Admin Console of the app

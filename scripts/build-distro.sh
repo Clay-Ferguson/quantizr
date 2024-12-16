@@ -50,7 +50,6 @@ rsync -av --exclude='__pycache__' ${PRJROOT}/QuantaAgent/   ${DEPLOY_TARGET}/Qua
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/mongo-backup.sh               ${DEPLOY_TARGET}
-cp ${SCRIPTS}/postgres-backup.sh            ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv-run-distro.sh          ${DEPLOY_TARGET}
@@ -61,7 +60,6 @@ mkdir -p ${DEPLOY_TARGET}/tmp
 mkdir -p ${DEPLOY_TARGET}/log
 mkdir -p ${DEPLOY_TARGET}/config
 mkdir -p ${MONGO_DATA}
-mkdir -p ${POSTGRES_DATA}
 
 # Default app configs
 # We only need this if overriding/extending the default properties

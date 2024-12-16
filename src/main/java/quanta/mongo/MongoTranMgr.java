@@ -29,7 +29,7 @@ public class MongoTranMgr implements PlatformTransactionManager {
 
     public static void ensureTran() {
         if (!isTranActive()) {
-            throw new RuntimeEx("This method must be called within a PostgreSQL transaction.");
+            throw new RuntimeEx("This method must be called within a transaction.");
         }
     }
 
