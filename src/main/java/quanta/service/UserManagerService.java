@@ -720,9 +720,23 @@ public class UserManagerService extends ServiceBase {
 
     public AddCreditResponse cm_addCredit(String userId, BigDecimal amount) {
         AddCreditResponse res = new AddCreditResponse();
+        TL.requireAdmin();
+
+        BigDecimal balance = adjustCredit(userId, amount);
+        if (balance != null) {
+            res.setBalance(balance);
+        }
+        return res;
+    }
+
+    public BigDecimal adjustCredit(String userId, BigDecimal amount) {
+        // if amount greater than 0, add credit, else subtract
+        if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            TL.requireAdmin();
+        }
+        BigDecimal balance = null;
         AccountNode userNode = svc_user.getAccountNodeAP(userId);
         if (userNode != null) {
-            BigDecimal balance = null;
             try {
                 balance = new BigDecimal(userNode.getStr(NodeProp.USER_AI_BALANCE));
             } catch (Exception e) {
@@ -730,9 +744,8 @@ public class UserManagerService extends ServiceBase {
             }
             balance = balance.add(amount);
             userNode.set(NodeProp.USER_AI_BALANCE, balance.toString());
-            res.setBalance(balance);
         }
-        return res;
+        return balance;
     }
 
     /*

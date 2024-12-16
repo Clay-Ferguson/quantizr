@@ -20,6 +20,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.SystemConfig;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
+import quanta.rest.response.UpdateAccountInfo;
 import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -34,8 +35,7 @@ import quanta.util.val.Val;
 public class AIService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc,
-            Val<BigDecimal> userCredit) {
+    public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc) {
         if (svc == null) {
             throw new RuntimeEx("No AI service selected.");
         }
@@ -121,10 +121,9 @@ public class AIService extends ServiceBase {
             throw new RuntimeEx(aiRes.getError());
         }
 
-        // BigDecimal cost = new BigDecimal(aiRes.getCost());
-        // todo-0: implement this
-        userCredit.setVal(new BigDecimal(1));
-
+        String userId = TL.getSC().getUserNodeId();
+        BigDecimal newBalance = svc_user.adjustCredit(userId, new BigDecimal(-aiRes.getCost()));
+        svc_push.pushInfo(TL.getSC(), new UpdateAccountInfo(userId, newBalance));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
     }

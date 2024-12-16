@@ -322,11 +322,9 @@ public class MongoCreate extends ServiceBase {
                 if (svc == null) {
                     throw new NoAgentException();
                 }
-                Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
                 aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,
-                        system, svc, userCredit);
+                        system, svc);
 
-                res.setGptCredit(userCredit.getVal());
                 typeToCreate = NodeType.AI_ANSWER.s();
             }
         }

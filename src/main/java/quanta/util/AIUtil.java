@@ -332,8 +332,6 @@ public class AIUtil extends ServiceBase {
 
         sb.append("Here is my question:\n");
         sb.append(req.getQuestion());
-
-        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
 
         SystemConfig system = new SystemConfig();
@@ -346,10 +344,8 @@ public class AIUtil extends ServiceBase {
             throw new NoAgentException();
         }
 
-        aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc, userCredit);
-
+        aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc);
         if (aiResponse != null) {
-            res.setGptCredit(userCredit.getVal());
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
         } else {
             throw new RuntimeEx("No answer from AI");
@@ -414,7 +410,6 @@ public class AIUtil extends ServiceBase {
         SubNode parentNode = svc_mongoRead.getNode(req.getNodeId());
         svc_auth.ownerAuth(parentNode);
 
-        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         SystemConfig system = new SystemConfig();
         AIModel svc = null;
@@ -491,9 +486,7 @@ public class AIUtil extends ServiceBase {
                         ```
                         """;
 
-        aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc, userCredit);
-        res.setGptCredit(userCredit.getVal());
-
+        aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc);
 
         String answer = aiResponse.getContent();
         log.debug("Generated book content: " + answer);

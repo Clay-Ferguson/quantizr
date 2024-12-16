@@ -632,7 +632,6 @@ export interface AddPrivilegeResponse extends ResponseBase {
 
 export interface AskSubGraphResponse extends ResponseBase {
     answer: string;
-    gptCredit: number;
 }
 
 export interface BlockUserResponse extends ResponseBase {
@@ -659,7 +658,6 @@ export interface CopySharingResponse extends ResponseBase {
 export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
     encrypt: boolean;
-    gptCredit: number;
     nodeChanges: NodeChanges;
 }
 
@@ -713,7 +711,6 @@ export interface FriendInfo {
 
 export interface GenerateBookByAIResponse extends ResponseBase {
     nodeId: string;
-    gptCredit: number;
 }
 
 export interface GetBookmarksResponse extends ResponseBase {
