@@ -37,21 +37,6 @@ export class UserAdminPanel extends Comp {
                             this.dlg.mergeState<UserProfileDlgState>({ userProfile });
                         }
                     }
-                }),
-                // todo-0: I think this is no longer needed (deleteUserTransactions can be removed)
-                new Button("Clear Transactions", async () => {
-                    const dlg = new ConfirmDlg("Are you sure you want to clear transactions?", "Clear Transactions");
-                    await dlg.open();
-                    if (!dlg.yes) {
-                        return;
-                    }
-                    const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
-                    await S.rpcUtil.rpc<J.DeleteUserTransactionsRequest, J.DeleteUserTransactionsResponse>("deleteUserTransactions", {
-                        userId: userProfile.userNodeId
-                    });
-
-                    userProfile.balance = 0;
-                    this.dlg.mergeState<UserProfileDlgState>({ userProfile });
                 })
             ])
         ];

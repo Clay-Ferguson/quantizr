@@ -98,12 +98,7 @@ public class StripeController extends ServiceBase implements ErrorController {
                                         svc_email.sendDevEmail("Stripe Payment Recieved from " + _customerEmail,
                                                 "Amount: " + dollarsAmount + "\nLog File: " + logFile);
                                         try {
-                                            // todo-0: This is broken per removal of RDB
-                                            // Tran tran = svc_pgTrans.addCreditByEmail(_customerEmail, dollarsAmount,
-                                            // now); // checkoutSession.getCreated());
-                                            // FileUtils.writeFile(logFile,
-                                            // "\n\nSTATUS: Saved OK: \n\nTran Record ID=" + tran.getId(), true);
-                                            throw new RuntimeException("not implemented");
+                                            svc_user.addCreditByEmail(_customerEmail, dollarsAmount, now); // checkoutSession.getCreated());
                                         } catch (Exception e) {
                                             log.error("Error adding credit to user", e);
                                             FileUtils.writeFile(logFile,

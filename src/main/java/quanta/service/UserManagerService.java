@@ -47,7 +47,6 @@ import quanta.mongo.model.SubNode;
 import quanta.rest.request.BlockUserRequest;
 import quanta.rest.request.ChangePasswordRequest;
 import quanta.rest.request.CloseAccountRequest;
-import quanta.rest.request.DeleteUserTransactionsRequest;
 import quanta.rest.request.GetPeopleRequest;
 import quanta.rest.request.GetUserAccountInfoRequest;
 import quanta.rest.request.GetUserProfileRequest;
@@ -61,7 +60,6 @@ import quanta.rest.response.AddCreditResponse;
 import quanta.rest.response.BlockUserResponse;
 import quanta.rest.response.ChangePasswordResponse;
 import quanta.rest.response.CloseAccountResponse;
-import quanta.rest.response.DeleteUserTransactionsResponse;
 import quanta.rest.response.FriendInfo;
 import quanta.rest.response.GetPeopleResponse;
 import quanta.rest.response.GetUserAccountInfoResponse;
@@ -495,52 +493,22 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public boolean initialGrant(String userId, String userName) {
-        // todo-0: add to user account INITIAL_GRANT_AMOUNT of funds
-        return true;
+    public void addCreditByEmail(String emailAdr, BigDecimal amount, long timestamp) {
+        AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
+        if (ownerNode != null) {
+            String userName = ownerNode.getStr(NodeProp.USER);
+
+            // add the credit to the user's account
+            adjustCredit(ownerNode.getIdStr(), amount);
+
+            if (!StringUtils.isEmpty(svc_prop.getMailHost())) {
+                String brandingAppName = svc_prop.getConfigText("brandingAppName");
+                String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment of $"
+                        + amount + " has been applied to your account.";
+                svc_email.queueEmail(emailAdr, brandingAppName + " - Account Credit", content);
+            }
+        }
     }
-
-    // todo-0: this is probably no longer needed.
-    public DeleteUserTransactionsResponse cm_deleteUserTransactions(DeleteUserTransactionsRequest req) {
-        TL.requireAdmin();
-        DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
-        // svc_userRepo.deleteByMongoId(req.getUserId()); // todo-0: implement this
-        return res;
-    }
-
-    public AddCreditResponse addCredit(String userId, BigDecimal amount) {
-        TL.requireAdmin();
-        AddCreditResponse res = new AddCreditResponse();
-        // addCreditInternal(userId, amount, null); // todo-0: implement this
-        // calculate new balance and return it.
-        // res.setBalance(svc_tranRepo.getBalByMongoId(userId)); // todo-0: implement this
-        return res;
-    }
-
-    // public Tran addCreditByEmail(String emailAdr, BigDecimal amount, Long timestamp) {
-    // PgTranMgr.ensureTran();
-    // AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
-    // if (ownerNode != null) {
-    // String userName = ownerNode.getStr(NodeProp.USER);
-    // Tran tran = addCreditInternal(ownerNode.getIdStr(), amount, timestamp);
-
-    // if (!StringUtils.isEmpty(svc_prop.getMailHost())) {
-    // String brandingAppName = svc_prop.getConfigText("brandingAppName");
-    // String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment
-    // of $"
-    // + amount + " has been applied to your account.";
-
-    // svc_email.queueEmail(emailAdr, brandingAppName + " - Account Credit", content);
-    // }
-
-    // BigDecimal credit = svc_tranRepo.getBalByMongoId(ownerNode.getIdStr());
-    // UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
-    // svc_push.pushInfo(TL.getSC(), pushInfo);
-    // return tran;
-    // } else {
-    // throw new RuntimeEx("addCreditByEmail: user not found for email: " + emailAdr);
-    // }
-    // }
 
     public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {
         SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
@@ -744,6 +712,19 @@ public class UserManagerService extends ServiceBase {
             }
             balance = balance.add(amount);
             userNode.set(NodeProp.USER_AI_BALANCE, balance.toString());
+        }
+        return balance;
+    }
+
+    public BigDecimal getUserBalance(String userId) {
+        BigDecimal balance = new BigDecimal(0);
+        AccountNode userNode = svc_user.getAccountNodeAP(userId);
+        if (userNode != null) {
+            try {
+                balance = new BigDecimal(userNode.getStr(NodeProp.USER_AI_BALANCE));
+            } catch (Exception e) {
+                // ignore
+            }
         }
         return balance;
     }

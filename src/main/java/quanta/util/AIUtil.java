@@ -246,53 +246,6 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public BigDecimal getBalance(AccountNode userNode) {
-        BigDecimal balance = BigDecimal.ONE;
-        // String userName = userNode.getStr(NodeProp.USER);
-        // todo-0: implement this
-        // if (svc_pgTrans.initialGrant(userNode.getIdStr(), userName)) {
-        // balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
-        // } else {
-        // balance = svc_tranRepo.getBalByMongoId(TL.getSC().getUserNodeObjId().toHexString());
-        // if (balance == null) {
-        // throw new RuntimeEx("Sorry, you have no more credit.");
-        // }
-        // int comparisonResult = balance.compareTo(BigDecimal.ZERO);
-        // if (comparisonResult <= 0) {
-        // throw new RuntimeEx("Sorry, you have no more credit.");
-        // }
-        // }
-        return balance;
-    }
-
-    // updates the user's credit, and returns new balance
-    public BigDecimal updateUserCredit(AccountNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
-        // todo-0: implement this
-        // PgTranMgr.ensureTran();
-        // UserAccount user = svc_userRepo.findByMongoId(userNode.getIdStr());
-
-        // if (user == null) {
-        // // creating here should never be necessary but we do it anyway
-        // log.debug("User not found, creating...");
-        // String userName = userNode.getStr(NodeProp.USER);
-        // user = svc_userRepo.save(new UserAccount(userNode.getIdStr(), userName));
-        // svc_userRepo.flush();
-        // }
-
-        // Tran debit = new Tran();
-        // debit.setAmt(cost);
-        // debit.setTransType("D");
-        // debit.setTs(Timestamp.from(Instant.now()));
-        // debit.setDescCode(serviceCode);
-        // debit.setUserAccount(user);
-
-        // // Eventually we will add to this information about the gpt request too. Entire Q & A
-        // // debit.setDetail(mapper.valueToTree(res));
-        // svc_tranRepo.save(debit);
-        // return curBal.subtract(cost);
-        return BigDecimal.ONE;
-    }
-
     public AskSubGraphResponse cm_askSubGraph(AskSubGraphRequest req) {
         AskSubGraphResponse res = new AskSubGraphResponse();
 

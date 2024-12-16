@@ -39,7 +39,6 @@ import quanta.rest.request.DeleteFriendRequest;
 import quanta.rest.request.DeleteNodesRequest;
 import quanta.rest.request.DeletePropertyRequest;
 import quanta.rest.request.DeleteSearchDefRequest;
-import quanta.rest.request.DeleteUserTransactionsRequest;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.request.GenerateBookByAIRequest;
 import quanta.rest.request.GetBookmarksRequest;
@@ -657,13 +656,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
         return svc_callProc.run("saveUserPreferences", true, req, session, () -> svc_user.cm_saveUserPreferences(req));
-    }
-
-    @RequestMapping(value = API_PATH + "/deleteUserTransactions", method = RequestMethod.POST)
-    @ResponseBody
-    public Object deleteUserTransactions(@RequestBody DeleteUserTransactionsRequest req, HttpSession session) {
-        return svc_callProc.run("deleteUserTransactions", true, req, session,
-                () -> svc_user.cm_deleteUserTransactions(req));
     }
 
     @RequestMapping(value = API_PATH + "/addCredit", method = RequestMethod.POST)

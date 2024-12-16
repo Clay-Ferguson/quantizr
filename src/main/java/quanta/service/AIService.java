@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.exception.MessageException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AIMessage;
 import quanta.model.AIRequest;
@@ -43,7 +44,10 @@ public class AIService extends ServiceBase {
         if (userNode == null) {
             throw new RuntimeEx("Unknown user.");
         }
-        BigDecimal balance = svc_aiUtil.getBalance(userNode);
+        BigDecimal balance = svc_user.getUserBalance(userNode.getIdStr());
+        if (balance.compareTo(new BigDecimal(0)) <= 0) {
+            throw new MessageException("Insufficient funds. Please add more credits to your account.");
+        }
 
         // this will hold all the prior chat history
         List<AIMessage> messages = new ArrayList<>();
