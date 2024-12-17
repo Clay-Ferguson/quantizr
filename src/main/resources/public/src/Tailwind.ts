@@ -37,9 +37,8 @@ export class Tailwind {
         }
     }
 
-    // static alertPrimary = "bg-blue-600 text-white px-4 py-3 rounded relative border border-blue-400";
     static alertSecondary = "bg-slate-700 text-white p-4 mb-4 rounded-lg border border-gray-200";
-    static alertPrimary = this.alertSecondary; // todo-0: change eventually
+    static alertPrimary = "bg-sky-800 text-white p-4 mb-4 rounded-lg border border-gray-200";
     static alertDanger = "bg-red-400 border border-red-400 text-white px-4 py-3 rounded relative";
     static alertInfo = "bg-blue-400 border border-blue-200 text-white px-4 py-3 rounded relative"
 
