@@ -411,7 +411,7 @@ export class MenuPanel extends Comp {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu("RDF Triple", [
+            children.push(new Menu("RDF", [
                 new MenuItem("Set Subject (Source)", S.edit._setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
                 new MenuItem("Create Triple (Target)", S.edit._linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //
                 new MenuItemSeparator(), //

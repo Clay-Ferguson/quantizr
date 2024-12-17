@@ -35,8 +35,10 @@ export class AdminView extends AppTab<any> {
                         // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                         this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
                         this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
-                        this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)) //
                     ]),
+                    new Div(null, { className: settingsCol }, [
+                        this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)) //
+                    ])
                 ], horzClass),
 
                 this.sectionTitle("Testing"),

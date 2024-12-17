@@ -1394,6 +1394,7 @@ public class UserManagerService extends ServiceBase {
             adminNode.set(NodeProp.USER_PREF_AI_MODE, Constant.AI_MODE_CHAT.s());
             adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
             adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
+            adminNode.set(NodeProp.USER_AI_BALANCE, "10");
             svc_mongoUpdate.save(adminNode);
         }
         usersNode =
