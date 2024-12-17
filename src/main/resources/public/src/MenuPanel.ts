@@ -321,6 +321,10 @@ export class MenuPanel extends Comp {
                     new MenuItem("To Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
                     new MenuItem("To Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
                 ], null, null, null, true),
+                new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
+                new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
+                new MenuItem("Undo Copy/Cut", S.edit._undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
+                new MenuItemSeparator(), //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
@@ -329,10 +333,6 @@ export class MenuPanel extends Comp {
                 new MenuItem("Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Split", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Join", S.edit._joinNodes, onMainTab && selNodeIsMine, null, true), //
-                new MenuItemSeparator(), //
-                new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
-                new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
-                new MenuItem("Undo Copy/Cut", S.edit._undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
                 new MenuItem("Clear Selections", S.nodeUtil._clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
             ], null));
         }
