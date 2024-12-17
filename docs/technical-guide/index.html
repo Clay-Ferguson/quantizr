@@ -92,6 +92,28 @@
      cursor: pointer;
  }
 
+ .img-upper-right {
+     float: right;
+     margin-left: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-left {
+     float: left;
+     margin-right: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-center {
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
  table {
      border-collapse: collapse;
      border-spacing: 2px;
@@ -203,7 +225,7 @@
             color: white;
             overflow-y: auto;
             border-right: 2px solid gray;
-            padding-right: 1rem;
+            padding: 0 1rem 3rem 0;
         }
 
         /* Media query for narrow screens */
@@ -253,8 +275,6 @@
 <li><a href="#66a3d374fabccc0b658df148">QAI</a></li>
 <li><a href="#66a3d2f4fabccc0b658df143">Redis</a></li>
 <li><a href="#66a3d31dfabccc0b658df144">MongoDB</a></li>
-<li><a href="#66a3d332fabccc0b658df145">PostgreSQL</a></li>
-<li><a href="#66a3d344fabccc0b658df146">PGAdmin</a></li>
 </ul>
 </li>
 </ul>
@@ -294,13 +314,6 @@
 <li><a href="#65751de15aaa050f4ddd7ff1">Note 2</a></li>
 </ul>
 </li>
-<li><a href="#65751e225aaa050f4ddd8006">PostgreSQL</a>
-<ul>
-<li><a href="#65751e315aaa050f4ddd800c">PostgreSQL Notes</a></li>
-<li><a href="#65751e565aaa050f4ddd8016">Postgre Docker Compose</a></li>
-<li><a href="#65751e565aaa050f4ddd8017">Postgre Admin</a></li>
-</ul>
-</li>
 <li><a href="#667b2cea74a4837b5459032c">AI Notes</a>
 <ul>
 <li><a href="#667b2cfa74a4837b5459032d">About AI Cloud Services HTTP Calls</a></li>
@@ -325,14 +338,13 @@
 <li><a href="#66f46c8b4fdbaa627978f218">Front End</a></li>
 </ul>
 </li>
+<li><a href="#6740fc5aaa53a12b272f5961">Random Notes</a></li>
 </ul>
 
         </nav>
         <main class="content">
             <div id='65751c3f5aaa050f4ddd7f9e'></div>
 <h1 id="quanta-technical-docs"><a href="#quanta-technical-docs" id="quanta-technical-docs">Quanta Technical Docs</a></h1>
-<div id='65751c505aaa050f4ddd7fab'></div>
-<p>This section is for software developers who will be working on the Quanta code and/or admins deploying an instance of the platform.</p>
 <div id='66a3d2a4fabccc0b658df141'></div>
 <h1 id="high-level-architecture"><a href="#high-level-architecture" id="high-level-architecture">High Level Architecture</a></h1>
 <div id='66a3d2c5fabccc0b658df142'></div>
@@ -350,12 +362,6 @@
 <div id='66a3d31dfabccc0b658df144'></div>
 <h3 id="mongodb"><a href="#mongodb" id="mongodb">MongoDB</a></h3>
 <p>This runs the MongoDB instance, which is the main database for the app. There is only one <code>collection</code> in the DB which represents a <code>Tree Structure</code>. There is a <code>path</code> property in each Document (i.e. DB Record) which is how the tree structure is stored.</p>
-<div id='66a3d332fabccc0b658df145'></div>
-<h3 id="postgresql"><a href="#postgresql" id="postgresql">PostgreSQL</a></h3>
-<p>Runs the PosgreSQL database instance. For any information that doesn't make sense to store on the main <code>Tree</code> structure of the app, we will put in the PostgreSQL database. Currently the only information stored in Postgre is the financial transactions related to the payments and usage of AI services. To allow users to consume as much AI usage from the AI Cloud providers (OpenAI, Anthropic, Perplexity, etc) as they want, in an unlimited way, we let users add credit into their own accounts, and then they're essentially spending their own money as they use the AI. The Quanta website doesn't charge extra for memberships or services.</p>
-<div id='66a3d344fabccc0b658df146'></div>
-<h3 id="pgadmin"><a href="#pgadmin" id="pgadmin">PGAdmin</a></h3>
-<p>This is a service that runs the PG Admin console where the PostgreSQL database can be managed from just for admin purposes.</p>
 <div id='667c81718591a5359fcbe42c'></div>
 <h1 id="app-flow"><a href="#app-flow" id="app-flow">App Flow</a></h1>
 <div id='667c818c8591a5359fcbe42d'></div>
@@ -486,33 +492,6 @@ sudo chmod +x /usr/local/bin/docker-compose
 <div id='65751de15aaa050f4ddd7ff1'></div>
 <h2 id="note-2"><a href="#note-2" id="note-2">Note 2</a></h2>
 <p>You'll see in the setenv file that the data folder for MongoDB defaults to <code>${DEPLOY_TARGET}/data</code> unless you change it, and when you run the app for the first time that folder must exist, but can be empty. If empty a new database will be created there. Any time you want to wipe the database and start over you can simply delete the files in this data folder (with the server offline) and then restart the server.</p>
-<div id='65751e225aaa050f4ddd8006'></div>
-<h1 id="postgresql-1"><a href="#postgresql-1" id="postgresql-1">PostgreSQL</a></h1>
-<div id='65751e315aaa050f4ddd800c'></div>
-<h2 id="postgresql-notes"><a href="#postgresql-notes" id="postgresql-notes">PostgreSQL Notes</a></h2>
-<p>Postgres is used to hold a transactions table which keeps track of financial expendatures for all users. The only kinds of expendatures currently are the OpenAI API charges, for access to ChatGPT</p>
-<div id='65751e565aaa050f4ddd8016'></div>
-<h2 id="postgre-docker-compose"><a href="#postgre-docker-compose" id="postgre-docker-compose">Postgre Docker Compose</a></h2>
-<p>See the docker compose yaml files for configuration details. Our Postgre instance, like every other component of Quanta is using docker.</p>
-<div id='65751e565aaa050f4ddd8017'></div>
-<h2 id="postgre-admin"><a href="#postgre-admin" id="postgre-admin">Postgre Admin</a></h2>
-<p>In the docker compose yaml file, there is a section (currently commented out) which can run pgAdmin4 right from inside the docker instance, but it's commented because there's currently no justification for consuming expensive server-side resources for managing the database when we can manage it remotely instead.</p>
-<p>The way we do this is by running a separate dockerized pgAdmin4 instance from some other machine like this:</p>
-<pre><code class="language-sh">docker pull dpage/pgadmin4
-docker run -p 5051:80 \
-    -e 'PGADMIN_DEFAULT_EMAIL=user@none.com' \
-    -e 'PGADMIN_DEFAULT_PASSWORD=password' \
-    -d dpage/pgadmin4
-</code></pre>
-<p>Makes server avilable at <a href="http://127.0.0.1:5051">http://127.0.0.1:5051</a></p>
-<p>Or by running an instance of pgAdmin from inside a docker compose file locally as is done in <code>dc-dev.yaml</code>, which is the development config.</p>
-<p>Assuming we're using the config in <code>dc-dev.yaml', once you login to the admin console at</code><a href="http://127.0.0.1:5051`">http://127.0.0.1:5051`</a>, here are the connection settings that can get you connected DB instance of the Quanta app and it's Postgres instance, and in the case below it's the dev db:</p>
-<pre><code class="language-txt">Connection Host: pgdb-host-dev
-Port: 5432 &lt;--- note this is the internal port not the one in our env var
-Maintenance Database: postgres
-User: quanta-pg
-Password: see: ${pgPassword}
-</code></pre>
 <div id='667b2cea74a4837b5459032c'></div>
 <h1 id="ai-notes"><a href="#ai-notes" id="ai-notes">AI Notes</a></h1>
 <div id='667b2cfa74a4837b5459032d'></div>
@@ -673,6 +652,11 @@ docker service scale quanta-stack-distro_quanta-distro=1
 <p>To upgrade a specific package</p>
 <pre><code class="language-sh">yarn upgrade [package-name]
 </code></pre>
+<div id='6740fc5aaa53a12b272f5961'></div>
+<h1 id="random-notes"><a href="#random-notes" id="random-notes">Random Notes</a></h1>
+<div id='6740fc64aa53a12b272f5962'></div>
+<p>URL used to download Prism files:</p>
+<p><a href="https://prismjs.com/download.html#themes=prism-okaidia&amp;languages=markup+css+clike+javascript+bash+c+cpp+go+java+json+kotlin+latex+python+jsx+tsx+sql+typescript+typoscript+yaml&amp;plugins=autolinker+show-language+highlight-keywords+toolbar+copy-to-clipboard">https://prismjs.com/download.html#themes=prism-okaidia&amp;languages=markup+css+clike+javascript+bash+c+cpp+go+java+json+kotlin+latex+python+jsx+tsx+sql+typescript+typoscript+yaml&amp;plugins=autolinker+show-language+highlight-keywords+toolbar+copy-to-clipboard</a></p>
 
         </main>
     </div>
