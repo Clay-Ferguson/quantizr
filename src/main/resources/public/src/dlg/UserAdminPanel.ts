@@ -5,7 +5,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { AddCreditDlg } from "./AddCreditDlg";
-import { ConfirmDlg } from "./ConfirmDlg";
 import { UserProfileDlg, LS as UserProfileDlgState } from "./UserProfileDlg";
 
 export class UserAdminPanel extends Comp {

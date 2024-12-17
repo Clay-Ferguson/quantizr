@@ -243,10 +243,6 @@ export interface DeleteSearchDefRequest extends RequestBase {
     searchDefName: string;
 }
 
-export interface DeleteUserTransactionsRequest extends RequestBase {
-    userId: string;
-}
-
 export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
@@ -677,9 +673,6 @@ export interface DeletePropertyResponse extends ResponseBase {
 
 export interface DeleteSearchDefResponse extends ResponseBase {
     searchDefs: SearchDefinition[];
-}
-
-export interface DeleteUserTransactionsResponse extends ResponseBase {
 }
 
 export interface ExportResponse extends ResponseBase {

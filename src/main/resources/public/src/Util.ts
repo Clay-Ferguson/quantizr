@@ -947,12 +947,16 @@ export class Util {
         const lines = content.split("\n");
 
         if (lines) {
+            let inCodeBlock = false;
             lines.forEach(line => {
+                if (line.startsWith("```")) {
+                    inCodeBlock = !inCodeBlock;
+                }
                 /* we allow lines to be an XHTML tag only for the purpose of being able to wrap subsections of AI prompts
                  in ways that we can discuss and identify via the AI/LLM, but we don't low any more use of HTML than this, and
                  we do this special case of only a single tag on a single line, so that we don't break Latex rendering, because
                  in latex we want to leave the angle brackets in place. */
-                if (line.startsWith("<") && line.endsWith(">")) {
+                if (!inCodeBlock && line.startsWith("<") && line.endsWith(">")) {
                     line = line.replace(/</g, "&lt;");
                     line = line.replace(/>/g, "&gt;");
                 }
