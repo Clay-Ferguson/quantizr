@@ -59,11 +59,10 @@ class Utils:
     def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:
         """Returns True if the file's extension should be included in the scan."""
         _, ext = os.path.splitext(file_name)
-        # if first character of ext is '.' then remove it
-        if ext[0] == '.':
-            ext = ext[1:]
+        # if ext is empty return false
+        if not ext:
+            return False
         ret = ext.lower() in ext_set
-        # print(f"Checking: [{file_name}] - [{ext}] = {ret}")
         return ret
     
     @staticmethod
