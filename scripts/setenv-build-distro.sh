@@ -48,6 +48,8 @@ export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 
 export QAI_HOST=qai-host-distro
 export QAI_PORT=8187
+export QAI_PROJECTS=/home/clay/ferguson/Quantizr/src
+export QAI_DATA=/home/clay/ai-agent-temp
 
 # we dump this key into the root, and will not use it, but in real environments you'll put this key in some secure location
 export MONGO_KEY=/mongo-key-distro

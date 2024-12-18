@@ -245,6 +245,9 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
 
+            qaiProjectsFolder: '${QAI_PROJECTS}'
+            qaiDataFolder: '${QAI_DATA}'
+
             mail.port: ""
             mail.user: "postmaster@quantizr.com" 
             mail.password: "${emailPassword}" 
@@ -289,8 +292,8 @@ services:
             - '${QAI_PORT}:${QAI_PORT}'
         volumes:
             # todo-2: make these two folders visible in Agent Config panel of app (but read-only)
-            - /home/clay/ferguson/Quantizr/src:/projects
-            - /home/clay/ai-agent-temp:/data
+            - '${QAI_PROJECTS}:/projects'
+            - '${QAI_DATA}:/data'
             - '${QUANTA_BASE}/log:/log'
 
 networks:

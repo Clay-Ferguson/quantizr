@@ -182,6 +182,9 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
 
+            qaiProjectsFolder: '${QAI_PROJECTS}'
+            qaiDataFolder: '${QAI_DATA}'
+
             # mail.port: ""
             # mail.user: "your mail user" 
             # mail.password: "${emailPassword}" 
@@ -227,8 +230,8 @@ services:
             - '${QAI_PORT}:${QAI_PORT}'
 
         volumes:
-            - /home/clay/ferguson/Quantizr/src:/projects
-            - /home/clay/quanta-localhost-dev/log:/data
+            - '${QAI_PROJECTS}:/projects'
+            - '${QAI_DATA}:/data'
             - "${DEPLOY_TARGET}/log:/log"
 networks:
     bridge:

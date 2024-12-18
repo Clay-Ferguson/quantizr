@@ -78,6 +78,7 @@ service: {req.service}
 codingAgent: {req.codingAgent}
 foldersToInclude: {req.foldersToInclude}
 foldersToExclude: {req.foldersToExclude}
+agentFileExtensions: {req.agentFileExtensions}
 maxTokens: {req.maxTokens}
 temperature: {req.temperature}
 """)
@@ -110,6 +111,7 @@ temperature: {req.temperature}
                 folders_to_include = req.foldersToInclude.split("\n")
                 folders_to_include = list(filter(None, folders_to_include))
 
+            folders_to_exclude = []
             if req.foldersToExclude:
                 folders_to_exclude = req.foldersToExclude.split("\n")
                 folders_to_exclude = list(filter(None, folders_to_exclude))

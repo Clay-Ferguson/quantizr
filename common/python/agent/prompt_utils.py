@@ -60,13 +60,19 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"Folder {folder_path} does not exist")
                 
+        # print("Walking folder_path: {folder_path}")
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
+                # print(f"Checking file: {filename}")
                 short_dir: str = dirpath[source_folder_len :]
                 
+                hasIncludedFileExtension = Utils.has_included_file_extension(ext_set, filename)
+                # print(f"    ext pass: {hasIncludedFileExtension}")
+                allowFolder = Utils.allow_folder(folders_to_include, folders_to_exclude, short_dir)
+                # print(f"    folder pass: {allowFolder}")
+                
                 # Check the file extension
-                if (Utils.has_included_file_extension(ext_set, filename) 
-                    and Utils.allow_folder(folders_to_include,folders_to_exclude, short_dir)):
+                if (hasIncludedFileExtension and allowFolder):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder

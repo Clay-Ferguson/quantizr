@@ -42,6 +42,8 @@ export MONGO_PORT=27017
 
 export QAI_HOST=qai-host-distro
 export QAI_PORT=8187
+export QAI_PROJECTS=/home/clay/ferguson/Quantizr/src
+export QAI_DATA=/home/clay/ai-agent-temp
 
 export DOCKER_DOWN_DELAY=30s
 export DOCKER_UP_DELAY=30s

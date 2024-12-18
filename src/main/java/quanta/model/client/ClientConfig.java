@@ -21,6 +21,8 @@ public class ClientConfig {
     private String login;
     private String paymentLink;
     private boolean aiAgentEnabled;
+    private String qaiProjectsFolder;
+    private String qaiDataFolder;
     private String userGuideUrl;
 
     public String getLogin() {
@@ -157,6 +159,22 @@ public class ClientConfig {
 
     public void setUserGuideUrl(String userGuideUrl) {
         this.userGuideUrl = userGuideUrl;
+    }
+
+    public String getQaiProjectsFolder() {
+        return qaiProjectsFolder;
+    }
+
+    public void setQaiProjectsFolder(String qaiProjectsFolder) {
+        this.qaiProjectsFolder = qaiProjectsFolder;
+    }
+
+    public String getQaiDataFolder() {
+        return qaiDataFolder;
+    }
+
+    public void setQaiDataFolder(String qaiDataFolder) {
+        this.qaiDataFolder = qaiDataFolder;
     }
 
     public ClientConfig() {}

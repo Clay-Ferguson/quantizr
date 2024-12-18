@@ -204,6 +204,14 @@ public class AppProp {
         return getPathProperty("adminDataFolder");
     }
 
+    public String getQaiProjectsFolder() {
+        return getPathProperty("qaiProjectsFolder");
+    }
+
+    public String getQaiDataFolder() {
+        return getPathProperty("qaiDataFolder");
+    }
+
     public String getRsaKeyFolder() {
         return getPathProperty("rsaKeyFolder");
     }

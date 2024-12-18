@@ -48,7 +48,7 @@ export class ConfigureAgentDlg extends DialogBase {
                     placeholder: "You are a helpful assistant."
                 }, this.promptState, null, false, 3, this.systemPromptScrollPos),
                 S.quanta.config.aiAgentEnabled ? new CollapsiblePanel("Coding Agent Props", "Hide Coding Agent Props", null, [
-                    new TextArea("Folders to Include", {
+                    new TextArea("Folders to Include (relative to: " + S.quanta.config.qaiProjectsFolder + ")", {
                         rows: 4,
                         placeholder: "List folders to include (optional)"
                     }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos, "mt-3"),
@@ -61,6 +61,7 @@ export class ConfigureAgentDlg extends DialogBase {
                         val: this.fileExtState,
                         outterClass: "mt-3"
                     }),
+                    new Div("Data Folder: " + S.quanta.config.qaiDataFolder, { className: "mt-3" }),
                 ], true,
                     (expanded: boolean) => {
                         dispatch("setPropsPanelExpanded", s => {
@@ -97,25 +98,25 @@ export class ConfigureAgentDlg extends DialogBase {
         this.fileExtState.setValue(S.props.getPropStr(J.NodeProp.AI_FILE_EXTENSIONS, this.node));
         this.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         this.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
-        this.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
+        this.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node));
     }
 
     save = async () => {
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
-        S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, this.promptState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_FOLDERS_TO_INCLUDE, this.node, this.foldersToIncludeState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_FOLDERS_TO_EXCLUDE, this.node, this.foldersToExcludeState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_FILE_EXTENSIONS, this.node, this.fileExtState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, this.aiServiceState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, this.maxWordsState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, this.temperatureState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, this.promptState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_FOLDERS_TO_INCLUDE, this.node, this.foldersToIncludeState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_FOLDERS_TO_EXCLUDE, this.node, this.foldersToExcludeState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_FILE_EXTENSIONS, this.node, this.fileExtState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, this.aiServiceState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, this.maxWordsState.getValue());
+        S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, this.temperatureState.getValue());
 
         const aiService: AIService = S.aiUtil.getServiceByName(this.aiServiceState.getValue());
         if (aiService && aiService.name !== J.AIModel.NONE) {
             S.props.setPropVal(J.NodeProp.AI_CONFIG, this.node, "true");
         }
         else {
-            S.props.setPropVal(J.NodeProp.AI_CONFIG, this.node, "[null]");
+            S.props.setPropVal(J.NodeProp.AI_CONFIG, this.node, "");
         }
 
         await S.edit.saveNode(this.node, true);
@@ -129,7 +130,7 @@ export class ConfigureAgentDlg extends DialogBase {
         this.fileExtState.setValue("");
         this.maxWordsState.setValue("");
         this.temperatureState.setValue("");
-        this.aiServiceState.setValue("[null]");
+        this.aiServiceState.setValue("");
     }
 
     override async preLoad(): Promise<void> {
