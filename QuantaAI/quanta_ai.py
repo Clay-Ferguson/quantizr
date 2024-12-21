@@ -28,8 +28,6 @@ OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 OPENAI_MODEL_COMPLETION_O1_PREVIEW = "o1-preview"
 OPENAI_MODEL_COMPLETION_O1_MINI = "o1-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3.1-sonar-huge-128k-online" 
-PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct" 
-PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" 
 GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
 GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 XAI_MODEL_COMPLETION_CHAT = "grok-beta"
@@ -272,14 +270,6 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
     elif model == ANTH_SONNET_MODEL_COMPLETION_CHAT:
         input_ppm = 3.0
         output_ppm = 15.0
-
-    elif model == PPLX_MODEL_COMPLETION_CHAT:
-        input_ppm = 1.0
-        output_ppm = 1.0
-
-    elif model == PPLX_MODEL_COMPLETION_LLAMA3:
-        input_ppm = 1.0
-        output_ppm = 1.0
 
     elif model == PPLX_MODEL_COMPLETION_ONLINE:
         input_ppm = 1.0

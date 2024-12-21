@@ -49,15 +49,6 @@ export class AIUtil {
             });
         }
 
-        if (S.quanta.config.usePplxAi) {
-            this.aiServices.push(//
-                {
-                    name: J.AIModel.PPLX_LLAMA3,
-                    description: "Meta: Llama 3",
-                    longDescription: "Meta's Open Source Llama 3 (131K context, max $1/megatoken)"
-                });
-        }
-
         if (S.quanta.config.useAnthAi) {
             this.aiServices.push(//
                 {
@@ -74,11 +65,6 @@ export class AIUtil {
 
         if (S.quanta.config.usePplxAi) {
             this.aiServices.push(//
-                {
-                    name: J.AIModel.PPLX_CHAT,
-                    description: "Perplexity: Basic",
-                    longDescription: "Perplexity's best high-end powerful general-purpose AI (127K context, max $1/megatoken)"
-                },
                 {
                     name: J.AIModel.PPLX_ONLINE,
                     description: "Perplexity: Recent News Aware",
