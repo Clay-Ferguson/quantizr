@@ -25,7 +25,6 @@ export class NodeCompMarkdown extends Comp {
     static CENTERING_START2 = "-&gt;";
     static CENTERING_END2 = "&lt;-";
 
-
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
     cont: string;
@@ -54,7 +53,6 @@ export class NodeCompMarkdown extends Comp {
         if (S.props.isMine(node)) {
             val = S.util.makeHtmlCommentsVisible(val);
         }
-        val = this.translateLaTex(val);
 
         // NOTE: we must call removeHiddenUrls before insertMarkdownLinks because the latter will insert markdown links
         val = S.util.processLines(val);
@@ -70,17 +68,6 @@ export class NodeCompMarkdown extends Comp {
             }
         });
         return val;
-    }
-
-    translateLaTex(val: string): string {
-        if (!val) return val;
-        // val = val.replaceAll(" $", " \\$"); // this thing will be the death of me.
-        if (val.indexOf("\\") == -1) return val;
-
-        return val.replaceAll("\\(", "$")//
-            .replaceAll("\\)", "$")//
-            .replaceAll("\\[", "$$")//
-            .replaceAll("\\]", "$$");
     }
 
     override compRender(_children: CompT[]): ReactNode {

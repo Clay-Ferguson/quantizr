@@ -32,7 +32,8 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
         ...props,
         ref,
         // WARNING: The order of these plugins is VERY significant!!! DO NOT ALTER
-        remarkPlugins: [remarkMath, remarkGfm],
+        // NOTE: The singleDollarTextMath option is needed to avoid conflict with $ in text, and so we only use $$ for math
+        remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
         rehypePlugins: [rehypeSanitize, rehypeKatex],
     });
 });
