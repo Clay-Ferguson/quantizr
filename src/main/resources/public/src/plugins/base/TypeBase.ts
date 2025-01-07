@@ -318,12 +318,37 @@ export class TypeBase implements TypeIntf {
             comp = cont ? new NodeCompMarkdown(node, null, tabData, urls) : null;
         }
 
+        let aiConfigDiv: Div = null;
+        if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER) {
+            if (S.props.getPropStr(J.NodeProp.AI_CONFIG, node)) {
+                aiConfigDiv = new Div("AI Settings", {
+                    onClick: () => S.edit.configureAgent(node),
+                    className: "nodeTags aiTags mb-1 float-right",
+                    title: "Configure Agent Settings"
+                });
+            }
+            else {
+                let template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+                if (template != null && template.trim().length > 0) {
+                    if (S.props.isMine(node)) {
+                        template = S.util.makeHtmlCommentsVisible(template);
+                    }
+                    aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
+                        new Div("AI Prompt", {
+                            className: "aiPrompt mb-1 float-right",
+                        }),
+                        template ? new Markdown(template, { className: "mb-1" }) : null
+                    ]);
+                }
+            }
+        }
+
         /* if we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
         if (urls) {
-            const children: Comp[] = [comp, choices];
+            const children: Comp[] = [aiConfigDiv, comp, choices];
             let count = 0;
 
             urls.forEach((ui: UrlInfo) => {
@@ -344,31 +369,6 @@ export class TypeBase implements TypeIntf {
         }
         else {
             const isRoot = node.id === ast.node?.id;
-
-            let aiConfigDiv: Div = null;
-            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER) {
-                if (S.props.getPropStr(J.NodeProp.AI_CONFIG, node)) {
-                    aiConfigDiv = new Div("AI Settings", {
-                        onClick: () => S.edit.configureAgent(node),
-                        className: "nodeTags aiTags mb-1 float-right",
-                        title: "Configure Agent Settings"
-                    });
-                }
-                else {
-                    let template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
-                    if (template != null && template.trim().length > 0) {
-                        if (S.props.isMine(node)) {
-                            template = S.util.makeHtmlCommentsVisible(template);
-                        }
-                        aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
-                            new Div("AI Prompt", {
-                                className: "aiPrompt mb-1 float-right",
-                            }),
-                            template ? new Markdown(template, { className: "mb-1" }) : null
-                        ]);
-                    }
-                }
-            }
 
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && S.util.showMetaData(ast, node)) {
