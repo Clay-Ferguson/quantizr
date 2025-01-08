@@ -200,6 +200,10 @@ public class AppProp {
         return "true".equals(env.getProperty("aiAgentEnabled"));
     }
 
+    public boolean getMultiUserEnabled() {
+        return "true".equals(env.getProperty("multiUserEnabled"));
+    }
+
     public String getAdminDataFolder() {
         return getPathProperty("adminDataFolder");
     }

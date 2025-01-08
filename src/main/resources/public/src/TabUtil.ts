@@ -66,40 +66,41 @@ export class TabUtil {
 
     async createAppTabs() {
         await promiseDispatch("initTabs", s => {
-            s.tabData = [
-                new GraphTab(),
-                new MainTab(),
-                new DocumentTab(),
-                new SearchTab(),
-                new SharesTab(),
-                new TimelineTab(),
-                new FollowersTab(),
-                new FollowingTab(),
-                new FeedTab(),
-                new RepliesTab(),
-                new ThreadTab(),
-                new StatisticsTab(),
-                new ServerInfoTab(),
-                new TTSTab(),
-                new RSSTab(),
-                new SettingsTab(),
-                new AudioPlayerTab(),
-                new AdminTab()
+            s.tabData = [];
+            s.tabData.push(new GraphTab());
+            s.tabData.push(new MainTab());
+            s.tabData.push(new DocumentTab());
+            s.tabData.push(new SearchTab());
+            s.tabData.push(new SharesTab());
+            s.tabData.push(new TimelineTab());
+            s.tabData.push(new FollowersTab());
+            s.tabData.push(new FollowingTab());
+            if (S.quanta.config?.multiUserEnabled) {
+                s.tabData.push(new FeedTab());
+            }
+            s.tabData.push(new RepliesTab());
+            s.tabData.push(new ThreadTab());
+            s.tabData.push(new StatisticsTab());
+            s.tabData.push(new ServerInfoTab());
+            s.tabData.push(new TTSTab());
+            s.tabData.push(new RSSTab());
+            s.tabData.push(new SettingsTab());
+            s.tabData.push(new AudioPlayerTab());
+            s.tabData.push(new AdminTab());
 
-                // this is throwing a react error, but we don't need this now anyaay
-                // {
-                //     name: "Log",
-                //     id: C.TAB_LOG,
-                //     isVisible: () => {
-                //         // this function needs to get the state itself.
-                //         let ast = getAst();
-                //         return ast.isAdminUser;
-                //     },
-                //     constructView: (data: TabIntf) => new LogView(data),
-                //     rsInfo: null,
-                //     props: {}
-                // }
-            ];
+            // this is throwing a react error, but we don't need this now anyaay
+            // {
+            //     name: "Log",
+            //     id: C.TAB_LOG,
+            //     isVisible: () => {
+            //         // this function needs to get the state itself.
+            //         let ast = getAst();
+            //         return ast.isAdminUser;
+            //     },
+            //     constructView: (data: TabIntf) => new LogView(data),
+            //     rsInfo: null,
+            //     props: {}
+            // }
         });
     }
 

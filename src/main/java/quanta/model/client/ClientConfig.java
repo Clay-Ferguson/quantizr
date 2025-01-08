@@ -21,6 +21,7 @@ public class ClientConfig {
     private String login;
     private String paymentLink;
     private boolean aiAgentEnabled;
+    private boolean multiUserEnabled;
     private String qaiProjectsFolder;
     private String qaiDataFolder;
     private String userGuideUrl;
@@ -151,6 +152,14 @@ public class ClientConfig {
 
     public void setAiAgentEnabled(boolean aiAgentEnabled) {
         this.aiAgentEnabled = aiAgentEnabled;
+    }
+
+    public boolean isMultiUserEnabled() {
+        return multiUserEnabled;
+    }
+
+    public void setMultiUserEnabled(boolean multiUserEnabled) {
+        this.multiUserEnabled = multiUserEnabled;
     }
 
     public String getUserGuideUrl() {

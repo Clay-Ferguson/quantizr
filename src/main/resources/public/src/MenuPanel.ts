@@ -301,7 +301,7 @@ export class MenuPanel extends Comp {
             }
         }
 
-        if (!ast.isAnonUser) {
+        if (!ast.isAnonUser && S.quanta.config?.multiUserEnabled) {
             children.push(new Menu("People", [
                 new MenuItem("Following", MenuPanel.editFriends),
                 new MenuItem("Followers", MenuPanel.showFollowers),
@@ -419,7 +419,7 @@ export class MenuPanel extends Comp {
             ]));
         }
 
-        if (!ast.isAnonUser) {
+        if (!ast.isAnonUser && S.quanta.config?.multiUserEnabled) {
             children.push(new Menu("Transfer", [
                 new MenuItem("Transfer", MenuPanel.transferNode, onMainTab && selNodeIsMine && !transferring, null, true), //
                 new MenuItem("Accept", MenuPanel.acceptTransfer, onMainTab && selNodeIsMine && transferring, null, true), //

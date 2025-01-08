@@ -148,6 +148,7 @@ services:
             mongoSecurity: "true"
             rssPreCacheEnabled: "false"
             aiAgentEnabled: "true"
+            multiUserEnabled: "false"
             userGuideUrl: "https://quanta.wiki/pub/user-guide"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS

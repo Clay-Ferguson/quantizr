@@ -68,7 +68,7 @@ export class MainTab extends TabBase<any> {
         const ast = getAs();
         return new Div(null, { className: "tabSubOptions" }, [
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav._navToMyAccntRoot, "ui-my-account") : null,
-            !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
+            !ast.isAnonUser && S.quanta.config?.multiUserEnabled ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
             !ast.isAnonUser ? new AppNavLink("My Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, false)) : null,
 
             // NOTE: This works, but let's not do this for now.

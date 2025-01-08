@@ -40,6 +40,7 @@ export interface ClientConfig {
     login: string;
     paymentLink: string;
     aiAgentEnabled: boolean;
+    multiUserEnabled: boolean;
     qaiProjectsFolder: string;
     qaiDataFolder: string;
     userGuideUrl: string;
