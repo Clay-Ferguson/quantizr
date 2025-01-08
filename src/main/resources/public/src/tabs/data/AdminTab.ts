@@ -1,10 +1,9 @@
-import { getAs } from "../../AppContext";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { AdminView } from "../AdminView";
 
 export class AdminTab extends TabBase<any> {
-    name = "Admin";
+    name = "Server Admin";
     tooltip = "Manage the Server Instance";
     id = C.TAB_ADMIN;
     static inst: AdminTab = null;
@@ -16,7 +15,11 @@ export class AdminTab extends TabBase<any> {
     }
 
     isVisible() {
-        return getAs().isAdminUser;
+        return AdminTab.tabSelected; //getAs().isAdminUser;
+    }
+
+    onActivate(): void {
+        AdminTab.tabSelected = true;
     }
 
     constructView(data: TabBase<any>): AdminView {

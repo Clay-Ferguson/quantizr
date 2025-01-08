@@ -431,7 +431,8 @@ export class MenuPanel extends Comp {
 
             children.push(new Menu("Account", [
                 new MenuItem("Profile", MenuPanel.userProfile),
-                new MenuItem("Settings", S.nav._showUserSettings)
+                new MenuItem("Settings", S.nav._showUserSettings),
+                getAs().isAdminUser ? new MenuItem("Server Admin", () => S.tabUtil.selectTab(C.TAB_ADMIN)) : null
             ]));
         }
 
