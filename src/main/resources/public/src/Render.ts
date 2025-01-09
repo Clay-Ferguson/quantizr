@@ -629,15 +629,73 @@ export class Render {
     }
 
     renderTagsDiv(node: NodeInfo, moreClasses: string = ""): Div {
-        if (!node || !node.tags) return null;
-        const tags = node.tags.split(" ");
-        const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
+        if (!node) return null;
+        let spans: Span[] = [];
+        if (node.tags) {
+            const tags = node.tags.split(" ");
+            spans = tags.map(tag => new Span(tag, { className: "nodeTags" }));
+        }
+
+        this.maybeRenderDateTime(spans, J.NodeProp.DATE, node);
+        if (spans.length === 0) {
+            return null;
+        }
 
         return new Div(null, {
-            title: "Click to copy to clipboard",
-            onClick: () => S.util.copyToClipboard(node.tags),
             className: "cursor-pointer -float-right " + moreClasses
         }, spans);
+    }
+
+    maybeRenderDateTime(children: Comp[], propName: string, node: NodeInfo) {
+        const timestampVal = S.props.getPropStr(propName, node);
+        if (timestampVal) {
+            const dateVal: Date = new Date(parseInt(timestampVal));
+            const diffTime = dateVal.getTime() - (new Date().getTime());
+            const diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
+            let diffStr = "";
+            let modClass;
+
+            if (diffDays === 0) {
+                diffStr = " (today)";
+                modClass = "dateTimeToday"
+            }
+            else if (diffDays > 0) {
+                if (diffDays === 1) {
+                    diffStr = " (tomorrow)";
+                }
+                else {
+                    diffStr = " (" + diffDays + " days away)";
+                }
+                modClass = "dateTimeFuture"
+            }
+            else if (diffDays < 0) {
+                if (diffDays === -1) {
+                    diffStr = " (yesterday)";
+                }
+                else {
+                    diffStr = " (" + Math.abs(diffDays) + " days ago)";
+                }
+
+                if (node.tags) {
+                    const tags: string[] = node.tags.split(" ");
+                    if (tags?.includes("#due")) {
+                        modClass = "dateTimePastDue";
+                    }
+                    else {
+                        modClass = "dateTimePast";
+                    }
+                }
+                else {
+                    modClass = "dateTimePast";
+                }
+            }
+
+            // if more than two days in future or past we don't show the time, just the date
+            const when = (diffDays <= -2 || diffDays >= 2) ? S.util.formatDateShort(dateVal) : S.util.formatDateTime(dateVal);
+            children.push(new Span(when + " " + S.util.getDayOfWeek(dateVal) + diffStr, {
+                className: "nodeTags dateTimeDisplay " + modClass
+            }));
+        }
     }
 
     renderUser(node: NodeInfo, user: string, _userBio: string, imgSrc: string,

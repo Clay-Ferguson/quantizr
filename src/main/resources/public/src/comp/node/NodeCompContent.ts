@@ -113,7 +113,6 @@ export class NodeCompContent extends Comp {
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));
         }
 
-        this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.children = children;
         if (floatedImages) {
             this.attribs.className = (this.attribs.className || "") + " overflowAuto";
@@ -121,58 +120,6 @@ export class NodeCompContent extends Comp {
         return true;
     }
 
-    maybeRenderDateTime(children: Comp[], propName: string, node: NodeInfo) {
-        const timestampVal = S.props.getPropStr(propName, node);
-        if (timestampVal) {
-            const dateVal: Date = new Date(parseInt(timestampVal));
-            const diffTime = dateVal.getTime() - (new Date().getTime());
-            const diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
-            let diffStr = "";
-            let modClass;
-
-            if (diffDays === 0) {
-                diffStr = " (today)";
-                modClass = "dateTimeToday"
-            }
-            else if (diffDays > 0) {
-                if (diffDays === 1) {
-                    diffStr = " (tomorrow)";
-                }
-                else {
-                    diffStr = " (" + diffDays + " days away)";
-                }
-                modClass = "dateTimeFuture"
-            }
-            else if (diffDays < 0) {
-                if (diffDays === -1) {
-                    diffStr = " (yesterday)";
-                }
-                else {
-                    diffStr = " (" + Math.abs(diffDays) + " days ago)";
-                }
-
-                if (node.tags) {
-                    const tags: string[] = node.tags.split(" ");
-                    if (tags?.includes("#due")) {
-                        modClass = "dateTimePastDue";
-                    }
-                    else {
-                        modClass = "dateTimePast";
-                    }
-                }
-                else {
-                    modClass = "dateTimePast";
-                }
-            }
-
-            // if more than two days in future or past we don't show the time, just the date
-            const when = (diffDays <= -2 || diffDays >= 2) ? S.util.formatDateShort(dateVal) : S.util.formatDateTime(dateVal);
-            children.push(new Div(when + " " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "dateTimeDisplay " + modClass + " -float-right"
-            }));
-            children.push(new Clearfix());
-        }
-    }
 
     override _domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {

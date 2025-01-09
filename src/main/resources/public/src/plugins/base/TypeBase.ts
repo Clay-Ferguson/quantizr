@@ -369,22 +369,14 @@ export class TypeBase implements TypeIntf {
         }
         else {
             const isRoot = node.id === ast.node?.id;
+            let tagsDiv = null;
 
             // If this node has tags render them below the content (if we have edit mode or info turned on)
-            if (node.tags && S.util.showMetaData(ast, node)) {
-                return new Div(null, attrs, [
-                    aiConfigDiv,
-                    comp,
-                    choices,
-                    S.render.renderTagsDiv(node, isRoot ? "mb-2" : "mb-1"),
-                    footerComp,
-                    new Clearfix(),
-                ])
+            if (S.util.showMetaData(ast, node)) {
+                tagsDiv = S.render.renderTagsDiv(node, isRoot ? "mb-2" : "mb-1");
             }
-            // otherwise just return the content component itself.
-            else {
-                return new Div(null, attrs, [aiConfigDiv, comp, choices, footerComp, new Clearfix()]);
-            }
+
+            return new Div(null, attrs, [aiConfigDiv, comp, choices, tagsDiv, footerComp, new Clearfix()]);
         }
     }
 
