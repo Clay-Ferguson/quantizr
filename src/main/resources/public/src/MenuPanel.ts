@@ -181,6 +181,38 @@ export class MenuPanel extends Comp {
         const fullScreenViewer = S.util.fullscreenViewerActive();
         const children = [];
 
+        const bookmarkItems = [];
+        if (!ast.isAnonUser) {
+            bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
+            if (ast.bookmarks) {
+                if (ast.bookmarks.length > 0) {
+                    bookmarkItems.push(new MenuItemSeparator());
+                }
+
+                ast.bookmarks.forEach(bookmark => {
+                    const nodeId = bookmark.id || bookmark.selfId;
+                    const floatRightComps = [
+                        new Tag("i", {
+                            className: "fa fa-trash fa-lg",
+                            title: "Delete",
+                            onClick: (event) => {
+                                // cancel even because it will also trigger the parent click event
+                                event.stopPropagation();
+                                S.edit.deleteBookmark(bookmark.selfId, bookmark.name);
+                            }
+                        })
+                    ];
+                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComps);
+                    S.domUtil.makeDropTarget(mi.attribs, nodeId);
+                    bookmarkItems.push(mi);
+                });
+            }
+
+            if (bookmarkItems.length > 0) {
+                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));
+            }
+        }
+
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
                 MenuPanel.isEditMode, false, "ui-menu-options-editmode"),
@@ -266,39 +298,6 @@ export class MenuPanel extends Comp {
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
             ], null));
-        }
-
-        const bookmarkItems = [];
-        if (!ast.isAnonUser) {
-            bookmarkItems.push(new MenuItem("Add", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
-            if (ast.bookmarks) {
-
-                if (ast.bookmarks.length > 0) {
-                    bookmarkItems.push(new MenuItemSeparator());
-                }
-
-                ast.bookmarks.forEach(bookmark => {
-                    const nodeId = bookmark.id || bookmark.selfId;
-                    const floatRightComps = [
-                        new Tag("i", {
-                            className: "fa fa-trash fa-lg",
-                            title: "Delete",
-                            onClick: (event) => {
-                                // cancel even because it will also trigger the parent click event
-                                event.stopPropagation();
-                                S.edit.deleteBookmark(bookmark.selfId, bookmark.name);
-                            }
-                        })
-                    ];
-                    const mi = new MenuItem(bookmark.name, () => S.view.bookmarkClick(bookmark), true, null, false, null, null, floatRightComps);
-                    S.domUtil.makeDropTarget(mi.attribs, nodeId);
-                    bookmarkItems.push(mi);
-                });
-            }
-
-            if (bookmarkItems.length > 0) {
-                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));
-            }
         }
 
         if (!ast.isAnonUser && S.quanta.config?.multiUserEnabled) {
