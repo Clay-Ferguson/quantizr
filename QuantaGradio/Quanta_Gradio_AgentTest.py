@@ -17,12 +17,12 @@ from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, Me
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 
-from common.python.agent.ai_utils import AIUtils
-from common.python.utils import Utils
-
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
+
+from common.python.agent.ai_utils import AIUtils
+from common.python.utils import Utils
 from app_config import AppConfig
 
 class DummyTestToolInput(BaseModel):
