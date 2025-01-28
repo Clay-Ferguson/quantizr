@@ -8,6 +8,8 @@ from ..file_utils import FileUtils
 
 
 class ProjectLoader:
+    """ ProjectLoader scans all our project files and collects all information about the files and folders that we need
+    """
     # Dictionary to store TextBlock objects keyed by 'name'
     blocks: Dict[str, TextBlock] = {}
     # All filen names encountered during the scan, relative to the source folder
@@ -121,7 +123,7 @@ class ProjectLoader:
         is to build up the 'blocks' dictionary with the content of the blocks in the files, and also
         to collect all the filenames into `file_names`
         """
-        print("scan_directory: "+ scan_dir)
+        print(f"scan_directory: {scan_dir}")
         self.reset()
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(scan_dir):
@@ -133,8 +135,10 @@ class ProjectLoader:
             self.folder_names.append(short_dir)
 
             for filename in filenames:
+                # Determine if we will include this file based on extension and folder
                 includeExt = Utils.has_included_file_extension(self.ext_set, filename)
                 includeFolder = Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)
+                
                 # print(f"file: {filename} -> includeExt: {includeExt}, includeFolder: {includeFolder}")
                 if (includeExt and includeFolder):
                     # print(f"include file {filename} in {dirpath}")

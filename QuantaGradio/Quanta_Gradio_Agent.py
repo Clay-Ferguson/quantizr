@@ -22,9 +22,15 @@ if __name__ == "__main__":
     AppConfig.init_config()
 
     async def query_ai(prompt, messages):
+        """# Runs an LLM inference (calls the AI) which can answer questions and/or refactor code using the tools
+        """
+        
+        # Get the LLM based on which model the Config calls for
         llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
 
         agent = QuantaAgent()
+        
+        # Calls the AI and does all the work of getting the response messages back, as the return value
         async for result in agent.run_gradio(
             AppConfig.cfg.ai_service,
             "", # output_file_name

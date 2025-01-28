@@ -260,6 +260,7 @@ Final Prompt:
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
+        # todo-0: we should just calculate this length everytime it's needed and not even store in a varible
         self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude

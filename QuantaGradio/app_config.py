@@ -16,6 +16,7 @@ class AppConfig:
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
 
+    # Configures the app by loading configuration yaml file, and getting 
     @staticmethod
     def init_config():
         """Loads configuration from config.yaml and secrets.yaml files."""
