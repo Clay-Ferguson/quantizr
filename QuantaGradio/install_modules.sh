@@ -8,12 +8,6 @@
 #    conda activate quanta_gradio
 #    ./install_modules.sh
 
-source ./conda_init.sh
-
-conda_path="/home/clay/miniconda3"
-export PATH="$conda_path/bin:$PATH"
-source $conda_path/bin/activate quanta_gradio
-
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
   read -p "Press ENTER. To install modules."
   # WARNING ************************************************************************************************************************
@@ -35,7 +29,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
       pydantic-core \
       configargparse
 else
-  echo "Failed to set Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
+  echo "Wrong Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s
   exit 1
 fi

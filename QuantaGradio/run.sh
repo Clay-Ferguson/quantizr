@@ -1,15 +1,15 @@
 #!/bin/bash
 
-source ./conda_init.sh
-
-conda_path="/home/clay/miniconda3"
-export PATH="$conda_path/bin:$PATH"
-source $conda_path/bin/activate quanta_gradio
+# NOTE: Run this in VSCode Terminal AND don't forget to also open a Python file and notice that you need to check
+# that VSCode is indeed activated to the correct conda environment, by visually looking at lower right corner of VSCode.
+#
+# conda activate quanta_gradio
 
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
+  rm ../../logs/Quanta_Gradio_*.log
   python3 Quanta_Gradio_ChatTest.py
 else
-  echo "Failed to set Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
+  echo "Wrong Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s
   exit 1
 fi
