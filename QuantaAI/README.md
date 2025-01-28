@@ -1,6 +1,6 @@
 # About QuantaAI
 
- This is the Quanta AI microservice, which will run inside the Quanta Docker stack to provide all AI services. We have this class specifically because it's far better to use Python for all AI functionality. A scondary reason is simply because we can eventually gain access to the entire world of capabilities available in Python, like generating charts and graphs, etc. because Python has a better ecosystem of these types of features than Java does.
+ This is the Quanta AI microservice, which will run inside the Quanta Docker stack to provide all AI services to the Quanta web app. We have this class specifically because it's far better to use Python for all AI functionality, than to use Java-based AI code. A scondary reason is simply because we can eventually gain access to the entire world of capabilities available in Python, like generating charts and graphs, etc. because Python has a better ecosystem of these types of features than Java does.
 
 # Tips
  

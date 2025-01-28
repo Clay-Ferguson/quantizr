@@ -13,8 +13,10 @@ sys.path.append(PRJ_DIR)
 
 from app_config import AppConfig
 from common.python.agent.ai_utils import AIUtils
+from common.python.utils import Utils
 
 if __name__ == "__main__":
+    Utils.init_logging("./quanta_ai.log")
     print("Quanta Gradio Chat Test Starting...")
     AppConfig.init_config()
     llm = AIUtils.create_llm(0.0, AppConfig.cfg)
@@ -28,7 +30,8 @@ if __name__ == "__main__":
                 chat_history.append(AIMessage(content=msg['content']))
                 
         chat_history.append(HumanMessage(content=message))
-        gpt_response = llm(chat_history)
+        # todo-0: find other places we called llm() and replace with invoke()
+        gpt_response = llm.invoke(chat_history)
         return gpt_response.content
 
     gr.ChatInterface(predict, type="messages").launch()            

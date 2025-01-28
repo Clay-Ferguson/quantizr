@@ -18,6 +18,7 @@ from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 
 from common.python.agent.ai_utils import AIUtils
+from common.python.utils import Utils
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
@@ -46,6 +47,7 @@ class DummyTestTool(BaseTool):
         return "Return val from DummyTestTool2 with input: "+input
 
 if __name__ == "__main__":
+    Utils.init_logging("./quanta_ai.log")
     print("Quanta Gradio Agent Test Starting...")
     
     # NOTE: You can remove this line of code as long as you just supply the correct 'model' and 'api_key' values on the line below.
