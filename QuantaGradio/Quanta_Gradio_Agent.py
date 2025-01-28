@@ -17,15 +17,16 @@ from common.python.agent.app_agent import QuantaAgent
 from langchain.chat_models.base import BaseChatModel
 
 if __name__ == "__main__":
-    Utils.init_logging("../../logs/Quanta_Gradio_Agent.log")
     print("Quanta Gradio Agent Starting...")
-    AppConfig.init_config()
+    AppConfig.init_config()    
+    Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
 
     async def query_ai(prompt, messages):
         """# Runs an LLM inference (calls the AI) which can answer questions and/or refactor code using the tools
         """
         
-        # Get the LLM based on which model the Config calls for
+        # Get the LLM based on which model the Config calls for. We use a temperature of 1.0 for no creativity at all but only
+        # always the most likely next tokens, and hopefully best code generation.
         llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
 
         agent = QuantaAgent()

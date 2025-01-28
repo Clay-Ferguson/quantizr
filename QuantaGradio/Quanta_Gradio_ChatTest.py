@@ -16,9 +16,10 @@ from common.python.agent.ai_utils import AIUtils
 from common.python.utils import Utils
 
 if __name__ == "__main__":
-    Utils.init_logging("../../logs/Quanta_Gradio_ChatTest.log")
     print("Quanta Gradio Chat Test Starting...")
     AppConfig.init_config()
+    Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_ChatTest.log")
+    
     llm = AIUtils.create_llm(0.0, AppConfig.cfg)
 
     def predict(message, history):

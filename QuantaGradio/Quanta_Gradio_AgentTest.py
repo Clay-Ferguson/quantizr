@@ -47,11 +47,9 @@ class DummyTestTool(BaseTool):
         return "Return val from DummyTestTool2 with input: "+input
 
 if __name__ == "__main__":
-    Utils.init_logging("../../logs/Quanta_Gradio_AgentTest.log")
     print("Quanta Gradio Agent Test Starting...")
-    
-    # NOTE: You can remove this line of code as long as you just supply the correct 'model' and 'api_key' values on the line below.
     AppConfig.init_config()
+    Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_AgentTest.log")
     
     llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
     
