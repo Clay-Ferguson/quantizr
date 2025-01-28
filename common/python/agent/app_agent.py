@@ -69,10 +69,9 @@ class QuantaAgent:
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
-        self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
+        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
         self.prompt = input_prompt
         self.parse_prompt = parse_prompt
         self.ok_hal = ok_hal
@@ -260,11 +259,9 @@ Final Prompt:
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
-        # todo-0: we should just calculate this length everytime it's needed and not even store in a varible
-        self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, False, "")
+        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude, False, "")
         self.prompt = input_prompt
         self.parse_prompt = False
         self.ok_hal = ""

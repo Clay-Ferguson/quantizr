@@ -12,7 +12,6 @@ class AppConfig:
     ext_list: List[str] = []
     ext_set: Set[str] = set()    
     cfg: argparse.Namespace
-    source_folder_len: int
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
 
@@ -91,7 +90,6 @@ class AppConfig:
         AppConfig.folders_to_exclude = list(filter(None, AppConfig.folders_to_exclude))
         
         AppConfig.ext_set = set(AppConfig.ext_list)
-        AppConfig.source_folder_len = len(AppConfig.cfg.source_folder)
         
         if (AppConfig.cfg):
             print("Configuration loaded")   

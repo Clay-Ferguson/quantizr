@@ -47,7 +47,7 @@ class PromptUtils:
 """
 
     @staticmethod
-    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]) -> str:
+    def build_folder_content(folder_path: str, source_folder: str, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]) -> str:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
@@ -60,11 +60,13 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"Folder {folder_path} does not exist")
                 
+        src_folder_len: int = len(source_folder)
+                
         # print("Walking folder_path: {folder_path}")
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
                 # print(f"Checking file: {filename}")
-                short_dir: str = dirpath[source_folder_len :]
+                short_dir: str = dirpath[len(source_folder) :]
                 
                 hasIncludedFileExtension = Utils.has_included_file_extension(ext_set, filename)
                 # print(f"    ext pass: {hasIncludedFileExtension}")
@@ -76,7 +78,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
-                    file_name: str = path[source_folder_len:]
+                    file_name: str = path[src_folder_len:]
                     file_content = FileUtils.read_file(path)
                     content += PromptUtils.get_file_content_block(
                         file_name, file_content
@@ -118,9 +120,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         """
         if "folder(" not in prompt:
             return prompt
-        
-        source_folder_len: int = len(source_folder)
-    
+            
         # Use regular expression to find all instances of folder(foldername) pattern in the prompt. 
         # The 'matches' collection will contain all the folder names
         pattern = r'folder\((.*?)\)'
@@ -132,7 +132,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 print(f"folder_name in prompt: {folder_name}")
                 content: str = PromptUtils.build_folder_content(
                     folder,
-                    source_folder_len,
+                    source_folder,
                     ext_set,
                     folders_to_include,
                     folders_to_exclude

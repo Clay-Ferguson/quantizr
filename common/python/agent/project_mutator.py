@@ -36,7 +36,6 @@ class ProjectMutator:
         """Initializes the ProjectMutator object."""
         self.mode: str = mode
         self.source_folder: str = source_folder
-        self.source_folder_len: int = len(source_folder)
         self.ai_answer: str = ai_answer
         self.suffix: Optional[str] = suffix
         self.ts: str = ts
@@ -62,7 +61,7 @@ class ProjectMutator:
             modified: bool = False
 
             # Check if we have a diff for this file
-            rel_filename: str = filename[self.source_folder_len :]
+            rel_filename: str = filename[len(self.source_folder) :]
             new_content: Optional[str] = None
 
             if self.mode == RefactorMode.REFACTOR.value:
@@ -162,11 +161,12 @@ class ProjectMutator:
 
     def process_project(self):
         """Scans the directory for files with the specified extensions."""
+        src_folder_len = len(self.source_folder)
 
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(self.source_folder):
             for filename in filenames:
-                short_dir: str = dirpath[self.source_folder_len :]
+                short_dir: str = dirpath[src_folder_len :]
                  
                 # Check the file extension
                 if (Utils.has_included_file_extension(self.ext_set, filename) 

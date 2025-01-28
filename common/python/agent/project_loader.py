@@ -20,10 +20,11 @@ class ProjectLoader:
     parse_prompt: bool = False
     parsed_prompt: str = ""
     file_with_prompt: str = ""
+    source_folder: str = ""
 
     # folders_to_include is a newline (\n) separated list of folders to include in the scan
-    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str], parse_prompt: bool = False, ok_hal: str = ""):
-        self.source_folder_len = source_folder_len
+    def __init__(self, source_folder: str, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str], parse_prompt: bool = False, ok_hal: str = ""):
+        self.source_folder = source_folder
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
@@ -45,7 +46,7 @@ class ProjectLoader:
         """
 
         # get the file name relative to the source folder
-        relative_file_name: str = path[self.source_folder_len :]
+        relative_file_name: str = path[len(self.source_folder) :]
         self.file_names.append(relative_file_name)
 
         # Open the file using 'with' which ensures the file is closed after reading
@@ -125,11 +126,13 @@ class ProjectLoader:
         """
         print(f"scan_directory: {scan_dir}")
         self.reset()
+        src_folder_len: int = len(self.source_folder)
+        
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(scan_dir):
             # Get the relative path of the directory, root folder is the source folder and will be "" (empty string) here
             # as the relative path of the source folder is the root folder
-            short_dir: str = dirpath[self.source_folder_len :]
+            short_dir: str = dirpath[src_folder_len :]
 
             # If not, add it to the set and list
             self.folder_names.append(short_dir)
