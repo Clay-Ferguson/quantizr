@@ -1,10 +1,5 @@
-"""Runs a basic ChatBot using Gradio interface.
+"""Runs a ChatBot using Gradio interface, with access to the QuantAgent for code refactoring.
 
-You can use this as the simplest possible test to verify that Gradio is working.
-
-NOTE: This file is now a work in progress and is what will eventually be the GUI app which can 
-run the Quanta Coding Agent. For now, all we've done in this file is demonstrate that we can run
-a basic ChatBot using Gradio and with a basic test tool.
 """
 
 import sys
@@ -22,7 +17,7 @@ from common.python.agent.app_agent import QuantaAgent
 from langchain.chat_models.base import BaseChatModel
 
 if __name__ == "__main__":
-    Utils.init_logging("./quanta_ai.log")
+    Utils.init_logging("../../logs/Quanta_Gradio_Agent.log")
     print("Quanta Gradio Agent Starting...")
     AppConfig.init_config()
 

@@ -17,7 +17,7 @@ from app_config import AppConfig
 from common.python.utils import Utils
 
 if __name__ == "__main__":
-    Utils.init_logging("./quanta_ai.log")
+    Utils.init_logging("../../logs/Quanta_Gradio_Image.log")
     print("Quanta Gradio Image Gen Starting...")
     AppConfig.init_config()
     openai.api_key = AppConfig.cfg.openai_api_key
