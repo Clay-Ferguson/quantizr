@@ -58,11 +58,20 @@ class Utils:
     @staticmethod
     def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:
         """Returns True if the file's extension should be included in the scan."""
+        
+        using_dots = any([ext.startswith(".") for ext in ext_set])
+        
         _, ext = os.path.splitext(file_name)
         # if ext is empty return false
         if not ext:
             return False
+        
+        # If we're not using dots and 'ext' starts with a dot, remove the dot
+        if not using_dots and ext[0] == ".":
+            ext = ext[1:]
+        
         ret = ext.lower() in ext_set
+        # print(f"has_included_file_extension: {file_name} -> {ext} -> {ret}, ext_set: {ext_set}")
         return ret
     
     @staticmethod
