@@ -133,12 +133,14 @@ class ProjectLoader:
             self.folder_names.append(short_dir)
 
             for filename in filenames:
-                if (Utils.has_included_file_extension(self.ext_set, filename) and 
-                    Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)):
-                    # print(f"visit file {filename} in {dirpath}")
+                includeExt = Utils.has_included_file_extension(self.ext_set, filename)
+                includeFolder = Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)
+                # print(f"file: {filename} -> includeExt: {includeExt}, includeFolder: {includeFolder}")
+                if (includeExt and includeFolder):
+                    # print(f"include file {filename} in {dirpath}")
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file
                     self.visit_file(path)
-                #else:
+                # else:
                 #    print(f"Skipping file {filename} in {dirpath}")
