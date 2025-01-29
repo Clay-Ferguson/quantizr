@@ -47,14 +47,9 @@ class UpdateBlockTool(BaseTool):
         print(f"UpdateBlockTool: {block_name}")
         msg = f"Tool Updated Block: {block_name} with content: {block_content}"
         block: Optional[TextBlock] = self.blocks.get(block_name)
-        if block is not None:
-            if block.updateable:
-                block.content = block_content
-                block.dirty = True
-            else:
-                err = f"Warning: Block not updateable: {block_name}, because it has a block_off tag."
-                print(err)
-                raise Exception(err)
+        if block is not None:            
+            block.content = block_content
+            block.dirty = True
         else:
             print(f"Warning: Block not found: {block_name}")
         return msg

@@ -8,9 +8,6 @@ GENERAL_INSTRUCTIONS = "\n----\nGeneral Instructions:\n"
 TAG_BLOCK_BEGIN = "block_begin"
 TAG_BLOCK_END = "block_end"
 
-TAG_BLOCK_OFF = "block_off"
-TAG_BLOCK_ON = "block_on"
-
 TAG_FILE_BEGIN = "file_begin"
 TAG_FILE_END = "file_end"
 

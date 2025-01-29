@@ -3,7 +3,7 @@ from typing import List, Dict, Optional, Set
 import os
 from .models import TextBlock
 from ..utils import Utils
-from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
+from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END
 from ..file_utils import FileUtils
 
 
@@ -52,7 +52,6 @@ class ProjectLoader:
         # Open the file using 'with' which ensures the file is closed after reading
         with FileUtils.open_file(path) as file:
             block: Optional[TextBlock] = None
-            block_on: bool = True
             in_prompt: bool = False
             parsed_prompt: str = ""
 
@@ -92,18 +91,9 @@ class ProjectLoader:
                         raise Exception(
                             f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""")
                     block = None
-                    
-                elif Utils.is_tag_line(trimmed, TAG_BLOCK_OFF):
-                    if block is not None:
-                        block.updateable = False
-                        block_on = False
-                        
-                elif Utils.is_tag_line(trimmed, TAG_BLOCK_ON):
-                    if block is not None:
-                        block_on = True
                         
                 else:
-                    if block is not None and block_on:
+                    if block is not None:
                         block.content += line
 
     def strip_comment_chars(self, line: str) -> str:

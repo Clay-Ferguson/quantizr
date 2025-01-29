@@ -1,4 +1,4 @@
-"""Injects data into files."""
+"""Updates blocks."""
 
 import os
 import re
@@ -7,15 +7,13 @@ from .models import TextBlock
 from ..string_utils import StringUtils
 from .tags import (
     TAG_BLOCK_BEGIN,
-    TAG_BLOCK_END,
-    TAG_FILE_BEGIN,
-    TAG_FILE_END,
+    TAG_BLOCK_END
 )
 from ..utils import RefactorMode, Utils
 from ..file_utils import FileUtils
 
 class ProjectMutator:
-    """Performs all project mutations that the AI has requested."""
+    """Performs all project mutations that the AI has requested, which will currently only be updating blocks in files."""
 
     blocks: Dict[str, TextBlock] = {}
     folders_to_include: List[str] = []
@@ -46,7 +44,6 @@ class ProjectMutator:
 
     def run(self):
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
-
         self.process_project()
 
 
@@ -60,28 +57,16 @@ class ProjectMutator:
             content[0] = FileUtils.read_file(filename)
             modified: bool = False
 
-            # Check if we have a diff for this file
-            rel_filename: str = filename[len(self.source_folder) :]
-            new_content: Optional[str] = None
-
             if self.mode == RefactorMode.REFACTOR.value:
-                new_content = self.parse_modified_file(self.ai_answer, rel_filename)
-
-            if new_content is not None:
-                content[0] = new_content
-                modified = True
-            # else if no new content, so we try any block updates
-            else:
-                if self.mode == RefactorMode.REFACTOR.value:
-                    for name, block in self.blocks.items():
-                        if block.dirty:
-                            if self.replace_block(content, block, name):
-                                modified = True
+                for name, block in self.blocks.items():
+                    if block.dirty:
+                        if self.replace_block(content, block, name):
+                            modified = True
 
             if modified:
                 print(f"Updated File: {filename}")
 
-            # Write the modified content back to the file
+            # Write the modified content back to the file, if we modified anything
             if modified:
                 out_file: str = (
                     StringUtils.add_filename_suffix(filename, self.suffix)
@@ -95,37 +80,9 @@ class ProjectMutator:
         except IOError:
             print("An error occurred while reading or writing to the file.")
 
-    def parse_modified_file(self, ai_answer: str, rel_filename: str) -> Optional[str]:
-        """Extract the new content for the given file from the AI answer."""
-
-        if f"""{TAG_FILE_BEGIN} {rel_filename}""" not in ai_answer:
-            return None
-
-        # Scan all the lines in content one by one and extract the new content
-        new_content: List[str] = []
-        started: bool = False
-
-        for line in ai_answer.splitlines():
-            if started:
-                if Utils.is_tag_and_name_line(line, TAG_FILE_END, rel_filename):
-                    started = False
-                    break
-                new_content.append(line)
-            elif Utils.is_tag_and_name_line(line, TAG_FILE_BEGIN, rel_filename):
-                if len(new_content) > 0:
-                    raise Exception(
-                        f"Error: {TAG_FILE_BEGIN} {rel_filename} exists multiple times in ai response. The LLM itself is failing.",)
-                started = True
-
-        if len(new_content) == 0:
-            return None
-
-        ret: str = "\n".join(new_content)
-        return ret
-
     def replace_block(self, content: List[str], block: TextBlock, name: str) -> bool:
         """Process the replacement for the given block. This is what does the actual
-        replacement of a named block of code in the file
+        replacement of a named block of code in the file in which the block is defined.
 
         We replace the first element of the dict content with the new content, so we're treating 'content'
         as a mutable object.

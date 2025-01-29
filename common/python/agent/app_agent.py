@@ -67,6 +67,8 @@ class QuantaAgent:
         llm: BaseChatModel,
         ok_hal: str
     ):
+        """Runs the AI/Agent when called from the Quanta Web app
+        """
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
@@ -257,6 +259,8 @@ Final Prompt:
         ext_set: Set[str],
         llm: BaseChatModel,
     ):
+        """Runs the AI/Agent from a Gradio UI.
+        """
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
@@ -426,13 +430,6 @@ Final Prompt:
                 prompt += line + "\n"
 
         return prompt, code
-
-    # def remove_thinking_tags(self, text: str) -> str:
-    #     """Removes the thinking tags from the prompt."""
-    #     # Use regex to find and remove content between <thinking> tags
-    #     pattern = r'<thinking>.*?</thinking>'
-    #     cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
-    #     return cleaned_text
         
     def inject_answer(self, file_with_prompt: str, answer: str, ok_hal: str):
         """Injects the AI answer into the file that contains the prompt."""
@@ -510,8 +507,6 @@ Final Prompt:
         """
         Substitute blocks into the prompt. Prompts can contain ${BlockName} tags, which will be replaced with the
         content of the block with the name 'BlockName'
-
-        Returns true only if someblocks were inserted.
         """
         # As performance boost, if self.prompt does not contain "block(" then return False
         if "block(" not in prompt or self.prj_loader is None or self.prj_loader.blocks is None:
@@ -519,15 +514,14 @@ Final Prompt:
         
         # ret = False
         for key, value in self.prj_loader.blocks.items():
-            # if k in prompt:
-                # ret = True
-
             prompt = prompt.replace(
                 f"block({key})",
-                f"""
+                f"""block {key}, defined by the following:
+<block>
 {TAG_BLOCK_BEGIN} {key}
 {value.content}
 {TAG_BLOCK_END}
+</block>
 """,
             )
             

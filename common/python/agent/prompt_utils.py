@@ -51,9 +51,8 @@ class PromptUtils:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
-        content = f"""
-
-Below is the content of the files in the folder named {folder_path} (using {TAG_FILE_BEGIN} and {TAG_FILE_END} tags to delimit the files):
+        # NOTE: The system prompt thoroughly also describes how the file_begin and file_end tags work, so we don't need to repeat that here to the AI.
+        content = f"""Below is the content of the files in the folder (using {TAG_FILE_BEGIN} and {TAG_FILE_END} tags to delimit the files):
         """
 
         # raise an error if the folder does not exist
@@ -130,7 +129,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
             for folder_name in matches:
                 folder = source_folder if folder_name == "/" else source_folder + folder_name
                 print(f"folder_name in prompt: {folder_name}")
-                content: str = PromptUtils.build_folder_content(
+                folder_content: str = PromptUtils.build_folder_content(
                     folder,
                     source_folder,
                     ext_set,
@@ -138,6 +137,11 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                     folders_to_exclude
                 )
                 prompt = prompt.replace(
-                    f"folder({folder_name})", content
+                    f"folder({folder_name})", 
+                    f"""folder '{folder_name}' which contains the following files:
+<folder>
+{folder_content}
+</folder>
+"""
                 )
         return prompt

@@ -101,8 +101,7 @@ class Utils:
     @staticmethod
     def is_tag_and_name_line(line: str, tag: str, name: str) -> bool:
         """Checks if the line is a pattern like
-        `-- block_begin {Name}` or `// block_begin {Name}` or `# block_begin {Name}`
-        or `-- block_end {Name}` or `// block_end {Name}` or `# block_end {Name}`
+        `-- {tag} {name}` or `// {tag} {name}` or `# {tag} {name}`
         or any of those without the comment characters at the beginning of the line as well
         """
 
