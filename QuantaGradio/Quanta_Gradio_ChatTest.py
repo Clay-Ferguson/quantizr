@@ -31,7 +31,6 @@ if __name__ == "__main__":
                 chat_history.append(AIMessage(content=msg['content']))
                 
         chat_history.append(HumanMessage(content=message))
-        # todo-0: find other places we called llm() and replace with invoke()
         gpt_response = llm.invoke(chat_history)
         return gpt_response.content
 

@@ -7,7 +7,7 @@
 
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
   rm /home/clay/ai-agent-temp/Quanta_Gradio_*.log
-  python3 Quanta_Gradio_Agent.py
+  python3 Quanta_Gradio_ImageChat.py
 else
   echo "Wrong Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s

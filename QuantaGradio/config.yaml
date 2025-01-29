@@ -4,7 +4,7 @@
 
 # OpenAI
 openai_api_key: "your-api-key"
-openai_model: "gpt-4o-2024-11-20"
+openai_model: "gpt-4o"
 
 # XAI
 xai_api_key: "your-api-key"
@@ -12,7 +12,7 @@ xai_model: "grok-beta"
 
 # Anthropic
 anth_api_key: "your-api-key"
-anth_model: "claude-3-opus-20240229"
+anth_model: claude-3-5-sonnet-20241022
 
 # Gemini
 gemini_api_key: "your-api-key"
@@ -24,7 +24,7 @@ mode: "none"
 # ANTHROPIC = "anth"
 # GEMINI = "gemini"
 # XAI = "xai"
-ai_service: "openai"
+ai_service: "anth"
 
 scan_extensions: "py,html"
 data_folder: "/home/clay/ai-agent-temp"
