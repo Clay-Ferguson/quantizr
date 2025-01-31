@@ -1,4 +1,3 @@
-from typing import List, Set
 import argparse
 from langchain.chat_models.base import BaseChatModel
 from langchain_openai import ChatOpenAI

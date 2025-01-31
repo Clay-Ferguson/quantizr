@@ -7,7 +7,6 @@ import logging
 import builtins
 from enum import Enum
 from typing import List, Set, Optional
-from langchain.schema import AIMessage, BaseMessage, AIMessage
 from .agent.tags import (
     TAG_FILE_BEGIN,
     TAG_FILE_END,
