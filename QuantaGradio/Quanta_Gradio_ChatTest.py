@@ -20,7 +20,7 @@ if __name__ == "__main__":
     AppConfig.init_config()
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_ChatTest.log")
     
-    llm = AIUtils.create_llm(0.0, AppConfig.cfg)
+    llm = AIUtils.create_llm(0.7, AppConfig.cfg)
 
     def predict(message, history):
         chat_history = []        

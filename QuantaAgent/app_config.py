@@ -58,7 +58,6 @@ class AppConfig:
         p.add_argument("--xai_model", required=True, help="XAI model name")
 
         p.add_argument("--ai_service", required=True, help="AI Service")
-        p.add_argument("--ok_hal", required=True, help="OK HAL Delimiter line")
         p.add_argument("--folders_to_include", required=True, help="Folders to Include")
         p.add_argument("--folders_to_exclude", required=True, help="Folders to Exclude")
         p.add_argument(

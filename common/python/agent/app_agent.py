@@ -33,7 +33,6 @@ class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
     
     prj_loader: ProjectLoader | None
-    ok_hal: str
 
     def __init__(self):
         self.ts: str = str(int(time.time() * 1000))
@@ -48,7 +47,6 @@ class QuantaAgent:
         self.folders_to_exclude: List[str] = []
         self.data_folder = ""
         self.dry_run: bool = False
-        self.parse_prompt: bool = False
     
     def run(
         self,
@@ -58,14 +56,12 @@ class QuantaAgent:
         output_file_name: str,
         messages: List[BaseMessage],
         input_prompt: str,
-        parse_prompt: bool,
         source_folder: str,
         folders_to_include: List[str],
         folders_to_exclude: List[str],
         data_folder: str,
         ext_set: Set[str],
-        llm: BaseChatModel,
-        ok_hal: str
+        llm: BaseChatModel
     ):
         """Runs the AI/Agent when called from the Quanta Web app
         """
@@ -73,10 +69,8 @@ class QuantaAgent:
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
+        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude)
         self.prompt = input_prompt
-        self.parse_prompt = parse_prompt
-        self.ok_hal = ok_hal
         self.mode = mode
         self.ext_set = ext_set
 
@@ -86,19 +80,6 @@ class QuantaAgent:
 
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
-        
-        if self.parse_prompt: 
-            if not self.prj_loader.parsed_prompt:
-                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' terminator line after the prompt.")
-            
-            if (self.prj_loader.file_with_prompt):
-                # get file extension from file_with_prompt filename
-                ext = os.path.splitext(self.prj_loader.file_with_prompt)[1]
-                self.prompt = self.prompt + self.get_file_type_mention(ext);
-        
-        # if we just got our prompt from scanning files then set it in self.prompt
-        if (self.prj_loader.parsed_prompt):
-            self.prompt, self.prompt_code = self.parse_prompt_and_code(self.prj_loader.parsed_prompt)
         
         if (self.prompt_code): 
             self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
@@ -122,27 +103,6 @@ class QuantaAgent:
                 user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
             )
         
-        # ========================================================================================================
-        # DO NOT DELETE:
-        # 
-        # These prompots were initially used in the 'ok hal' scenario where I only wanted to be able to ask questions about a specific
-        # file and have the context only be about the provided code within the 'ok hal' block, but then I decided I wanted the 'ok hal' 
-        # to be able to do FULL refactoring of code, just like the Quanta Agent does, so I decided to always use the  `build_system_prompt`
-        # call here to give those full instructions.
-        # I leave this block commented out here for now, because later on we can theoretically have another additional syntax in additionto
-        # the 'ok hal' syntax, which would be a more limited syntax that only allows for asking questions about the provided code only
-        # if (self.parse_prompt): 
-        #     if (self.prompt_code):  
-        #         self.system_prompt = PromptUtils.get_template(
-        #             "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
-        #         )
-        #     else:
-        #         self.system_prompt = PromptUtils.get_template(
-        #             "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
-        #         )
-        # else:
-        #     self.build_system_prompt(user_system_prompt)
-        # ========================================================================================================
         self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
@@ -165,9 +125,7 @@ class QuantaAgent:
 
             self.human_message = HumanMessage(content=self.prompt)
             messages.append(self.human_message)
-            
-            # default to using tools if we are not parsing the prompt
-            use_tools = not self.parse_prompt
+            use_tools = True
                         
             # but if we mention any blocks, files or folders in the prompt then we must use tools
             if not use_tools and ("block(" in raw_prompt or "file(" in raw_prompt or "folder(" in raw_prompt):
@@ -229,9 +187,6 @@ Final Prompt:
         filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
-
-        if self.parse_prompt and self.answer:
-            self.inject_answer(self.prj_loader.file_with_prompt, self.answer, self.ok_hal)
             
         if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
@@ -265,10 +220,8 @@ Final Prompt:
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude, False, "")
+        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude)
         self.prompt = input_prompt
-        self.parse_prompt = False
-        self.ok_hal = ""
         self.mode = RefactorMode.REFACTOR.value
         self.ext_set = ext_set
 
@@ -278,15 +231,6 @@ Final Prompt:
 
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
-        
-        if self.parse_prompt: 
-            if not self.prj_loader.parsed_prompt:
-                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' terminator line after the prompt.")
-            
-            if (self.prj_loader.file_with_prompt):
-                # get file extension from file_with_prompt filename
-                ext = os.path.splitext(self.prj_loader.file_with_prompt)[1]
-                self.prompt = self.prompt + self.get_file_type_mention(ext);
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
         self.prompt = PromptUtils.insert_files_into_prompt(
@@ -356,9 +300,6 @@ Final Prompt:
         filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
-
-        if self.parse_prompt and self.answer:
-            self.inject_answer(self.prj_loader.file_with_prompt, self.answer, self.ok_hal)
             
         if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
@@ -410,51 +351,6 @@ Final Prompt:
         if file_type:
             return f"\nI'm working in a {file_type} file. "
         return ""
-
-    def parse_prompt_and_code(self, prompt: str) -> tuple[str, str]:
-        """Takes the prompt and divides it at the line containing a '-' character (if there is one)
-        and returns the top half as the prompt, and the bottom half as the code, otherwise the
-        input prompt is sent back as prompt and code sent back as empty string
-        """
-        prompt_lines = prompt.split("\n")
-        prompt = ""
-        code = ""
-        in_code = False
-
-        for line in prompt_lines:
-            if line.strip() == "-":
-                in_code = True
-            elif in_code:
-                code += line + "\n"
-            else:
-                prompt += line + "\n"
-
-        return prompt, code
-        
-    def inject_answer(self, file_with_prompt: str, answer: str, ok_hal: str):
-        """Injects the AI answer into the file that contains the prompt."""
-        wrote = False
-        
-        with FileUtils.open_file(file_with_prompt) as file:
-            lines = file.readlines()
-        
-        with FileUtils.open_writable_file(file_with_prompt) as file:
-            ready_to_write = False
-            for line in lines:
-                trimmed = line.strip()
-                if trimmed == ok_hal:
-                    ready_to_write = True
-                    file.write("-"+trimmed+"\n")
-                    
-                elif trimmed == "?" and ready_to_write:
-                    file.write(line)
-                    if not wrote:
-                        file.write(answer)
-                        file.write("\n----\n\n")
-                        wrote = True
-                else:
-                    file.write(line)
-            print("Wrote File: "+file_with_prompt)
 
     def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,

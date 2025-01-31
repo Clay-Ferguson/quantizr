@@ -17,22 +17,13 @@ class ProjectLoader:
     folder_names: List[str] = []
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
-    parse_prompt: bool = False
-    parsed_prompt: str = ""
-    file_with_prompt: str = ""
     source_folder: str = ""
 
-    # folders_to_include is a newline (\n) separated list of folders to include in the scan
-    def __init__(self, source_folder: str, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str], parse_prompt: bool = False, ok_hal: str = ""):
+    def __init__(self, source_folder: str, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]):
         self.source_folder = source_folder
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
-        self.parse_prompt = parse_prompt
-        self.parsed_prompt = ""
-        self.file_with_prompt = ""
-        self.ok_hal = ok_hal
-        
+        self.folders_to_exclude = folders_to_exclude        
         
     def reset(self):
         self.blocks = {}
@@ -52,27 +43,12 @@ class ProjectLoader:
         # Open the file using 'with' which ensures the file is closed after reading
         with FileUtils.open_file(path) as file:
             block: Optional[TextBlock] = None
-            in_prompt: bool = False
-            parsed_prompt: str = ""
 
             for line in file:  # NOTE: There's no way do to typesafety in loop vars
                 # Print each line; using end='' to avoid adding extra newline
                 trimmed: str = line.strip()
-
-                # If we're parsing the prompt
-                if in_prompt:
-                    if trimmed == "?":
-                        self.parsed_prompt = parsed_prompt
-                        self.file_with_prompt = path
-                        in_prompt = False
-                    else:  
-                        prompt_line = self.strip_comment_chars(trimmed)
-                        parsed_prompt += prompt_line+"\n"
-
-                if trimmed == self.ok_hal and self.parse_prompt and not self.parsed_prompt:
-                    in_prompt = True
                     
-                elif Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):
+                if Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):
                     name: Optional[str] = Utils.parse_name_from_tag_line(
                         trimmed, TAG_BLOCK_BEGIN
                     )

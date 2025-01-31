@@ -51,7 +51,7 @@ if __name__ == "__main__":
     AppConfig.init_config()
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_AgentTest.log")
     
-    llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
+    llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
     
     tools = [DummyTestTool("My Dummy Test Tool")]
     

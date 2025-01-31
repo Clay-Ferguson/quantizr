@@ -22,32 +22,6 @@ class AIUtils:
         return False
     
     @staticmethod
-    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]) -> None: 
-        """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
-        print("Running ask_agent")
-        messages: List[BaseMessage] = []
-        mode = RefactorMode.REFACTOR.value
-        llm: BaseChatModel = AIUtils.create_llm(0.0, cfg)
-        prompt = ""
-        agent = QuantaAgent()
-        agent.run(
-            "",
-            cfg.ai_service,
-            mode,
-            "",
-            messages,
-            prompt,
-            True,
-            cfg.source_folder,
-            folders_to_include,
-            folders_to_exclude,
-            cfg.data_folder,
-            ext_set,
-            llm,
-            cfg.ok_hal
-        )
-    
-    @staticmethod
     def create_llm(
             temperature: float,
             cfg: argparse.Namespace

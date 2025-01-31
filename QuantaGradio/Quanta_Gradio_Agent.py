@@ -27,7 +27,7 @@ if __name__ == "__main__":
         
         # Get the LLM based on which model the Config calls for. We use a temperature of 1.0 for no creativity at all but only
         # always the most likely next tokens, and hopefully best code generation.
-        llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
+        llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
 
         agent = QuantaAgent()
         

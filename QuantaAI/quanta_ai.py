@@ -123,15 +123,13 @@ temperature: {req.temperature}
                 "",
                 messages,
                 req.prompt if req.prompt else "",
-                False,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 folders_to_include,
                 folders_to_exclude,
                 "/data",
                 ext_set,
-                llm,
-                ""
+                llm
             )
             answer = messages[-1].content # type: ignore
         else:

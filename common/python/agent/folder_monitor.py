@@ -26,14 +26,10 @@ class FileChangeHandler(FileSystemEventHandler):
             if (Utils.has_included_file_extension(self.ext_set, event.src_path)
                  and Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)):
                 
-                # if there's no query to the agent in this file, then return
-                if not AIUtils.file_contains_line(event.src_path, self.cfg.ok_hal):
-                    return
-                
                 print(f"File Changed: {event.src_path}")
                 try:
                     FolderMonitor.active = False
-                    AIUtils.ask_agent(self.cfg, self.ext_set, self.folders_to_include, self.folders_to_exclude)
+                    # do something with the file here, some day maybe.
                 except Exception as e:
                     print(f"Error: {e}")
                 finally:
