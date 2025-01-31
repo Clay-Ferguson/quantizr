@@ -2,6 +2,7 @@
 
 import re
 import os
+import sys
 import logging
 import builtins
 from enum import Enum
@@ -26,6 +27,12 @@ class RefactorMode(Enum):
 
 class Utils:
     """Utilities Class"""
+
+    @staticmethod
+    def check_conda_env(name: str):
+        if os.getenv("CONDA_DEFAULT_ENV") != name:
+            print(f"Please activate the '{name}' environment before running. Exiting...")
+            sys.exit(1)
 
     @staticmethod
     def init_logging(file_name: str):

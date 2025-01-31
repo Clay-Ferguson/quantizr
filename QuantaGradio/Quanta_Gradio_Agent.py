@@ -18,6 +18,8 @@ from langchain.chat_models.base import BaseChatModel
 
 if __name__ == "__main__":
     print("Quanta Gradio Agent Starting...")
+    Utils.check_conda_env("quanta_gradio")
+    
     AppConfig.init_config()    
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
 
