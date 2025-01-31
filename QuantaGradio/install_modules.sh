@@ -6,7 +6,7 @@
 #    conda remove --name quanta_gradio --all
 #    conda create --name quanta_gradio python=3.12.3
 #    conda activate quanta_gradio
-#    ./install_modules.sh
+#    ./install_modules.sh  # this file
 
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
   read -p "Press ENTER. To install modules."
