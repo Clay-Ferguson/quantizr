@@ -10,7 +10,7 @@ import os
 import gradio as gr
 from langchain.schema import AIMessage, HumanMessage
 import base64
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Any
 import mimetypes
 
 ABS_FILE = os.path.abspath(__file__)
