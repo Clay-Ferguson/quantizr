@@ -24,7 +24,7 @@ if __name__ == "__main__":
     AppConfig.init_config()    
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
 
-    async def query_ai(prompt, messages):
+    async def query_ai(prompt, messages, show_tool_usage):
         """# Runs an LLM inference (calls the AI) which can answer questions and/or refactor code using the tools
         """
         
@@ -39,6 +39,7 @@ if __name__ == "__main__":
             AppConfig.cfg.ai_service,
             "", # output_file_name
             messages,
+            show_tool_usage,
             full_prompts,
             prompt,
             AppConfig.cfg.source_folder,
@@ -83,9 +84,9 @@ if __name__ == "__main__":
         with gr.Row():
             submit_button = gr.Button("Submit")
             clear_button = gr.Button("Clear")
+            show_tool_usage = gr.Checkbox(label="Show Tool Usage", value=False)
             
-        submit_button.click(query_ai, [input, chatbot], [chatbot, input])
+        submit_button.click(query_ai, [input, chatbot, show_tool_usage], [chatbot, input])
         clear_button.click(clear_history, [], [chatbot])
     
     demo.launch()         
-    

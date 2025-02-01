@@ -205,7 +205,8 @@ Final Prompt:
         self,
         ai_service: str,
         output_file_name: str,
-        messages, 
+        messages,
+        show_tool_usage: bool, 
         full_prompts: List[str],
         input_prompt: str,
         source_folder: str,
@@ -276,9 +277,9 @@ Final Prompt:
         for msg in messages:
             if msg['role'] == "user":
                 chat_history.append(HumanMessage(content=full_prompts[idx]))
+                idx += 1 
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
-            idx += 1 
 
         agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
         agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
@@ -290,17 +291,11 @@ Final Prompt:
         async for chunk in agent_executor.astream(
             {"input": full_prompt, "chat_history": chat_history}
         ):
-            # =======================================================================
-            # DO NOT DELETE. I'm not 100% this won't break some thing in the history, that will affect the actual context/intelligence
-            # during the refactoring chat, but for now I don't need to see which tools are getting used, so I comment this out, because it
-            # does remove the tool use messages from the chat history GUI, and appears to work.
-            #
-            # if "steps" in chunk:
-            #     for step in chunk["steps"]:
-            #         messages.append(ChatMessage(role="assistant", content=step.action.log,
-            #                         metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
-            #         yield messages
-            # =======================================================================
+            if show_tool_usage and "steps" in chunk:
+                for step in chunk["steps"]:
+                    messages.append(ChatMessage(role="assistant", content=step.action.log,
+                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
+                    yield messages
             if "output" in chunk:
                 messages.append(ChatMessage(role="assistant", content=chunk["output"]))
                 yield messages
