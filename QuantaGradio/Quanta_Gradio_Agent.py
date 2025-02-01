@@ -19,6 +19,7 @@ from langchain.chat_models.base import BaseChatModel
 if __name__ == "__main__":
     print("Quanta Gradio Agent Starting...")
     Utils.check_conda_env("quanta_gradio")
+    full_prompts = []
     
     AppConfig.init_config()    
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
@@ -38,6 +39,7 @@ if __name__ == "__main__":
             AppConfig.cfg.ai_service,
             "", # output_file_name
             messages,
+            full_prompts,
             prompt,
             AppConfig.cfg.source_folder,
             AppConfig.folders_to_include,
@@ -52,6 +54,7 @@ if __name__ == "__main__":
         yield messages, ""
 
     def clear_history():
+        full_prompts = []
         return []
 
     # This 'logo' isn't being used, but I leave this in place for future reference in case we

@@ -206,6 +206,7 @@ Final Prompt:
         ai_service: str,
         output_file_name: str,
         messages, 
+        full_prompts: List[str],
         input_prompt: str,
         source_folder: str,
         folders_to_include: List[str],
@@ -232,12 +233,15 @@ Final Prompt:
         # Scan the source folder(s) for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
 
-        self.prompt = self.insert_blocks_into_prompt(self.prompt)
-        self.prompt = PromptUtils.insert_files_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.file_names
+        # full_prompt will hold the final prompt sent to AI which can hav all kinds of substitutions in it (files, blocks, etc)
+        full_prompt = self.prompt
+
+        full_prompt = self.insert_blocks_into_prompt(full_prompt)
+        full_prompt = PromptUtils.insert_files_into_prompt(
+            full_prompt, self.source_folder, self.prj_loader.file_names
         )
-        self.prompt = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
+        full_prompt = PromptUtils.insert_folders_into_prompt(
+            full_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
         )
         
         self.build_system_prompt("")
@@ -247,7 +251,6 @@ Final Prompt:
             CreateFileTool("File Creator Tool", self.source_folder),
             UpdateFileTool("File Updater Tool", self.source_folder),
         ]
-        print("Created Agent Tools")
             
         chat_prompt_template = ChatPromptTemplate.from_messages([
             SystemMessage(content=self.system_prompt),
@@ -256,28 +259,48 @@ Final Prompt:
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
     
-        # Convert messages to a format the agent can understand
-        chat_history = []        
+        # first, in 'messages' need to count how many of them have msg['role'] == "user"
+        user_message_count = 0
         for msg in messages:
             if msg['role'] == "user":
-                chat_history.append(HumanMessage(content=msg['content']))
+                user_message_count += 1
+                
+        # if the user has used some Gradio feature to reset the chat history, then we need to clear the full_prompts list too
+        if user_message_count == 0:
+            # remove all elements in full_prompts
+            full_prompts.clear()
+                
+        # Convert messages to a format the agent can understand
+        chat_history = []
+        idx = 0        
+        for msg in messages:
+            if msg['role'] == "user":
+                chat_history.append(HumanMessage(content=full_prompts[idx]))
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
+            idx += 1 
 
         agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
         agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
         
+        full_prompts.append(full_prompt)
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages
         
         async for chunk in agent_executor.astream(
-            {"input": self.prompt, "chat_history": chat_history}
+            {"input": full_prompt, "chat_history": chat_history}
         ):
-            if "steps" in chunk:
-                for step in chunk["steps"]:
-                    messages.append(ChatMessage(role="assistant", content=step.action.log,
-                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
-                    yield messages
+            # =======================================================================
+            # DO NOT DELETE. I'm not 100% this won't break some thing in the history, that will affect the actual context/intelligence
+            # during the refactoring chat, but for now I don't need to see which tools are getting used, so I comment this out, because it
+            # does remove the tool use messages from the chat history GUI, and appears to work.
+            #
+            # if "steps" in chunk:
+            #     for step in chunk["steps"]:
+            #         messages.append(ChatMessage(role="assistant", content=step.action.log,
+            #                         metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
+            #         yield messages
+            # =======================================================================
             if "output" in chunk:
                 messages.append(ChatMessage(role="assistant", content=chunk["output"]))
                 yield messages
