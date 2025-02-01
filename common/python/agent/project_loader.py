@@ -48,13 +48,16 @@ class ProjectLoader:
                 # Print each line; using end='' to avoid adding extra newline
                 trimmed: str = line.strip()
                     
+                # If this is the beginning of a block
                 if Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):
                     name: Optional[str] = Utils.parse_name_from_tag_line(
                         trimmed, TAG_BLOCK_BEGIN
                     )
 
+                    # have we already seen this block name?
                     if name in self.blocks:
                         raise Exception(f"Duplicate Block Name `{name}` in file {path}. Block Names must be unique across all files.")
+                    # if not create the block
                     else:
                         # print(f"Block name: {name}")
                         # n is a non-optional string
@@ -62,12 +65,14 @@ class ProjectLoader:
                         block = TextBlock(relative_file_name, n, "", False)
                         self.blocks[n] = block
                         
+                # If this is the end of a block
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_END):
                     if block is None:
                         raise Exception(
                             f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""")
                     block = None
-                        
+                    
+                # Otherwise, we're in a block, and so we just add the line to the block
                 else:
                     if block is not None:
                         block.content += line
@@ -108,7 +113,6 @@ class ProjectLoader:
                 includeExt = Utils.has_included_file_extension(self.ext_set, filename)
                 includeFolder = Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)
                 
-                # print(f"file: {filename} -> includeExt: {includeExt}, includeFolder: {includeFolder}")
                 if (includeExt and includeFolder):
                     # print(f"include file {filename} in {dirpath}")
                     # build the full path

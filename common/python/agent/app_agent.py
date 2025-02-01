@@ -229,7 +229,7 @@ Final Prompt:
         if output_file_name == "":
             output_file_name = self.ts
 
-        # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
+        # Scan the source folder(s) for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
@@ -356,7 +356,7 @@ Final Prompt:
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
         folders, and creating files.
 
-        WARNING: This method modifies the `prompt` attribute of the class to have already been configured, and
+        WARNING: This method modifies the `prompt` member of the class to have already been configured, and
         also really everything else that this class sets up, so this method should be called last, just before
         the AI query is made.
         """
@@ -404,11 +404,10 @@ Final Prompt:
         Substitute blocks into the prompt. Prompts can contain ${BlockName} tags, which will be replaced with the
         content of the block with the name 'BlockName'
         """
-        # As performance boost, if self.prompt does not contain "block(" then return False
+        # If self.prompt does not contain "block(" then return False
         if "block(" not in prompt or self.prj_loader is None or self.prj_loader.blocks is None:
             return prompt
         
-        # ret = False
         for key, value in self.prj_loader.blocks.items():
             prompt = prompt.replace(
                 f"block({key})",

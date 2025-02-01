@@ -64,16 +64,13 @@ class PromptUtils:
         # print("Walking folder_path: {folder_path}")
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
-                # print(f"Checking file: {filename}")
                 short_dir: str = dirpath[len(source_folder) :]
                 
-                hasIncludedFileExtension = Utils.has_included_file_extension(ext_set, filename)
-                # print(f"    ext pass: {hasIncludedFileExtension}")
+                allowExt = Utils.has_included_file_extension(ext_set, filename)
                 allowFolder = Utils.allow_folder(folders_to_include, folders_to_exclude, short_dir)
-                # print(f"    folder pass: {allowFolder}")
                 
                 # Check the file extension
-                if (hasIncludedFileExtension and allowFolder):
+                if (allowExt and allowFolder):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder

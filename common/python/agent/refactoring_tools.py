@@ -15,7 +15,6 @@ class CreateFileInput(BaseModel):
     file_name: str = Field(description="File Name")
     file_content: str = Field(description="File Content")
 
-
 class UpdateFileInput(BaseModel):
     file_name: str = Field(description="File Name")
     file_content: str = Field(description="File Content")
@@ -67,7 +66,6 @@ class UpdateBlockTool(BaseTool):
     #     # LangChain will automatically provide a better implementation that will
     #     # kick off the task in a thread to make sure it doesn't block other async code.
     #     return self._run(block_name, block_content, run_manager=run_manager.get_sync())
-
 
 class CreateFileTool(BaseTool):
     """Tool to create a new file."""
