@@ -4,6 +4,9 @@ The primary purpose of this project is to contai Quanta_Gradio_Agent.py. The oth
 
 Quanta_Gradio_Agent is a Web-based GUI tool based on Gradio and Langchain, which runs our Quanta Agent code as a web app. (This is not to be confused with the Quanta Web App itself which is a Content Management System primarily). The Quanta Agent web app is just a light weight Gradio front end that offers AI capabilities. Most of the code for this app is in `common/python` folder of the Quantizr repository, because the common code is used by several other projects.
 
+# Warning
+
+The Gradio Agent currently only works with OpenAI model. For Anthropic, and other model providers the code will have to change.
 
 # About Quanta Coding Agent
 

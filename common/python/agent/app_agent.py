@@ -201,6 +201,9 @@ Final Prompt:
                 self.ext_set
             ).run()
 
+
+    # todo-0: oops! I've made quite a few changes to this method without, around 2/1/25 (and the two days before that), without thinking about the fact that
+    # we ALSO have the 'run' method above that's similar!!!
     async def run_gradio(
         self,
         ai_service: str,
@@ -246,6 +249,10 @@ Final Prompt:
         )
         
         self.build_system_prompt("")
+
+        # todo-0: Use the link below and learn how to get Anthropic model working.
+        #         Start with Quanta_Graio_AgentTest.py, and get that workiong first.
+        # See Also: https://python.langchain.com/docs/tutorials/agents/
 
         tools = [
             UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
