@@ -16,7 +16,7 @@ from langchain.chat_models.base import BaseChatModel
 import gradio as gr
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
+from langchain.schema import HumanMessage, SystemMessage
 from langgraph.prebuilt import chat_agent_executor
 
 ABS_FILE = os.path.abspath(__file__)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         yield messages, ""
         
         async for chunk in agent_executor.astream({"messages": chat_history}):
-            AIUtils.handle_agent_response_item(chunk, messages)
+            AIUtils.handle_agent_response_item(chunk, messages, True)
             yield messages, ""            
 
     with gr.Blocks() as demo:

@@ -90,18 +90,19 @@ class AIUtils:
         return str(msg)
         
     @staticmethod
-    def handle_agent_response_item(chunk, messages):
+    def handle_agent_response_item(chunk, messages, include_tool_usage):
         if "agent" in chunk:
             agnt = chunk["agent"]
             if agnt is not None and "messages" in agnt:
                 for msg in agnt["messages"]:
-                    messages.append(ChatMessage(role="assistant", content="Agent: "+AIUtils.get_agent_response_string(msg.content)))
+                    messages.append(ChatMessage(role="assistant", content=AIUtils.get_agent_response_string(msg.content)))
             
         elif "tools" in chunk:
-            toolz = chunk["tools"]
-            if toolz is not None and "messages" in toolz:
-                for msg in toolz["messages"]:
-                    messages.append(ChatMessage(role="assistant", content=f"🛠️ Tool: {AIUtils.get_agent_response_string(msg.content)}"))
+            if include_tool_usage:
+                toolz = chunk["tools"]
+                if toolz is not None and "messages" in toolz:
+                    for msg in toolz["messages"]:
+                        messages.append(ChatMessage(role="assistant", content=f"🛠️ {AIUtils.get_agent_response_string(msg.content)}"))
                 
         elif "final_answer" in chunk:
             # Final response from the agent

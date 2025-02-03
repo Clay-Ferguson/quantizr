@@ -1,6 +1,7 @@
 """This is the main agent module that scans the source code and generates the AI prompt."""
 
 import os
+import sys
 import time
 from typing import List, Set
 from .project_loader import ProjectLoader
@@ -27,6 +28,11 @@ from .tags import (
 from ..utils import RefactorMode
 from .prompt_utils import PromptUtils
 
+ABS_FILE = os.path.abspath(__file__)
+PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
+sys.path.append(PRJ_DIR)
+
+from common.python.agent.ai_utils import AIUtils
 
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
@@ -249,10 +255,6 @@ Final Prompt:
         
         self.build_system_prompt("")
 
-        # todo-0: Use the link below and learn how to get Anthropic model working.
-        #         Start with Quanta_Graio_AgentTest.py, and get that workiong first.
-        # See Also: https://python.langchain.com/docs/tutorials/agents/
-
         tools = [
             UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
             CreateFileTool("File Creator Tool", self.source_folder),
@@ -287,24 +289,16 @@ Final Prompt:
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
 
-        agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
-        agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
-        
+        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
+    
+        chat_history.append(HumanMessage(content=full_prompt))    
         full_prompts.append(full_prompt)
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages
         
-        async for chunk in agent_executor.astream(
-            {"input": full_prompt, "chat_history": chat_history}
-        ):
-            if show_tool_usage and "steps" in chunk:
-                for step in chunk["steps"]:
-                    messages.append(ChatMessage(role="assistant", content=step.action.log,
-                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
-                    yield messages
-            if "output" in chunk:
-                messages.append(ChatMessage(role="assistant", content=chunk["output"]))
-                yield messages
+        async for chunk in agent_executor.astream({"messages": chat_history}):
+            AIUtils.handle_agent_response_item(chunk, messages, show_tool_usage)
+            yield messages            
             
         output = f"""AI Model Used: {ai_service}, Mode: {self.mode}, Timestamp: {self.ts}
 ____________________________________________________________________________________

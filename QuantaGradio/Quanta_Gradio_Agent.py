@@ -52,6 +52,7 @@ if __name__ == "__main__":
             # Handle each yielded result
             if isinstance(result, list):
                 messages = result
+                
         yield messages, ""
 
     def clear_history():
