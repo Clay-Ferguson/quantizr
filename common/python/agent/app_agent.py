@@ -1,7 +1,6 @@
 """This is the main agent module that scans the source code and generates the AI prompt."""
 
 import os
-import re
 import time
 from typing import List, Set
 from .project_loader import ProjectLoader

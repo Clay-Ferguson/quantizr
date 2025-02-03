@@ -1,10 +1,12 @@
-"""Runs a basic ChatBot with Tool Use using Gradio interface.
+"""
+WARNING: This file is obsolete/deprecated, but we'll keep from now. It only ever
+worked with OpenAI, and not with other LLMs.
+
+Runs a basic ChatBot with Tool Use using Gradio interface.
 You can use this as the simplest possible test to verify that Gradio (with Tools) is working.
 
 In the gui the following prompt will run a tool test: 
 prompt = "run the test tool using input string "abc"
-
-NOTE: This agent is known to work with both Anthropic and OpenAI LLMs!
 """
 
 import sys
@@ -17,7 +19,7 @@ import gradio as gr
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from langgraph.prebuilt import chat_agent_executor
+from langchain.agents import AgentExecutor, create_openai_tools_agent
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_AgentTest.log")
     
     llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
+    
     tools = [DummyTestTool("My Dummy Test Tool")]
     
     chat_prompt_template = ChatPromptTemplate.from_messages([
@@ -65,26 +68,40 @@ if __name__ == "__main__":
     ])
 
     async def query_ai(prompt, messages):
-        chat_history = AIUtils.gradio_messages_to_langchain(messages)
-        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
+        # Convert messages to a format the agent can understand
+        chat_history = []
+        for msg in messages:
+            if msg['role'] == "user":
+                chat_history.append(HumanMessage(content=msg['content']))
+            elif msg['role'] == "assistant":
+                chat_history.append(AIMessage(content=msg['content']))
     
-        chat_history.append(HumanMessage(content=prompt))    
-        messages.append(ChatMessage(role="user", content=prompt))
-        yield messages, ""
+        agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
+        agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
         
-        async for chunk in agent_executor.astream({"messages": chat_history}):
-            AIUtils.handle_agent_response_item(chunk, messages)
-            yield messages, ""            
+        messages.append(ChatMessage(role="user", content=prompt))
+        yield messages
+        async for chunk in agent_executor.astream(
+            {"input": prompt, "chat_history": chat_history}
+        ):
+            if "steps" in chunk:
+                for step in chunk["steps"]:
+                    messages.append(ChatMessage(role="assistant", content=step.action.log,
+                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
+                    yield messages
+            if "output" in chunk:
+                messages.append(ChatMessage(role="assistant", content=chunk["output"]))
+                yield messages
 
     with gr.Blocks() as demo:
-        gr.Markdown("# Chat Agent Test")
+        gr.Markdown("# Chat with a LangChain Agent 🦜⛓️ and see its thoughts 💭")
         chatbot = gr.Chatbot(
             type="messages",
             label="Agent",
             avatar_images=(None, "assets/logo-100px-tr.jpg"),
         )
         input = gr.Textbox(lines=1, label="Chat Message")
-        input.submit(query_ai, [input, chatbot], [chatbot, input])
+        input.submit(query_ai, [input, chatbot], [chatbot])
 
     demo.launch()         
               
