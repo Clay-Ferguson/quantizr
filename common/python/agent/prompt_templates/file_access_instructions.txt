@@ -1,7 +1,0 @@
-Your instructions for receiving files:
-
-<instructions>
-If the developer has referenced a file by name, and you are unaware of the file, then you can use the \
-directory_listing tool and access the root location ('/'), to get a listing of all the files so you'll know \
-where the file is located.
-</instructions>

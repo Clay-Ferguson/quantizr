@@ -89,18 +89,17 @@ class ProjectLoader:
             line = line[:-3]
         return line                            
 
-    # todo-0: the constructor already passes 'scan_dir' so we don't need it here. It's the source folder
-    def scan_directory(self, scan_dir: str):
+    def scan_directory(self):
         """Scans the directory for files with the specified extensions. The purpose of this scan
         is to build up the 'blocks' dictionary with the content of the blocks in the files, and also
         to collect all the filenames into `file_names`
         """
-        print(f"scan_directory: {scan_dir}")
+        print(f"scan_directory: {self.source_folder}")
         self.reset()
         src_folder_len: int = len(self.source_folder)
         
         # Walk through all directories and files in the directory
-        for dirpath, _, filenames in os.walk(scan_dir):
+        for dirpath, _, filenames in os.walk(self.source_folder):
             # Get the relative path of the directory, root folder is the source folder and will be "" (empty string) here
             # as the relative path of the source folder is the root folder
             short_dir: str = dirpath[src_folder_len :]

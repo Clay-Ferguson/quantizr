@@ -6,6 +6,8 @@ from typing import List, Set
 import argparse
 import configargparse
 
+from common.python.agent.models import FileSources
+
 class AppConfig:
     """Loads configuration from config.yaml and secrets.yaml files."""
 
@@ -14,6 +16,7 @@ class AppConfig:
     cfg: argparse.Namespace
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
+    file_sources: FileSources
 
     # Configures the app by loading configuration yaml file, and getting 
     @staticmethod
@@ -88,6 +91,13 @@ class AppConfig:
         AppConfig.folders_to_exclude = list(filter(None, AppConfig.folders_to_exclude))
         
         AppConfig.ext_set = set(AppConfig.ext_list)
+        
+        # todo-0: this file_sources will be used everywhere (soon)
+        AppConfig.file_sources = FileSources(AppConfig.cfg.source_folder, 
+                                             AppConfig.folders_to_include, 
+                                             AppConfig.folders_to_exclude, 
+                                             AppConfig.ext_set, 
+                                             AppConfig.cfg.data_folder)
         
         if (AppConfig.cfg):
             print("Configuration loaded")   

@@ -16,8 +16,6 @@ from .tags import (
     TAG_BLOCK_END
 )
 
-# todo-0: for all these tools, especially 'get_block_info' I want to add a lot more info on how to use them.
-
 class GetBlockInfoInput(BaseModel):
     block_name: str = Field(description="Block Name")
 
@@ -32,7 +30,7 @@ class CreateFileInput(BaseModel):
 class DirectoryListingInput(BaseModel):
     folder_name: str = Field(description="Folder Name")
 
-class UpdateFileInput(BaseModel):
+class WriteFileInput(BaseModel):
     file_name: str = Field(description="File Name")
     file_content: str = Field(description="File Content")
 
@@ -40,12 +38,10 @@ class ReadFileInput(BaseModel):
     file_name: str = Field(description="File Name")
 
 class GetBlockInfoTool(BaseTool):
-    """Tool for getting information about named blocks of text, including the entire current block content, and what file the block is defined in."""
-
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
     name: str = "get_block_info"
-    description: str = "useful for when you need to get information about a named block of text, including the entire current block content, and what file the block is defined in."
+    description: str
     source_folder: str = ""
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
@@ -54,14 +50,12 @@ class GetBlockInfoTool(BaseTool):
     args_schema: Type[BaseModel] = GetBlockInfoInput
     return_direct: bool = False
 
-    def __init__(self, description, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description=description)
-        # self.blocks = blocks
+    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
+        super().__init__(description="Get Block Info Tool: Useful for when you need to get information about a named block of text, including the entire current block content, and what file the block is defined in.")
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
         self.ext_set = ext_set
-        print(f"Created GetBlockInfoTool")
 
     def _run(
         self,
@@ -71,7 +65,7 @@ class GetBlockInfoTool(BaseTool):
         """Use the tool."""
         print(f"GetBlockInfoTool: {block_name}")
         prj_loader = ProjectLoader(self.source_folder, self.ext_set, self.folders_to_include, self.folders_to_exclude)
-        prj_loader.scan_directory(self.source_folder)
+        prj_loader.scan_directory()
         
         block: Optional[TextBlock] = prj_loader.blocks.get(block_name)
         if block is not None:            
@@ -82,12 +76,10 @@ class GetBlockInfoTool(BaseTool):
         return msg
 
 class UpdateBlockTool(BaseTool):
-    """Tool for updating a named block of text to set new content"""
-
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
     name: str = "update_block"
-    description: str = "useful for when you need to updat a named block of text to set new content"
+    description: str
     source_folder: str = ""
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
@@ -96,14 +88,13 @@ class UpdateBlockTool(BaseTool):
     args_schema: Type[BaseModel] = UpdateBlockInput
     return_direct: bool = False
 
-    def __init__(self, description, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description=description)
+    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
+        super().__init__(description="Block Updater Tool: Useful for when you need to updat a named block of text to set new content")
         # self.blocks = blocks
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
         self.ext_set = ext_set
-        print(f"Created UpdateBlockTool")
 
     def _run(
         self,
@@ -114,7 +105,7 @@ class UpdateBlockTool(BaseTool):
         """Use the tool."""
         print(f"UpdateBlockTool: {block_name}")
         prj_loader = ProjectLoader(self.source_folder, self.ext_set, self.folders_to_include, self.folders_to_exclude)
-        prj_loader.scan_directory(self.source_folder)
+        prj_loader.scan_directory()
         
         block: Optional[TextBlock] = prj_loader.blocks.get(block_name)
         if block is not None:            
@@ -172,20 +163,16 @@ class UpdateBlockTool(BaseTool):
     #     # kick off the task in a thread to make sure it doesn't block other async code.
     #     return self._run(block_name, block_content, run_manager=run_manager.get_sync())
 
-# todo-0: add note to agent that tells it, it can use this and expect subfolders to be created automatically. Ask AI how to do this
-# in a way that's tool internal (not part of System Prompt). Is it just added to description?
 class CreateFileTool(BaseTool):
-    """Tool to create a new file."""
-
     name: str = "create_file"
-    description: str = "useful for when you need to create a new file"
+    description: str
     
     args_schema: Type[BaseModel] = CreateFileInput
     return_direct: bool = False
     base_path: str = ""
 
-    def __init__(self, description, base_path: str):
-        super().__init__(description=description)
+    def __init__(self, base_path: str):
+        super().__init__(description="File Creator Tool: Useful for when you need to create a new file. Subfolders will be created automatically if they don't exist.")
         self.base_path = base_path
 
     def _run(
@@ -214,10 +201,8 @@ class CreateFileTool(BaseTool):
         return msg
 
 class DirectoryListingTool(BaseTool):
-    """Tool to get a listing of folders (filtered by the config settings)."""
-
     name: str = "directory_listing"
-    description: str = "Useful for when you need to get a directory listing of folders"
+    description: str
     source_folder: str = ""
     folders_to_include: List[str] = []
     folders_to_exclude: List[str] = []
@@ -227,9 +212,8 @@ class DirectoryListingTool(BaseTool):
     return_direct: bool = False
     base_path: str = ""
 
-    # todo-0: for this and all tools, remove 'description' from being a constructor arg, and make it internal
-    def __init__(self, description, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description=description)
+    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
+        super().__init__(description="Directory Listing Tool: Useful for when you need to get a directory listing of folders")
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
@@ -275,17 +259,15 @@ class DirectoryListingTool(BaseTool):
         return ret
 
 class ReadFileTool(BaseTool):
-    """Tool to read a file."""
-
     name: str = "read_file"
-    description: str = "useful for when you need to read an existing file and get its text content"
+    description: str
     
     args_schema: Type[BaseModel] = ReadFileInput
     return_direct: bool = False
     base_path: str = ""
 
-    def __init__(self, description, base_path: str):
-        super().__init__(description=description)
+    def __init__(self, base_path: str):
+        super().__init__(description="File Reader Tool: Useful for when you need to read an existing file and get its text content")
         self.base_path = base_path
 
     def _run(
@@ -301,32 +283,32 @@ class ReadFileTool(BaseTool):
         print("    File content: " + content)
         return content
 
-# todo-0: rename this (and associated documentation) to "WriteFileTool"
-class UpdateFileTool(BaseTool):
-    """Tool to update a file by writing all new content to the file"""
-
-    name: str = "update_file"
-    description: str = "useful for when you need to update an existing file with all new content"
+class WriteFileTool(BaseTool):
+    name: str = "write_file"
+    description: str
     
-    args_schema: Type[BaseModel] = UpdateFileInput
+    args_schema: Type[BaseModel] = WriteFileInput
     return_direct: bool = False
     base_path: str = ""
 
-    def __init__(self, description, base_path: str):
-        super().__init__(description=description)
+    def __init__(self, base_path: str):
+        super().__init__(description="File Writer Tool: Useful for when you need to write to a file with all new content. Any paths in the file name will be created automatically if they don't exist")
         self.base_path = base_path
-
+        
     def _run(
         self,
         file_name: str,
         file_content: str,
     ) -> str:
         """Use the tool."""
-        msg = f"File Updated: {file_name} with content: {file_content}"
-        print(f"File Updated: {file_name}")
         if not file_name.startswith("/"):
             file_name = "/" + file_name
         full_file_name = self.base_path + file_name
+        
+        # ensure that all paths exist for the file
+        FileUtils.ensure_folder_exists(full_file_name)
+        
         FileUtils.write_file(full_file_name, file_content)
-
+        msg = f"Wrote to File: {file_name}"
+        print(msg)
         return msg

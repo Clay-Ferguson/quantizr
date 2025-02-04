@@ -2,9 +2,6 @@
 
 from typing import Dict
 
-AGENT_INSTRUCTIONS = "\n----\nCoding Agent Instructions:\n"
-GENERAL_INSTRUCTIONS = "\n----\nGeneral Instructions:\n"
-
 TAG_BLOCK_BEGIN = "block_begin"
 TAG_BLOCK_END = "block_end"
 

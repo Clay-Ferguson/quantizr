@@ -14,14 +14,10 @@ from .refactoring_tools import (
     UpdateBlockTool,
     CreateFileTool,
     ReadFileTool,
-    UpdateFileTool, 
+    WriteFileTool, 
     DirectoryListingTool
 )
 from ..file_utils import FileUtils
-from .tags import (
-    AGENT_INSTRUCTIONS,
-    GENERAL_INSTRUCTIONS
-)
 from ..utils import RefactorMode
 from .prompt_utils import PromptUtils
 
@@ -105,19 +101,18 @@ class QuantaAgent:
             use_tools = True
 
             if use_tools and self.mode != RefactorMode.NONE.value:
-                # https://python.langchain.com/v0.2/docs/tutorials/agents/
                 tools = []
 
                 # todo-0: We need a class called FileSetInfo which packages up (source_folder, folders_to_include, folders_to_exclude, ext_set)
                 # todo-0: createing these 'tools' needs to be in a separate method probably INSIDE the file they're defined in.
                 if self.mode == RefactorMode.REFACTOR.value:
                     tools = [
-                        GetBlockInfoTool("Get Block Info Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-                        UpdateBlockTool("Block Updater Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-                        CreateFileTool("File Creator Tool", self.source_folder),
-                        UpdateFileTool("File Updater Tool", self.source_folder),
-                        ReadFileTool("File Reader Tool", self.source_folder),
-                        DirectoryListingTool("Directory Listing Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
+                        GetBlockInfoTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+                        UpdateBlockTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+                        CreateFileTool(self.source_folder),
+                        WriteFileTool(self.source_folder),
+                        ReadFileTool(self.source_folder),
+                        DirectoryListingTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
                     ]
                     print("Created Agent Tools")
                     
@@ -197,12 +192,12 @@ Final Prompt:
         self.build_system_prompt("")
 
         tools = [
-            GetBlockInfoTool("Get Block Info Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-            UpdateBlockTool("Block Updater Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-            CreateFileTool("File Creator Tool", self.source_folder),
-            UpdateFileTool("File Updater Tool", self.source_folder),
-            ReadFileTool("File Reader Tool", self.source_folder),
-            DirectoryListingTool("Directory Listing Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
+            GetBlockInfoTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+            UpdateBlockTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+            CreateFileTool(self.source_folder),
+            WriteFileTool(self.source_folder),
+            ReadFileTool(self.source_folder),
+            DirectoryListingTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
         ]
                 
         # Convert messages to a format the agent can understand
@@ -292,15 +287,12 @@ Final Prompt:
         """
 
         self.system_prompt = PromptUtils.get_template(
-            "../common/python/agent/prompt_templates/agent_system_prompt.txt"
+            "../common/python/agent/prompt_templates/agent_system_prompt.md"
         )
-        self.system_prompt += AGENT_INSTRUCTIONS
-        self.add_file_handling_instructions()
-        self.add_block_handling_instructions()
         
         # Users themselves may have provided a system prompt so add that if so.
         if user_system_prompt:
-            self.system_prompt += GENERAL_INSTRUCTIONS + user_system_prompt
+            self.system_prompt += f"\n----\nGeneral Instructions:\n{user_system_prompt}"
 
 
     def add_block_handling_instructions(self):
