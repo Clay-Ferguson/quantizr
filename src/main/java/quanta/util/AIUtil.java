@@ -1,6 +1,5 @@
 package quanta.util;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,13 +16,11 @@ import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
 import quanta.model.client.SystemConfig;
-import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.AskSubGraphRequest;
 import quanta.rest.request.GenerateBookByAIRequest;
 import quanta.rest.response.AskSubGraphResponse;
 import quanta.rest.response.GenerateBookByAIResponse;
-import quanta.util.val.Val;
 
 @Component
 public class AIUtil extends ServiceBase {

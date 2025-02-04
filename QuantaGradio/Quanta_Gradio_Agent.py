@@ -19,7 +19,6 @@ from langchain.chat_models.base import BaseChatModel
 if __name__ == "__main__":
     print("Quanta Gradio Agent Starting...")
     Utils.check_conda_env("quanta_gradio")
-    full_prompts = []
     
     AppConfig.init_config()    
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
@@ -40,7 +39,6 @@ if __name__ == "__main__":
             "", # output_file_name
             messages,
             show_tool_usage,
-            full_prompts,
             prompt,
             AppConfig.cfg.source_folder,
             AppConfig.folders_to_include,
@@ -85,7 +83,7 @@ if __name__ == "__main__":
         with gr.Row():
             submit_button = gr.Button("Submit")
             clear_button = gr.Button("Clear")
-            show_tool_usage = gr.Checkbox(label="Show Tool Usage", value=False)
+            show_tool_usage = gr.Checkbox(label="Show Tool Usage", value=True)
             
         submit_button.click(query_ai, [input, chatbot, show_tool_usage], [chatbot, input])
         clear_button.click(clear_history, [], [chatbot])

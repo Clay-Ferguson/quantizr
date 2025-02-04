@@ -9,11 +9,9 @@ class TextBlock:
     rel_filename: Optional[str]
     name: str
     content: str
-    dirty: bool = False
 
     #constructor function
-    def __init__(self, rel_filename: Optional[str], name: str, content: str, dirty: bool = False):
+    def __init__(self, rel_filename: Optional[str], name: str, content: str):
         self.rel_filename = rel_filename
         self.name = name
         self.content = content
-        self.dirty = dirty

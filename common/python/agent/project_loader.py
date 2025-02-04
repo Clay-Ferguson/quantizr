@@ -6,7 +6,6 @@ from ..utils import Utils
 from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END
 from ..file_utils import FileUtils
 
-
 class ProjectLoader:
     """ ProjectLoader scans all our project files and collects all information about the files and folders that we need
     """
@@ -62,7 +61,7 @@ class ProjectLoader:
                         # print(f"Block name: {name}")
                         # n is a non-optional string
                         n = name if name is not None else ""
-                        block = TextBlock(relative_file_name, n, "", False)
+                        block = TextBlock(relative_file_name, n, "")
                         self.blocks[n] = block
                         
                 # If this is the end of a block
@@ -90,6 +89,7 @@ class ProjectLoader:
             line = line[:-3]
         return line                            
 
+    # todo-0: the constructor already passes 'scan_dir' so we don't need it here. It's the source folder
     def scan_directory(self, scan_dir: str):
         """Scans the directory for files with the specified extensions. The purpose of this scan
         is to build up the 'blocks' dictionary with the content of the blocks in the files, and also
@@ -121,3 +121,6 @@ class ProjectLoader:
                     self.visit_file(path)
                 # else:
                 #    print(f"Skipping file {filename} in {dirpath}")
+        
+        # print number of blocks we ended up with
+        print(f"Found {len(self.blocks)} blocks")

@@ -7,12 +7,6 @@ import logging
 import builtins
 from enum import Enum
 from typing import List, Set, Optional
-from .agent.tags import (
-    TAG_FILE_BEGIN,
-    TAG_FILE_END,
-    TAG_BLOCK_BEGIN,
-    TAG_BLOCK_END,
-)
 
 class AIService(Enum):
     OPENAI = "openai"

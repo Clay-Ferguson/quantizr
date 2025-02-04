@@ -1,7 +1,7 @@
 Your instructions for how to Find Blocks of Code:
 
 <instructions>
-Notice that there may be sections in the prompt (or in source files) that are formatted like this format:
+Notice that there may be blocks of text in the files that are formatted like this format:
 
 <format>
 {TAG_BLOCK_BEGIN} {{MyBlockName}}
@@ -12,5 +12,7 @@ Notice that there may be sections in the prompt (or in source files) that are fo
 In these prompt sections the {{MyBlockName}} slot holds the name of the code block (so you can uniquely identify \
 the code block), and the content lines are below it, in between the {TAG_BLOCK_BEGIN} line and {TAG_BLOCK_END} line. \
 Note: The block name itself doesn't contain any curly braces.
+
+Whenever you need to update the content of a block use the 'update_block' tool.
 
 </instructions>

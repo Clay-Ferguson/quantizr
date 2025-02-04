@@ -4,24 +4,21 @@ import os
 import sys
 import time
 from typing import List, Set
-from .project_loader import ProjectLoader
-from .project_mutator import ProjectMutator
 from gradio import ChatMessage
-from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
-from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
 from ..utils import RefactorMode
 from .refactoring_tools import (
+    GetBlockInfoTool,
     UpdateBlockTool,
     CreateFileTool,
-    UpdateFileTool
+    ReadFileTool,
+    UpdateFileTool, 
+    DirectoryListingTool
 )
 from ..file_utils import FileUtils
 from .tags import (
-    TAG_BLOCK_BEGIN,
-    TAG_BLOCK_END,
     AGENT_INSTRUCTIONS,
     GENERAL_INSTRUCTIONS
 )
@@ -36,8 +33,6 @@ from common.python.agent.ai_utils import AIUtils
 
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
-    
-    prj_loader: ProjectLoader | None
 
     def __init__(self):
         self.ts: str = str(int(time.time() * 1000))
@@ -46,7 +41,6 @@ class QuantaAgent:
         self.prompt: str = ""
         self.prompt_code: str = ""
         self.system_prompt: str = ""
-        self.prj_loader = None
         self.source_folder = ""
         self.folders_to_include: List[str] = []
         self.folders_to_exclude: List[str] = []
@@ -74,7 +68,6 @@ class QuantaAgent:
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude)
         self.prompt = input_prompt
         self.mode = mode
         self.ext_set = ext_set
@@ -82,32 +75,11 @@ class QuantaAgent:
         # default filename to timestamp if empty
         if output_file_name == "":
             output_file_name = self.ts
-
-        # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
-        self.prj_loader.scan_directory(self.source_folder)
         
         if (self.prompt_code): 
             self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
 
         raw_prompt = self.prompt
-
-        self.prompt = self.insert_blocks_into_prompt(self.prompt)
-        self.prompt = PromptUtils.insert_files_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.file_names
-        )
-        self.prompt = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
-        )
-        
-        if user_system_prompt:
-            user_system_prompt = self.insert_blocks_into_prompt(user_system_prompt)
-            user_system_prompt = PromptUtils.insert_files_into_prompt(
-                user_system_prompt, self.source_folder, self.prj_loader.file_names
-            )
-            user_system_prompt = PromptUtils.insert_folders_into_prompt(
-                user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
-            )
-        
         self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
@@ -131,20 +103,21 @@ class QuantaAgent:
             self.human_message = HumanMessage(content=self.prompt)
             messages.append(self.human_message)
             use_tools = True
-                        
-            # but if we mention any blocks, files or folders in the prompt then we must use tools
-            if not use_tools and ("block(" in raw_prompt or "file(" in raw_prompt or "folder(" in raw_prompt):
-                use_tools = True
 
             if use_tools and self.mode != RefactorMode.NONE.value:
                 # https://python.langchain.com/v0.2/docs/tutorials/agents/
                 tools = []
 
+                # todo-0: We need a class called FileSetInfo which packages up (source_folder, folders_to_include, folders_to_exclude, ext_set)
+                # todo-0: createing these 'tools' needs to be in a separate method probably INSIDE the file they're defined in.
                 if self.mode == RefactorMode.REFACTOR.value:
                     tools = [
-                        UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
+                        GetBlockInfoTool("Get Block Info Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+                        UpdateBlockTool("Block Updater Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
                         CreateFileTool("File Creator Tool", self.source_folder),
                         UpdateFileTool("File Updater Tool", self.source_folder),
+                        ReadFileTool("File Reader Tool", self.source_folder),
+                        DirectoryListingTool("Directory Listing Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
                     ]
                     print("Created Agent Tools")
                     
@@ -192,30 +165,13 @@ Final Prompt:
         filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
-            
-        if self.mode == RefactorMode.REFACTOR.value:
-            ProjectMutator(
-                self.mode,
-                self.source_folder,
-                self.folders_to_include,
-                self.folders_to_exclude,
-                self.answer,
-                self.ts,
-                None,
-                self.prj_loader.blocks,
-                self.ext_set
-            ).run()
 
-
-    # todo-0: oops! I've made quite a few changes to this method without, around 2/1/25 (and the two days before that), without thinking about the fact that
-    # we ALSO have the 'run' method above that's similar!!!
     async def run_gradio(
         self,
         ai_service: str,
         output_file_name: str,
         messages,
         show_tool_usage: bool, 
-        full_prompts: List[str],
         input_prompt: str,
         source_folder: str,
         folders_to_include: List[str],
@@ -230,7 +186,6 @@ Final Prompt:
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder, ext_set, folders_to_include, folders_to_exclude)
         self.prompt = input_prompt
         self.mode = RefactorMode.REFACTOR.value
         self.ext_set = ext_set
@@ -238,64 +193,34 @@ Final Prompt:
         # default filename to timestamp if empty
         if output_file_name == "":
             output_file_name = self.ts
-
-        # Scan the source folder(s) for files with the specified extensions, to build up the 'blocks' dictionary
-        self.prj_loader.scan_directory(self.source_folder)
-
-        # full_prompt will hold the final prompt sent to AI which can hav all kinds of substitutions in it (files, blocks, etc)
-        full_prompt = self.prompt
-
-        full_prompt = self.insert_blocks_into_prompt(full_prompt)
-        full_prompt = PromptUtils.insert_files_into_prompt(
-            full_prompt, self.source_folder, self.prj_loader.file_names
-        )
-        full_prompt = PromptUtils.insert_folders_into_prompt(
-            full_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
-        )
         
         self.build_system_prompt("")
 
         tools = [
-            UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
+            GetBlockInfoTool("Get Block Info Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
+            UpdateBlockTool("Block Updater Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
             CreateFileTool("File Creator Tool", self.source_folder),
             UpdateFileTool("File Updater Tool", self.source_folder),
+            ReadFileTool("File Reader Tool", self.source_folder),
+            DirectoryListingTool("Directory Listing Tool", self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
         ]
-            
-        chat_prompt_template = ChatPromptTemplate.from_messages([
-            SystemMessage(content=self.system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
-            HumanMessagePromptTemplate.from_template("Human: {input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ])
-    
-        # first, in 'messages' need to count how many of them have msg['role'] == "user"
-        user_message_count = 0
-        for msg in messages:
-            if msg['role'] == "user":
-                user_message_count += 1
-                
-        # if the user has used some Gradio feature to reset the chat history, then we need to clear the full_prompts list too
-        if user_message_count == 0:
-            # remove all elements in full_prompts
-            full_prompts.clear()
                 
         # Convert messages to a format the agent can understand
         chat_history = []
         idx = 0        
         for msg in messages:
             if msg['role'] == "user":
-                chat_history.append(HumanMessage(content=full_prompts[idx]))
+                chat_history.append(HumanMessage(content=msg['content']))
                 idx += 1 
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
 
         agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
-    
-        chat_history.append(HumanMessage(content=full_prompt))    
-        full_prompts.append(full_prompt)
+        chat_history.append(HumanMessage(content=self.prompt))    
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages
         
+        print("Processing agent responses...")
         async for chunk in agent_executor.astream({"messages": chat_history}):
             AIUtils.handle_agent_response_item(chunk, messages, show_tool_usage)
             yield messages            
@@ -318,19 +243,6 @@ Final Prompt:
         filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
-            
-        if self.mode == RefactorMode.REFACTOR.value:
-            ProjectMutator(
-                self.mode,
-                self.source_folder,
-                self.folders_to_include,
-                self.folders_to_exclude,
-                self.answer,
-                self.ts,
-                None,
-                self.prj_loader.blocks,
-                self.ext_set
-            ).run()
 
     def append_message(self, message: AIMessage, answer: str) -> str:
         if isinstance(message.content, str):
@@ -394,7 +306,7 @@ Final Prompt:
     def add_block_handling_instructions(self):
         """Adds instructions for updating blocks. If the prompt contains ${BlockName} tags, then we need to provide
         instructions for how to provide the new block content."""
-        if self.mode == RefactorMode.REFACTOR.value and self.prj_loader is not None and len(self.prj_loader.blocks) > 0:
+        if self.mode == RefactorMode.REFACTOR.value:
             self.system_prompt += PromptUtils.get_template(
                 "../common/python/agent/prompt_templates/block_access_instructions.txt"
             )
@@ -417,29 +329,3 @@ Final Prompt:
                 "../common/python/agent/prompt_templates/file_edit_instructions.txt"
             )
 
-    def insert_blocks_into_prompt(self, prompt: str) -> str:
-        """
-        Substitute blocks into the prompt. Prompts can contain ${BlockName} tags, which will be replaced with the
-        content of the block with the name 'BlockName'
-        """
-        # If self.prompt does not contain "block(" then return False
-        if "block(" not in prompt or self.prj_loader is None or self.prj_loader.blocks is None:
-            return prompt
-        
-        for key, value in self.prj_loader.blocks.items():
-            prompt = prompt.replace(
-                f"block({key})",
-                f"""block {key}, defined by the following:
-<block>
-{TAG_BLOCK_BEGIN} {key}
-{value.content}
-{TAG_BLOCK_END}
-</block>
-""",
-            )
-            
-            # If no more 'block(' tags are in prompt, then we can break out of the loop
-            if "block(" not in prompt:
-                break
-            
-        return prompt

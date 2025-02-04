@@ -91,36 +91,37 @@ class AIUtils:
         
     @staticmethod
     def handle_agent_response_item(chunk, messages, include_tool_usage):
+        content = ""
         if "agent" in chunk:
             agnt = chunk["agent"]
             if agnt is not None and "messages" in agnt:
                 for msg in agnt["messages"]:
-                    messages.append(ChatMessage(role="assistant", content=AIUtils.get_agent_response_string(msg.content)))
+                    content += f"{AIUtils.get_agent_response_string(msg.content)}\n"
             
-        elif "tools" in chunk:
+        if "tools" in chunk:
             if include_tool_usage:
                 toolz = chunk["tools"]
                 if toolz is not None and "messages" in toolz:
                     for msg in toolz["messages"]:
-                        messages.append(ChatMessage(role="assistant", content=f"🛠️ {AIUtils.get_agent_response_string(msg.content)}"))
+                        content += f"🛠️ Tool {msg.name}: {AIUtils.get_agent_response_string(msg.content)}\n"
                 
-        elif "final_answer" in chunk:
+        if "final_answer" in chunk:
             # Final response from the agent
-            messages.append(ChatMessage(role="assistant", content=str(chunk["final_answer"])))
+            content += str(chunk["final_answer"])+"\n"
             
-        elif "intermediate_steps" in chunk:
+        if "intermediate_steps" in chunk:
             # Intermediate reasoning steps
+            # todo-0: we can improve formatting here? (what's inside 'step'?)
             for step in chunk["intermediate_steps"]:
-                messages.append(ChatMessage(role="assistant", content=f"Thinking: {step.action.log}"))
+                content += f"Thinking: {step.action.log}\n"
         
-        elif "output" in chunk:
+        if "output" in chunk:
             # Generic output field
-            messages.append(ChatMessage(role="assistant", content=str(chunk["output"])))
+            content += str(chunk["output"])+"\n"
                     
-        elif isinstance(chunk, str):
+        if isinstance(chunk, str):
             # Direct string output (common in simple responses)
-            messages.append(ChatMessage(role="assistant", content=chunk))                  
-                                        
-        else:
-            messages.append(ChatMessage(role="assistant", content="Other Response Parts: "+str(chunk)))
+            content += chunk+"\n"                 
+                                      
+        messages.append(ChatMessage(role="assistant", content=content.strip()))
 

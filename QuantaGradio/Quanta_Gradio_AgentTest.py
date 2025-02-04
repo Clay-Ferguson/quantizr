@@ -15,8 +15,7 @@ from langchain_core.tools import BaseTool
 from langchain.chat_models.base import BaseChatModel
 import gradio as gr
 from gradio import ChatMessage
-from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage
 from langgraph.prebuilt import chat_agent_executor
 
 ABS_FILE = os.path.abspath(__file__)
@@ -56,13 +55,6 @@ if __name__ == "__main__":
     
     llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
     tools = [DummyTestTool("My Dummy Test Tool")]
-    
-    chat_prompt_template = ChatPromptTemplate.from_messages([
-        SystemMessage(content="You are a helpful assistant with access to the following tools:"),
-        MessagesPlaceholder(variable_name="chat_history"),
-        HumanMessagePromptTemplate.from_template("Human: {input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
 
     async def query_ai(prompt, messages):
         chat_history = AIUtils.gradio_messages_to_langchain(messages)
