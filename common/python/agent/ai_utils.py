@@ -91,6 +91,7 @@ class AIUtils:
         
     @staticmethod
     def handle_agent_response_item(chunk, messages, include_tool_usage):
+        print("AGENT RESPONSE CHUNK: "+str(chunk))
         content = ""
         if "agent" in chunk:
             agnt = chunk["agent"]

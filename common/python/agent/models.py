@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Optional, Set
 
+from pydantic import BaseModel
+
 
 @dataclass
 class TextBlock:
@@ -27,7 +29,7 @@ class FileSources:
     data_folder: str
     
     #constructor function
-    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str], data_folder: str):
+    def __init__(self, source_folder :str = "", folders_to_include: List[str] = [], folders_to_exclude: List[str] = [], ext_set: Set[str] = set(), data_folder: str = ""):
         self.source_folder = source_folder
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude

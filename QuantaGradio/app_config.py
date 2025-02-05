@@ -11,11 +11,7 @@ from common.python.agent.models import FileSources
 class AppConfig:
     """Loads configuration from config.yaml and secrets.yaml files."""
 
-    ext_list: List[str] = []
-    ext_set: Set[str] = set()    
-    cfg: argparse.Namespace
-    folders_to_include: List[str] = []
-    folders_to_exclude: List[str] = []
+    cfg: argparse.Namespace    
     file_sources: FileSources
 
     # Configures the app by loading configuration yaml file, and getting 
@@ -62,6 +58,7 @@ class AppConfig:
         p.add_argument("--ai_service", required=True, help="AI Service")
         p.add_argument("--folders_to_include", required=True, help="Folders to Include")
         p.add_argument("--folders_to_exclude", required=True, help="Folders to Exclude")
+        
         p.add_argument(
             "--scan_extensions",
             required=True,
@@ -82,21 +79,19 @@ class AppConfig:
         )
 
         AppConfig.cfg = p.parse_args()        
-        AppConfig.ext_list = re.split(r"\s*,\s*", AppConfig.cfg.scan_extensions)
-        AppConfig.folders_to_include = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_include)
-        AppConfig.folders_to_exclude = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_exclude)
+        ext_list = re.split(r"\s*,\s*", AppConfig.cfg.scan_extensions)
+        folders_to_include = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_include)
+        folders_to_exclude = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_exclude)
         
         # remove all empty strings from folders_to_include and folders_to_exclude
-        AppConfig.folders_to_include = list(filter(None, AppConfig.folders_to_include))
-        AppConfig.folders_to_exclude = list(filter(None, AppConfig.folders_to_exclude))
+        folders_to_include = list(filter(None, folders_to_include))
+        folders_to_exclude = list(filter(None, folders_to_exclude))
+        ext_set = set(ext_list)
         
-        AppConfig.ext_set = set(AppConfig.ext_list)
-        
-        # todo-0: this file_sources will be used everywhere (soon)
         AppConfig.file_sources = FileSources(AppConfig.cfg.source_folder, 
-                                             AppConfig.folders_to_include, 
-                                             AppConfig.folders_to_exclude, 
-                                             AppConfig.ext_set, 
+                                             folders_to_include, 
+                                             folders_to_exclude, 
+                                             ext_set, 
                                              AppConfig.cfg.data_folder)
         
         if (AppConfig.cfg):

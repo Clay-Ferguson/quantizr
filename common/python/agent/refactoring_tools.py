@@ -2,13 +2,13 @@
 
 import os
 import re
-from typing import Dict, Optional, Type, List, Set
+from typing import Optional, Type, List
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 
 from common.python.agent.project_loader import ProjectLoader
 from common.python.utils import Utils
-from .models import TextBlock
+from .models import FileSources, TextBlock
 from ..file_utils import FileUtils
 
 from .tags import (
@@ -41,21 +41,15 @@ class GetBlockInfoTool(BaseTool):
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
     name: str = "get_block_info"
-    description: str
-    source_folder: str = ""
-    folders_to_include: List[str] = []
-    folders_to_exclude: List[str] = []
-    ext_set: Set[str] = set()
+    description: str = ""
+    file_sources: FileSources = FileSources()
     
     args_schema: Type[BaseModel] = GetBlockInfoInput
     return_direct: bool = False
 
-    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description="Get Block Info Tool: Useful for when you need to get information about a named block of text, including the entire current block content, and what file the block is defined in.")
-        self.source_folder = source_folder
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
-        self.ext_set = ext_set
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="Get Block Info Tool: Retrieves information about a named text block, including its location and complete content. Returns both the file path where the block is defined and the block's current content.")
+        self.file_sources = file_sources
 
     def _run(
         self,
@@ -64,37 +58,30 @@ class GetBlockInfoTool(BaseTool):
     ) -> str:
         """Use the tool."""
         print(f"GetBlockInfoTool: {block_name}")
-        prj_loader = ProjectLoader(self.source_folder, self.ext_set, self.folders_to_include, self.folders_to_exclude)
+        prj_loader = ProjectLoader(self.file_sources)
         prj_loader.scan_directory()
         
         block: Optional[TextBlock] = prj_loader.blocks.get(block_name)
         if block is not None:            
-            msg = f"Block {block_name} is defined in file {prj_loader.blocks[block_name].rel_filename}. The current block content is between the block_content tags here:\n <block_content>{block.content}</block_content>"
+            msg = f"Block '{block_name}' is defined in file '{prj_loader.blocks[block_name].rel_filename}'. Current block content: <block_content>{block.content}</block_content>"
         else:
             # todo-0: I think throwing an exception here, instead is the better way to let the agent know we hit a problem right?
-            msg = f"Warning: Block not found: {block_name}"
+            msg = f"ERROR: Block '{block_name}' not found"
         return msg
 
 class UpdateBlockTool(BaseTool):
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
     name: str = "update_block"
-    description: str
-    source_folder: str = ""
-    folders_to_include: List[str] = []
-    folders_to_exclude: List[str] = []
-    ext_set: Set[str] = set()
+    description: str = ""
+    file_sources: FileSources = FileSources()
     
     args_schema: Type[BaseModel] = UpdateBlockInput
     return_direct: bool = False
 
-    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description="Block Updater Tool: Useful for when you need to updat a named block of text to set new content")
-        # self.blocks = blocks
-        self.source_folder = source_folder
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
-        self.ext_set = ext_set
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="Block Updater Tool: Updates a named block of text to set new content. This tool automatically knows how to find the right file to put the block in.")
+        self.file_sources = file_sources
 
     def _run(
         self,
@@ -104,7 +91,7 @@ class UpdateBlockTool(BaseTool):
     ) -> str:
         """Use the tool."""
         print(f"UpdateBlockTool: {block_name}")
-        prj_loader = ProjectLoader(self.source_folder, self.ext_set, self.folders_to_include, self.folders_to_exclude)
+        prj_loader = ProjectLoader(self.file_sources)
         prj_loader.scan_directory()
         
         block: Optional[TextBlock] = prj_loader.blocks.get(block_name)
@@ -112,7 +99,7 @@ class UpdateBlockTool(BaseTool):
             if block.rel_filename is None:
                 return "Warning: Block filename is None"
             
-            full_file_name = self.source_folder + block.rel_filename
+            full_file_name = self.file_sources.source_folder + block.rel_filename
             content = FileUtils.read_file(full_file_name)
             
             if f"{TAG_BLOCK_BEGIN} {block_name}" not in content:
@@ -142,11 +129,11 @@ class UpdateBlockTool(BaseTool):
                 content = "\n".join(new_lines)
                 # write the file
                 FileUtils.write_file(full_file_name, content)
-                msg = f"Tool Updated Block {block_name} by updating it in file {prj_loader.blocks[block_name].rel_filename}"
+                msg = f"SUCCESS: Block '{block_name}' updated in file '{prj_loader.blocks[block_name].rel_filename}'"
             
         else:
             # todo-0: I think throwing an exception here, instead is the better way to let the agent know we hit a problem right?
-            msg = f"Warning: Block not found: {block_name}"
+            msg = f"ERROR: Block not found: {block_name}"
         return msg
 
     # This async stuff is optional and performance related, so for now we omit.
@@ -165,15 +152,15 @@ class UpdateBlockTool(BaseTool):
 
 class CreateFileTool(BaseTool):
     name: str = "create_file"
-    description: str
+    description: str = ""
     
     args_schema: Type[BaseModel] = CreateFileInput
     return_direct: bool = False
-    base_path: str = ""
+    file_sources: FileSources = FileSources()
 
-    def __init__(self, base_path: str):
-        super().__init__(description="File Creator Tool: Useful for when you need to create a new file. Subfolders will be created automatically if they don't exist.")
-        self.base_path = base_path
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="File Creator Tool: Creates a new file with the specified content. Subfolders will be created automatically if they don't exist.")
+        self.file_sources = file_sources
 
     def _run(
         self,
@@ -181,17 +168,17 @@ class CreateFileTool(BaseTool):
         file_content: str,
     ) -> str:
         """Use the tool."""
-        msg = f"File Created: {file_name} with content: {file_content}"
+        msg = f"File Created with name '{file_name}' and content: <content>{file_content}</content>"
         print(f"File Created: {file_name}")
 
         if not file_name.startswith("/"):
             file_name = "/" + file_name
-        full_file_name = self.base_path + file_name
+        full_file_name = self.file_sources.source_folder + file_name
 
         # if the file already exists print a warning message
         if os.path.isfile(full_file_name):
             # TODO: Need to investigate how the LLM and our GUI should report failures in tools to the user
-            print(f"Warning: File already exists: {full_file_name}")
+            print(f"Warning: File '{full_file_name}' already exisits.")
             # st.error(f"Error: File already exists: {full_file_name}")
         else:
             # ensure that folder 'self.base_path' exists
@@ -202,22 +189,16 @@ class CreateFileTool(BaseTool):
 
 class DirectoryListingTool(BaseTool):
     name: str = "directory_listing"
-    description: str
-    source_folder: str = ""
-    folders_to_include: List[str] = []
-    folders_to_exclude: List[str] = []
-    ext_set: Set[str] = set()
+    description: str = ""
+    file_sources: FileSources = FileSources()
     
     args_schema: Type[BaseModel] = DirectoryListingInput
     return_direct: bool = False
     base_path: str = ""
 
-    def __init__(self, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]):
-        super().__init__(description="Directory Listing Tool: Useful for when you need to get a directory listing of folders")
-        self.source_folder = source_folder
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
-        self.ext_set = ext_set
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="Directory Listing Tool: Gets a recursive directory listing of all files in a folder and subfolders.")
+        self.file_sources = file_sources
 
     def _run(
         self,
@@ -233,8 +214,8 @@ class DirectoryListingTool(BaseTool):
             folder_name = folder_name[1:]
         
         print(f"list_directory: {folder_name}")
-        src_folder_len: int = len(self.source_folder)
-        full_folder_name = self.source_folder + folder_name
+        src_folder_len: int = len(self.file_sources.source_folder)
+        full_folder_name = self.file_sources.source_folder + folder_name
          
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(full_folder_name):
@@ -244,8 +225,8 @@ class DirectoryListingTool(BaseTool):
 
             for filename in filenames:
                 # Determine if we will include this file based on extension and folder
-                includeExt = Utils.has_included_file_extension(self.ext_set, filename)
-                includeFolder = Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)
+                includeExt = Utils.has_included_file_extension(self.file_sources.ext_set, filename)
+                includeFolder = Utils.allow_folder(self.file_sources.folders_to_include, self.file_sources.folders_to_exclude, short_dir)
                 
                 if (includeExt and includeFolder):
                     # print(f"include file {filename} in {dirpath}")
@@ -260,15 +241,14 @@ class DirectoryListingTool(BaseTool):
 
 class ReadFileTool(BaseTool):
     name: str = "read_file"
-    description: str
-    
+    description: str = ""
     args_schema: Type[BaseModel] = ReadFileInput
     return_direct: bool = False
-    base_path: str = ""
+    file_sources: FileSources = FileSources()
 
-    def __init__(self, base_path: str):
-        super().__init__(description="File Reader Tool: Useful for when you need to read an existing file and get its text content")
-        self.base_path = base_path
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="File Reader Tool: Reads an existing file to get its text content")
+        self.file_sources = file_sources
 
     def _run(
         self,
@@ -278,22 +258,21 @@ class ReadFileTool(BaseTool):
         print(f"Reading file: {file_name}")
         if not file_name.startswith("/"):
             file_name = "/" + file_name
-        full_file_name = self.base_path + file_name
+        full_file_name = self.file_sources.source_folder + file_name
         content = FileUtils.read_file(full_file_name)
         print("    File content: " + content)
         return content
 
 class WriteFileTool(BaseTool):
     name: str = "write_file"
-    description: str
-    
+    description: str = ""
     args_schema: Type[BaseModel] = WriteFileInput
     return_direct: bool = False
-    base_path: str = ""
+    file_sources: FileSources = FileSources()
 
-    def __init__(self, base_path: str):
-        super().__init__(description="File Writer Tool: Useful for when you need to write to a file with all new content. Any paths in the file name will be created automatically if they don't exist")
-        self.base_path = base_path
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="File Writer Tool: Writes to a file with all new content. Any paths in the file name will be created automatically if they don't exist")
+        self.file_sources = file_sources
         
     def _run(
         self,
@@ -303,12 +282,26 @@ class WriteFileTool(BaseTool):
         """Use the tool."""
         if not file_name.startswith("/"):
             file_name = "/" + file_name
-        full_file_name = self.base_path + file_name
+        full_file_name = self.file_sources.source_folder + file_name
         
         # ensure that all paths exist for the file
         FileUtils.ensure_folder_exists(full_file_name)
         
         FileUtils.write_file(full_file_name, file_content)
-        msg = f"Wrote to File: {file_name}"
+        msg = f"Wrote File '{file_name}'"
         print(msg)
         return msg
+
+@staticmethod
+def init_tools(file_sources: FileSources) -> List[BaseTool]:
+    """Initialize tools for the agent."""
+    return [
+        GetBlockInfoTool(file_sources),
+        UpdateBlockTool(file_sources),
+        CreateFileTool(file_sources),
+        DirectoryListingTool(file_sources),
+        ReadFileTool(file_sources),
+        WriteFileTool(file_sources)
+    ]
+    
+    

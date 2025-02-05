@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Set
 
 import os
-from .models import TextBlock
+from .models import FileSources, TextBlock
 from ..utils import Utils
 from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END
 from ..file_utils import FileUtils
@@ -14,15 +14,9 @@ class ProjectLoader:
     # All filen names encountered during the scan, relative to the source folder
     file_names: List[str] = []
     folder_names: List[str] = []
-    folders_to_include: List[str] = []
-    folders_to_exclude: List[str] = []
-    source_folder: str = ""
 
-    def __init__(self, source_folder: str, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]):
-        self.source_folder = source_folder
-        self.ext_set = ext_set
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude        
+    def __init__(self, file_sources: FileSources):
+        self.file_sources = file_sources     
         
     def reset(self):
         self.blocks = {}
@@ -36,7 +30,7 @@ class ProjectLoader:
         """
 
         # get the file name relative to the source folder
-        relative_file_name: str = path[len(self.source_folder) :]
+        relative_file_name: str = path[len(self.file_sources.source_folder) :]
         self.file_names.append(relative_file_name)
 
         # Open the file using 'with' which ensures the file is closed after reading
@@ -94,12 +88,12 @@ class ProjectLoader:
         is to build up the 'blocks' dictionary with the content of the blocks in the files, and also
         to collect all the filenames into `file_names`
         """
-        print(f"scan_directory: {self.source_folder}")
+        print(f"scan_directory: {self.file_sources.source_folder}")
         self.reset()
-        src_folder_len: int = len(self.source_folder)
+        src_folder_len: int = len(self.file_sources.source_folder)
         
         # Walk through all directories and files in the directory
-        for dirpath, _, filenames in os.walk(self.source_folder):
+        for dirpath, _, filenames in os.walk(self.file_sources.source_folder):
             # Get the relative path of the directory, root folder is the source folder and will be "" (empty string) here
             # as the relative path of the source folder is the root folder
             short_dir: str = dirpath[src_folder_len :]
@@ -109,8 +103,8 @@ class ProjectLoader:
 
             for filename in filenames:
                 # Determine if we will include this file based on extension and folder
-                includeExt = Utils.has_included_file_extension(self.ext_set, filename)
-                includeFolder = Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)
+                includeExt = Utils.has_included_file_extension(self.file_sources.ext_set, filename)
+                includeFolder = Utils.allow_folder(self.file_sources.folders_to_include, self.file_sources.folders_to_exclude, short_dir)
                 
                 if (includeExt and includeFolder):
                     # print(f"include file {filename} in {dirpath}")

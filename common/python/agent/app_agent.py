@@ -8,14 +8,12 @@ from gradio import ChatMessage
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
+from langchain_core.tools import BaseTool
+
+from common.python.agent.models import FileSources
 from ..utils import RefactorMode
 from .refactoring_tools import (
-    GetBlockInfoTool,
-    UpdateBlockTool,
-    CreateFileTool,
-    ReadFileTool,
-    WriteFileTool, 
-    DirectoryListingTool
+    init_tools
 )
 from ..file_utils import FileUtils
 from ..utils import RefactorMode
@@ -30,6 +28,9 @@ from common.python.agent.ai_utils import AIUtils
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
 
+    # I'm not sure it's best practice or not, but for now I'll only create tools once and store here
+    tool_set: List[BaseTool] | None = None
+
     def __init__(self):
         self.ts: str = str(int(time.time() * 1000))
         self.answer: str = ""
@@ -37,10 +38,7 @@ class QuantaAgent:
         self.prompt: str = ""
         self.prompt_code: str = ""
         self.system_prompt: str = ""
-        self.source_folder = ""
-        self.folders_to_include: List[str] = []
-        self.folders_to_exclude: List[str] = []
-        self.data_folder = ""
+        self.file_sources: FileSources
         self.dry_run: bool = False
     
     def run(
@@ -51,22 +49,14 @@ class QuantaAgent:
         output_file_name: str,
         messages: List[BaseMessage],
         input_prompt: str,
-        source_folder: str,
-        folders_to_include: List[str],
-        folders_to_exclude: List[str],
-        data_folder: str,
-        ext_set: Set[str],
+        file_sources: FileSources,
         llm: BaseChatModel
     ):
         """Runs the AI/Agent when called from the Quanta Web app
         """
-        self.data_folder = data_folder
-        self.source_folder = source_folder
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
+        self.file_sources = file_sources
         self.prompt = input_prompt
         self.mode = mode
-        self.ext_set = ext_set
 
         # default filename to timestamp if empty
         if output_file_name == "":
@@ -81,7 +71,7 @@ class QuantaAgent:
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
             # if we canfind that file or else we return a default response.
-            answer_file: str = f"{self.data_folder}/dry-run-answer.txt"
+            answer_file: str = f"{self.file_sources.data_folder}/dry-run-answer.txt"
 
             if os.path.isfile(answer_file):
                 print(f"Simulating AI Response by reading answer from {answer_file}")
@@ -102,18 +92,10 @@ class QuantaAgent:
 
             if use_tools and self.mode != RefactorMode.NONE.value:
                 tools = []
-
-                # todo-0: We need a class called FileSetInfo which packages up (source_folder, folders_to_include, folders_to_exclude, ext_set)
-                # todo-0: createing these 'tools' needs to be in a separate method probably INSIDE the file they're defined in.
                 if self.mode == RefactorMode.REFACTOR.value:
-                    tools = [
-                        GetBlockInfoTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-                        UpdateBlockTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-                        CreateFileTool(self.source_folder),
-                        WriteFileTool(self.source_folder),
-                        ReadFileTool(self.source_folder),
-                        DirectoryListingTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
-                    ]
+                    if QuantaAgent.tool_set is None:
+                        QuantaAgent.tool_set = init_tools(self.file_sources)
+                    tools = QuantaAgent.tool_set
                     print("Created Agent Tools")
                     
                 agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
@@ -157,7 +139,7 @@ Final Prompt:
 {self.prompt}
 """
 
-        filename = f"{self.data_folder}/{output_file_name}.txt"
+        filename = f"{self.file_sources.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
 
@@ -168,37 +150,22 @@ Final Prompt:
         messages,
         show_tool_usage: bool, 
         input_prompt: str,
-        source_folder: str,
-        folders_to_include: List[str],
-        folders_to_exclude: List[str],
-        data_folder: str,
-        ext_set: Set[str],
+        file_sources: FileSources,
         llm: BaseChatModel,
     ):
         """Runs the AI/Agent from a Gradio UI.
         """
-        self.data_folder = data_folder
-        self.source_folder = source_folder
-        self.folders_to_include = folders_to_include
-        self.folders_to_exclude = folders_to_exclude
+        self.file_sources = file_sources
         self.prompt = input_prompt
         self.mode = RefactorMode.REFACTOR.value
-        self.ext_set = ext_set
 
         # default filename to timestamp if empty
         if output_file_name == "":
             output_file_name = self.ts
         
         self.build_system_prompt("")
-
-        tools = [
-            GetBlockInfoTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-            UpdateBlockTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set),
-            CreateFileTool(self.source_folder),
-            WriteFileTool(self.source_folder),
-            ReadFileTool(self.source_folder),
-            DirectoryListingTool(self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set)
-        ]
+        if QuantaAgent.tool_set is None:
+            QuantaAgent.tool_set = init_tools(self.file_sources)
                 
         # Convert messages to a format the agent can understand
         chat_history = []
@@ -210,7 +177,7 @@ Final Prompt:
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
 
-        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
+        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, QuantaAgent.tool_set)
         chat_history.append(HumanMessage(content=self.prompt))    
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages
@@ -235,7 +202,7 @@ Final Prompt:
 {self.prompt}
 """
 
-        filename = f"{self.data_folder}/{output_file_name}.txt"
+        filename = f"{self.file_sources.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
 

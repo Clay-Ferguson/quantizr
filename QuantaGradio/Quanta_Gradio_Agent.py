@@ -30,7 +30,6 @@ if __name__ == "__main__":
         # Get the LLM based on which model the Config calls for. We use a temperature of 1.0 for no creativity at all but only
         # always the most likely next tokens, and hopefully best code generation.
         llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
-
         agent = QuantaAgent()
         
         # Calls the AI and does all the work of getting the response messages back, as the return value
@@ -40,11 +39,7 @@ if __name__ == "__main__":
             messages,
             show_tool_usage,
             prompt,
-            AppConfig.cfg.source_folder,
-            AppConfig.folders_to_include,
-            AppConfig.folders_to_exclude,
-            AppConfig.cfg.data_folder,
-            AppConfig.ext_set,
+            AppConfig.file_sources,
             llm
         ):
             # Handle each yielded result

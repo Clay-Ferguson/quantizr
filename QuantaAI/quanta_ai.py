@@ -13,6 +13,8 @@ from pydantic import BaseModel
 from typing import List, Optional, Set
 import traceback
 
+from common.python.agent.models import FileSources
+
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
@@ -116,6 +118,8 @@ temperature: {req.temperature}
 
             messages = buildContext(req)
             agent = QuantaAgent()
+            file_sources = FileSources("/projects", folders_to_include, folders_to_exclude, ext_set, "/data")
+            
             agent.run(
                 req.systemPrompt if req.systemPrompt else "",
                 req.service,
@@ -123,12 +127,7 @@ temperature: {req.temperature}
                 "",
                 messages,
                 req.prompt if req.prompt else "",
-                # Note: These folders are defined by the docker compose yaml file as volumes.
-                "/projects",
-                folders_to_include,
-                folders_to_exclude,
-                "/data",
-                ext_set,
+                file_sources,
                 llm
             )
             answer = messages[-1].content # type: ignore
