@@ -29,11 +29,11 @@ ai_service: "anth"
 scan_extensions: "py,html"
 data_folder: "/home/clay/ai-agent-temp"
 
-source_folder: "/home/clay/ferguson/Quantizr/QuantaGradio/test_project"
+source_folder: "/home/clay/ferguson/Quantizr"
 
 # Folders to include/exclude in the scan, relative to (i.e. contained within) the source_folder. In other words
 # these folders will be directly concatenated to the source_folder to form the full paths to the folders to scan.
 # If folders_to_include is not specified, the entire project is scanned. If folders_to_exclude is not specified, no
 # folders are excluded.
-folders_to_include: ""
+folders_to_include: "/common,/QuantaGradio"
 folders_to_exclude: ""

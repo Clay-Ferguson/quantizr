@@ -204,16 +204,16 @@ class DirectoryListingTool(BaseTool):
     ) -> str:
         """Use the tool."""
         ret = ""
-        if folder_name == ".":
-            folder_name = "/"
+        if folder_name == "."  or folder_name == "/" or folder_name == "./":
+            folder_name = ""
             
         # if folder name starts with "." remove it.
         if folder_name.startswith("."):
             folder_name = folder_name[1:]
         
-        print(f"list_directory: {folder_name}")
         src_folder_len: int = len(self.file_sources.source_folder)
         full_folder_name = self.file_sources.source_folder + folder_name
+        # print(f"list_directory: {folder_name} (Full Path: {full_folder_name})")
          
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(full_folder_name):

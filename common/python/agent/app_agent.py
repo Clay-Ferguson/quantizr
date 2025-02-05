@@ -65,7 +65,6 @@ class QuantaAgent:
         if (self.prompt_code): 
             self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
 
-        raw_prompt = self.prompt
         self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:

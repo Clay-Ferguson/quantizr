@@ -13,14 +13,13 @@ from pydantic import BaseModel
 from typing import List, Optional, Set
 import traceback
 
-from common.python.agent.models import FileSources
-
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from common.python.agent.app_agent import QuantaAgent
 from common.python.utils import RefactorMode, Utils
+from common.python.agent.models import FileSources
 
 # #ai-model (WARNING: These values are in a Java file too (AIModel.java))
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
@@ -193,7 +192,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
         llm = ChatOpenAI(
             model=req.model,
             temperature=req.temperature,
-            max_tokens=req.maxTokens,
+            max_completion_tokens=req.maxTokens, # Yes, OpenAI is different than the other on max tokens name here.
             timeout=timeout,
             api_key=api_key
         )

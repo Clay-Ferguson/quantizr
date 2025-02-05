@@ -53,7 +53,7 @@ export MONGO_PORT=27016
 
 export QAI_HOST=qai-host-dev
 export QAI_PORT=8186
-export QAI_PROJECTS=/home/clay/ferguson/Quantizr/common
+export QAI_PROJECTS=/home/clay/ferguson/Quantizr/QuantaGradio/test_project
 export QAI_DATA=/home/clay/ai-agent-temp
 
 # NOTE: This file gets *generated* by the build.
