@@ -112,7 +112,6 @@ class AIUtils:
             
         if "intermediate_steps" in chunk:
             # Intermediate reasoning steps
-            # todo-0: we can improve formatting here? (what's inside 'step'?)
             for step in chunk["intermediate_steps"]:
                 content += f"Thinking: {step.action.log}\n"
         

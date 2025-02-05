@@ -65,7 +65,6 @@ class GetBlockInfoTool(BaseTool):
         if block is not None:            
             msg = f"Block '{block_name}' is defined in file '{prj_loader.blocks[block_name].rel_filename}'. Current block content: <block_content>{block.content}</block_content>"
         else:
-            # todo-0: I think throwing an exception here, instead is the better way to let the agent know we hit a problem right?
             msg = f"ERROR: Block '{block_name}' not found"
         return msg
 
@@ -132,7 +131,6 @@ class UpdateBlockTool(BaseTool):
                 msg = f"SUCCESS: Block '{block_name}' updated in file '{prj_loader.blocks[block_name].rel_filename}'"
             
         else:
-            # todo-0: I think throwing an exception here, instead is the better way to let the agent know we hit a problem right?
             msg = f"ERROR: Block not found: {block_name}"
         return msg
 
