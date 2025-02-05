@@ -443,15 +443,9 @@
 <li><a href="#66ce40b20843c4114d7be59d">Block Examples</a></li>
 </ul>
 </li>
-<li><a href="#66ce3ff70843c4114d7be598">File and Folder Syntax</a>
-<ul>
-<li><a href="#66ce47170843c4114d7be5a4">File Example</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li><a href="#66ce0c6c0843c4114d7be58e">Creating Custom Coding Agents</a></li>
-<li><a href="#66a3dfa1fabccc0b658df14d">Quanta Agent Command Line Tool</a></li>
 </ul>
 </li>
 </ul>
@@ -1576,14 +1570,11 @@ $$</p>
 <p>Once you've enabled these AI settings mentioned above, any questions you ask to the AI will be assumed to be questions about your codebase (i.e. whatever's in <code>/projects</code> docker volume, per docker YAML) and you can either ask questions about the code or ask for actual refactoring to be done!</p>
 <div id='66ce0cf80843c4114d7be58f'></div>
 <p>If you ask for refactoring to be done, the Quanta AI agent will actually make those changes directly in your code in real-time, as it answers your questions, or performs what you ask it to do. So the best practice is to be working in a git branch where you can allow the AI to modify your code and then you can use git (or your IDE Git integration/extension, to be more specific) to immediately show you the changes the AI has made which you can then either accept or reject.</p>
-<div id='66ce3f1e0843c4114d7be595'></div>
-<p>When working with the Coding Agent your System Prompt (Agent Definition) and ordinary prompts (Questions on nodes) can have three different types of special syntaxes which allow you to refer directly to specific parts of your code by name. These syntax elements are <code>block</code>, <code>file</code>, and <code>folder</code>, described as follows:</p>
 <div id='66ce3fdd0843c4114d7be597'></div>
 <h4 id="block-syntax"><a href="#block-syntax" id="block-syntax">Block Syntax</a></h4>
 <div id='66ce40460843c4114d7be59a'></div>
-<p>You can define <code>Named Blocks</code> in your code to identify specific areas which you'd like to ask questions about by name (name of a block), to save you from having to continually paste those sections of code into AI prompts.</p>
-<p>In other words, this tool will scan your project and extract named snippets (or sections of code) called <code>blocks</code> (i.e. fragments of files, that you identify using structured comments, described below) which are then automatically injected into your prompts.</p>
-<p>If you're asking the agent to refactor your code, it's only able to &quot;see&quot; (know about) the code that you pass to it using the <code>block, file, folder syntax</code>, and this is by design, because it's impractical and undesirable to sent your entire project to the AI for all kinds of reasons we won't discuss here. The main point here is that once you do reference a <code>block, file, or folder</code> in a prompt you can also ask for refactoring to be done and the agent will Directly edit your source files to perform the refactoring you asked for.</p>
+<p>You can define <code>Named Blocks</code> in your code to identify specific areas which you'd like to ask questions about by name (name of a block), to save you from having to continually paste those sections of code into AI prompts, whenever you need to refer to them.</p>
+<p>In other words, this tool will automatically scan your project files and locate named snippets (or sections of code) called <code>blocks</code> (i.e. fragments of files, that you identify using structured comments, described below).</p>
 <div id='66ce405d0843c4114d7be59b'></div>
 <p>Named blocks are defined using this kind syntax to wrap part of your files:</p>
 <pre><code class="language-sql">-- block_begin SQL_Scripts
@@ -1595,14 +1586,11 @@ $$</p>
 ...some source code...
 // block_end 
 </code></pre>
+<p>Currently the only comment characters supported are <code>--</code> (common for SQL files), <code>//</code> (common for Java, JavaScript), and <code>#</code> (for Python files)</p>
 <div id='66ce40920843c4114d7be59c'></div>
-<p>In the example above, the text that comes after the <code>block_begin</code> is considered the <code>Block Name</code> and, so those blocks, anywhere in your code, can now be referred to as <code>block(SQL_Scripts)</code> and/or <code>block(My_Java)</code> in the text of any prompt, and it will be replaced with the block content (actual source). You can also request for those blocks to be refactored and updates by the AI as well.</p>
-<div id='66ce42700843c4114d7be59f'></div>
-<p>Just be aware that wherever you actually put <code>block(block_name)</code> in your prompt the entire content of that block will be included right there in the prompt, in it's entirety, but wrapped in a way that the Agent will also understand that it is a named piece of code, and is a &quot;block&quot;.</p>
+<p>In the example above, the text that comes after the <code>block_begin</code> is considered the <code>Block Name</code> and, so those blocks, anywhere in your code, can now be referred to as <code>block SQL_Scripts</code> in your prompts to the AI. In other words when you mention &quot;blocks&quot; the AI can understand based on context when you're talking about a &quot;Named Block&quot; of code, and it will know how to find and even edit those blocks of code directly in your source files, wherever they exist.</p>
 <div id='66ce42730843c4114d7be5a0'></div>
-<p>If you want to mention a block in your prompt in a way that the AI Agent will know what you're talking about just omit the parenthesis and talk about the block by name. For example, the following prompt would make sense to the AI: &quot;What are the names of my SQL tables that are in block SQL_Scripts?&quot; In that prompt you're just asking a question about a block. You could also request refactoring by mentioning block names like this: &quot;In block SQL_Scripts add a new table create SQL statement that creates a table named 'people' and has 'first_name' and 'last_name' columns in it.&quot;</p>
-<div id='66ce448e0843c4114d7be5a2'></div>
-<p>In summary: The block syntax lets you create named sections in your codebase, which you can then discuss with the AI, and it will understand exactly what's in the Named Blocks by you referring to the blocks by name, and you can also ask for specific refactoring to be done in one or more blocks, by telling the AI what you want done and the Block Name for where you want it done.</p>
+<p>For example, the following prompt would make sense to the AI: &quot;What are the names of my SQL tables that are in block SQL_Scripts?&quot; In that prompt you're just asking a question about a block. You could also request refactoring by mentioning block names like this: &quot;In block SQL_Scripts add a new table create SQL statement that creates a table named 'people' and has 'first_name' and 'last_name' columns in it.&quot;</p>
 <div id='66ce40b20843c4114d7be59d'></div>
 <h5 id="block-examples"><a href="#block-examples" id="block-examples">Block Examples</a></h5>
 <div id='66ce40d40843c4114d7be59e'></div>
@@ -1612,27 +1600,9 @@ int total = a + b;
 // block_end
 </code></pre>
 <p>You can run LLM Prompts/Queries like this:</p>
-<pre><code>What is happening in the following code:
-
-block(Adding_Numbers)
+<pre><code>What is happening in the `Adding_Numbers` block ?
 </code></pre>
-<p>So you're basically labeling (or naming) specific sections of your code (or other text files) in such a way that this tool can find them, answer questions about them, and/or modify them directly. You can go anywhere in your codebase and wrap sections of code with this <code>block_begin</code> and <code>block_end</code> syntax, to create named blocks which are then template substituded automatically into your prompt. Also once the AI has seen any code with the named block in it, it can also automatically refactor any of that code for you, and in any number of named blocks, simultaneously.</p>
-<div id='66ce3ff70843c4114d7be598'></div>
-<h4 id="file-and-folder-syntax"><a href="#file-and-folder-syntax" id="file-and-folder-syntax">File and Folder Syntax</a></h4>
-<div id='66ce44ee0843c4114d7be5a3'></div>
-<p>The <code>file</code> and <code>folder</code> syntax works very similarly to the <code>block</code> syntax so you should read the above <code>Block Syntax</code> section before you read this. Whenever you want to refer to a specific file when talking to the AI Agent about your code you can include something like <code>file(/my/file/Name.java)</code> in a prompt or System Prompt, and the entire content of that file will be embedded right into your prompt in a way such that the AI knows which file it is and what it's file name is.</p>
-<p>Similarly, when you include something like <code>folder(/my/folder/name)</code> in a prompt, the entire content of that folder and all the content of all the files it contains will be embedded into the prompt in such a way that the AI understands all of it.</p>
-<p>So once you refer to files and/or folders in this way the AI will then be able to answer questions about any of it and also perform any kinds of code refactoring you might ask for.</p>
-<div id='66ce47170843c4114d7be5a4'></div>
-<h5 id="file-example"><a href="#file-example" id="file-example">File Example</a></h5>
-<div id='66ce47370843c4114d7be5a5'></div>
-<p>The simplest possible refactoring prompt, using <code>file()</code> would be something like this:</p>
-<pre><code class="language-txt">Modify the following Python file, so that it's using a 
-class that has a public static `run` method to do what it does.
-
-file(/temperature_convert.py)
-</code></pre>
-<p>In the above prompt we're using the <code>file()</code> syntax to inject the entire <code>temperature_convert.py</code> file into the prompt, and the tool will actually <em>do</em> what you're asking for to the actual file when you run the tool! In other words this tool will modify your source files if you ask for a refactor. The default <code>config.yaml</code> already points to the <code>test_project</code> folder, which contains a <code>temperature_convert.py</code> which is not implemented as a class. So running the prompt example above will update the actual python file and make it into a class as the prompt requested.</p>
+<p>So you're basically labeling (or naming) specific sections of your code (or other text files) in such a way that this tool can find them, answer questions about them, and/or modify them directly. You can go anywhere in your codebase and wrap sections of code with this <code>block_begin</code> and <code>block_end</code> syntax.</p>
 <div id='66ce0c6c0843c4114d7be58e'></div>
 <h3 id="creating-custom-coding-agents"><a href="#creating-custom-coding-agents" id="creating-custom-coding-agents">Creating Custom Coding Agents</a></h3>
 <div id='66ce2b290843c4114d7be594'></div>
@@ -1649,16 +1619,6 @@ file(/temperature_convert.py)
 <div id='66ce12380843c4114d7be592'></div>
 <p>You can then start asking questions or requesting refactoring to be done, and the agent will be active for those questions, as long as you have <code>Menu -&gt; AI -&gt; Agent Mode</code> checkbox selected. This checkbox makes the app assume all your questions are going to an agent and are related to code refactoring.</p>
 <p>The way you submit requests (i.e. prompts) to the agent is to create a subnode anywhere under the <code>SQL Coding Agent</code> node (or any node you've configured to be an agent) and enter node content/questions like, for example, &quot;What are the names of our SQL tables?&quot; and then click <code>Ask AI</code> button. The system will notice your question is being asked within a part of the tree under the <code>SQL Coding Agent</code> and will therefore let that specific Agent handle the question, and give you the answer, or do whatever refactoring you've asked for.</p>
-<div id='66a3dfa1fabccc0b658df14d'></div>
-<h3 id="quanta-agent-command-line-tool"><a href="#quanta-agent-command-line-tool" id="quanta-agent-command-line-tool">Quanta Agent Command Line Tool</a></h3>
-<div id='66cbae913d26ec1bae8749cb'></div>
-<p>There's a separate <a href="https://github.com/Clay-Ferguson/quantizr/tree/main/QuantaAgent">QuantaAgent Command Line Tool</a> (written in Python) that can run all by itself (outside of the Quanta app) as a pure Python app that you can run locally, and this app is available in a folder named <code>QuantaAgent</code> inside the quantizr monorepo. This stand-alone Python agent has basically all the same power as the Quanta Web App-driven version, so everything above about including <code>blocks, files, and folders</code> in your prompts also works in the Python agent.</p>
-<p>The <a href="https://github.com/Clay-Ferguson/quantizr/blob/main/QuantaAgent/README.md">README</a>
-in the Coding Agent project contains all the docs on how to use it.</p>
-<div id='66cbae913d26ec1bae8749cc'></div>
-<p>To run this standalone Python app, you can just take the <code>QuantaAgent</code> and <code>common</code> folders out of the root of the monorepo and put them somewhere in some other folder (but as siblings, in same parent folder), and then you can just run the <code>Quanta_Agent.py</code> script.</p>
-<div id='66cbae913d26ec1bae8749cd'></div>
-<p>The <code>QuantaAgent</code> folder itself contains only files related to the Command Line tool, and all of the actual implementation of the AI Agent is contained in the <code>common</code> folder so that it can be shared by both the Quanta AI Microservice (QAI) and the Command Line app.</p>
 <div id='650b1b2bb4c8c62a0574be8f'></div>
 <p><strong><a href="/n/chatgpt-examples">ChatGPT Example Q&amp;A</a></strong></p>
 <div id='63f19e6155770e1b97ddc0f6'></div>
