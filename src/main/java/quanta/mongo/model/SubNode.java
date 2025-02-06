@@ -2,6 +2,7 @@ package quanta.mongo.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -682,7 +684,17 @@ public class SubNode {
             changed = props.remove(key) != null;
         } else {
             Object curVal = props.get(key);
-            changed = curVal == null || !val.equals(curVal);
+
+            // if val and curVal are a Collection we need to convert to a JSON string do to the compares with
+            // the equals() method.
+            if (val instanceof Collection) {
+                String valStr = SubNodeUtil.toCanonicalJson(val);
+                String curValStr = SubNodeUtil.toCanonicalJson(curVal);
+                changed = !valStr.equals(curValStr);
+            } else {
+                changed = curVal == null || !val.equals(curVal);
+            }
+
             props.put(key, val);
         }
         if (changed) {

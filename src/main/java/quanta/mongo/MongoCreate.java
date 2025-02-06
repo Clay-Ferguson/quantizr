@@ -408,7 +408,7 @@ public class MongoCreate extends ServiceBase {
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
             }
         }
-        svc_openGraph.parseNode(newNode, true);
+        svc_openGraph.parseNode(newNode);
 
         if (parentPlugin != null) {
             parentPlugin.childCreated(new Val<>(parentNode), new Val<>(newNode));
@@ -507,7 +507,7 @@ public class MongoCreate extends ServiceBase {
         svc_mongoUpdate.saveIfDirty(parentNode);
         // We save this right away, before calling convertToNodeInfo in case that method does any Db related
         // stuff where it's expecting the node to exist.
-        svc_openGraph.parseNode(newNode, true);
+        svc_openGraph.parseNode(newNode);
 
         TypeBase plugin = svc_typeMgr.getPluginByType(req.getTypeName());
         if (plugin != null) {

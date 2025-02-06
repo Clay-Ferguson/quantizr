@@ -41,7 +41,7 @@ public class SubNodeUtil extends ServiceBase {
                     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
                     .serializationInclusion(JsonInclude.Include.NON_NULL).build();
 
-    public String toCanonicalJson(Object obj) {
+    public static String toCanonicalJson(Object obj) {
         if (obj == null) {
             return "null";
         }

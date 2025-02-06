@@ -197,7 +197,7 @@ public class NodeEditService extends ServiceBase {
             node.setPath(newPath);
         }
 
-        svc_openGraph.parseNode(node, true);
+        svc_openGraph.parseNode(node);
 
         TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
         if (plugin != null) {

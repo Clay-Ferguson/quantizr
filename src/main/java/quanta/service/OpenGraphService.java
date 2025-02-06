@@ -20,7 +20,7 @@ import quanta.rest.response.GetOpenGraphResponse;
 import quanta.util.MimeUtil;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class OpenGraphService extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
@@ -111,32 +111,26 @@ public class OpenGraphService extends ServiceBase {
      * edited (unless all HTTPs text is removed), but we will take care of that when we are calling this
      * during SAVEs.
      */
-    public void parseNode(SubNode node, boolean reset) {
+    public void parseNode(SubNode node) {
         if (StringUtils.isEmpty(node.getContent())) {
-            if (reset) {
-                node.set(NodeProp.OPEN_GRAPH.s(), null);
-            }
+            node.set(NodeProp.OPEN_GRAPH.s(), null);
             return;
         }
 
         if (node.getContent().toLowerCase().indexOf("http") == -1) {
-            if (reset) {
-                node.set(NodeProp.OPEN_GRAPH.s(), null);
-            }
+            node.set(NodeProp.OPEN_GRAPH.s(), null);
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        ArrayList<String> ogList =
-                reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
+        ArrayList<String> ogList = null;
 
-        List<String> urlList = XString.tokenize(node.getContent(), "\n", true);
-        if (urlList == null || urlList.size() == 0) {
+        List<String> lines = XString.tokenize(node.getContent(), "\n", true);
+        if (lines == null || lines.size() == 0) {
             return;
         }
 
         // iterate through each url and cache it
-        for (String line : urlList) {
+        for (String line : lines) {
             if (!line.contains("http"))
                 continue;
             String url = null;
@@ -178,7 +172,8 @@ public class OpenGraphService extends ServiceBase {
                 continue;
 
             OpenGraph og = getOpenGraph(url);
-            ogList.add(XString.compactPrint(og));
+            String ogStr = XString.compactPrint(og);
+            ogList.add(ogStr);
 
             // if more than 10 links in content then ignore the rest
             if (ogList.size() > 10) {
