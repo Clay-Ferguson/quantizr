@@ -427,13 +427,13 @@ export class MenuPanel extends Comp {
 
                 // todo-2: need a "Show Incomming" transfers menu option
             ], null));
-
-            children.push(new Menu("Account", [
-                new MenuItem("Profile", MenuPanel.userProfile),
-                new MenuItem("Settings", S.nav._showUserSettings),
-                getAs().isAdminUser ? new MenuItem("Server Admin", () => S.tabUtil.selectTab(C.TAB_ADMIN)) : null
-            ]));
         }
+
+        children.push(new Menu("Account", [
+            new MenuItem("Profile", MenuPanel.userProfile),
+            new MenuItem("Settings", S.nav._showUserSettings),
+            getAs().isAdminUser ? new MenuItem("Server Admin", () => S.tabUtil.selectTab(C.TAB_ADMIN)) : null
+        ]));
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //
