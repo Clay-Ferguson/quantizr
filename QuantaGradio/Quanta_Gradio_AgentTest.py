@@ -1,10 +1,7 @@
 """Runs a basic ChatBot with Tool Use using Gradio interface.
 You can use this as the simplest possible test to verify that Gradio (with Tools) is working.
 
-In the gui the following prompt will run a tool test: 
-prompt = "run the test tool using input string "abc"
-
-NOTE: This agent is known to work with both Anthropic and OpenAI LLMs!
+In the gui, you can ask questions like "What is 3 + 4?" and the agent will use the addition tool to calculate the answer.
 """
 
 import sys
@@ -26,26 +23,27 @@ from common.python.agent.ai_utils import AIUtils
 from common.python.utils import Utils
 from app_config import AppConfig
 
-class DummyTestToolInput(BaseModel):
-    input: str = Field(description="Dummy input for testing")
+class AdditionToolInput(BaseModel):
+    number1: float = Field(description="First number to add")
+    number2: float = Field(description="Second number to add")
 
-class DummyTestTool(BaseTool):
-    """Dummy tool for testing purposes"""
+class AdditionTool(BaseTool):
+    """Tool for adding two numbers together"""
 
-    name: str = "test_tool"
-    description: str = "Used for testing that the tools support is working"
+    name: str = "addition_tool"
+    description: str = "Use this tool when you need to add two numbers together. Input should be two numbers."
     
-    args_schema: Type[BaseModel] = DummyTestToolInput
+    args_schema: Type[BaseModel] = AdditionToolInput
     return_direct: bool = True 
     
     def __init__(self, description):
         super().__init__(description=description)
-        print(f"Created DummyTestTool as {description}")
+        print(f"Created AdditionTool as {description}")
 
-    def _run(self, input: str) -> str:
-        """Use the tool."""
-        print(f"DummyTestTool: {input}")
-        return "Return val from DummyTestTool2 with input: "+input
+    def _run(self, number1: float, number2: float) -> str:
+        """Add two numbers together."""
+        result = number1 + number2
+        return f"The sum of {number1} and {number2} is {result}"
 
 if __name__ == "__main__":
     print("Quanta Gradio Agent Test Starting...")
@@ -54,7 +52,7 @@ if __name__ == "__main__":
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_AgentTest.log")
     
     llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
-    tools = [DummyTestTool("My Dummy Test Tool")]
+    tools = [AdditionTool("A tool that adds two numbers together")]
 
     async def query_ai(prompt, messages):
         chat_history = AIUtils.gradio_messages_to_langchain(messages)
@@ -79,4 +77,3 @@ if __name__ == "__main__":
         input.submit(query_ai, [input, chatbot], [chatbot, input])
 
     demo.launch()         
-              
