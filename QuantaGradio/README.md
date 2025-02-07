@@ -1,19 +1,22 @@
-# About Quanta Gradio
+# Gradio-based AI Web Apps
 
-The primary purpose of this project is to contai Quanta_Gradio_Agent.py. The other Python apps in this folder named `Quanta_Gradio_*.py` are smaller more trivial Gradio apps for running AI via LangChain. There's an app for running a simple test tool/agent (Quanta_Gradio_AgentTest.py), one for a basic chat bot (Quanta_Gradio_ChatTest.py), one for image understanding/vision (Quanta_Gradio_ImageChat.py), and one for image generation (Quanta_Gradio_ImageGen.py).
+* `Quanta_Gradio_Agent.py` - Quanta Coding Agent. Most of the code for this app is in `common/python` folder of the Quantizr repository. The common code is used by several other projects.
 
-Quanta_Gradio_Agent is a Web-based GUI tool based on Gradio and Langchain, which runs our Quanta Agent code as a web app. (This is not to be confused with the Quanta Web App itself which is a Content Management System primarily). The Quanta Agent web app is just a light weight Gradio front end that offers AI capabilities. Most of the code for this app is in `common/python` folder of the Quantizr repository, because the common code is used by several other projects.
+* `Quanta_Gradio_ChatTest.py` - Chat app
 
-# Warning
+* `Quanta_Gradio_AgentTest.py` - Chat app with tool-calling
 
-The Gradio Agent currently only works with OpenAI model. For Anthropic, and other model providers the code will have to change.
+* `Quanta_Gradio_ImageGen.py` - Image Generation app
 
-# About Quanta Coding Agent
+* `Quanta_Gradio_ImageChat.py` - Image Understanding chat app. Lets you upload images, and ask questions about them.
+
+
+# About Quanta Coding Agent (Quanta_Gradio_Agent.py)
 
 The Quanta Coding Agent (QCA) features and capabilities are mostly the same regardless of whether you're running the the Quanta Web App, or the Quanta Gradio Agent (this project). Each way of using the QCA has it's own advantages and disadvantages. For example, the Quanta Web App itself is massive in size, complex, and complicated to configure and deploy, while this Quanta Gradio App is, like all Gradio apps, very easy to run, as long as you know how to run Python.
 
 
-# How Coding Agent Works
+## How Coding Agent Works
 
 A simple description of how this Gradio-based QCA works is as follows:
 
@@ -24,23 +27,10 @@ A simple description of how this Gradio-based QCA works is as follows:
 3) In the gradio app you can use the file(), folder(), and block() syntax (described in links below) to ask questions about your codebase or request actual direct real-time code refactoring to be done to your code base also.
 
 
-# Documentation - Coding Agent Features
+## Documentation - Coding Agent Features
 
 Here are a couple of links to the AI Docs on Github
 
 * [Quanta Coding Agent Documentation on Github](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md#ai-agent-for-code-refactoring)
 * [All Quanta AI Documentation on Github](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md)
-
-
-# Minimalist Gradio Apps
-
-The primary reason for this project is to have `Quanta_Gradio_Agent.py`, which is the Coding Agent Gradio App, however there are several other minimalist sample Gradio apps in the root folder which are as follows:
-
-* `Quanta_Gradio_ChatTest.py` - The minimalist example of a working Gradio chatbot
-
-* `Quanta_Gradio_AgentTest.py` - The minimalist example of a working Gradio chatbot with Tool-calling capability
-
-* `Quanta_Gradio_Image.py` - The minimalist example of a working Gradio Image Generation App
-
-These minimalist projects are included only to help other developers who are getting started with Gradio AI Chatbots, or Image Generation
 
