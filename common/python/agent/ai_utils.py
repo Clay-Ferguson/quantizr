@@ -93,11 +93,45 @@ class AIUtils:
     def handle_agent_response_item(chunk, messages, include_tool_usage):
         print("AGENT RESPONSE CHUNK: "+str(chunk))
         content = ""
+        usage_metadata = None
         
         if "agent" in chunk:
             for message in chunk["agent"]["messages"]:
-                if message.content:
-                    content += f"{AIUtils.get_agent_response_string(message.content)}\n"
+                # Capture usage metadata if available
+                if hasattr(message, 'usage_metadata'):
+                    usage_metadata = message.usage_metadata
+                
+                # todo1: I have a feeling this "tool_calls" path is obsolete, no longer used by LangGraph. This section doesn"t execute for tools.
+                if "tool_calls" in message.additional_kwargs:
+                # If the message contains tool calls, extract and display an informative message with tool call details
+
+                    # Extract all the tool calls
+                    tool_calls = message.additional_kwargs["tool_calls"]
+
+                    # Iterate over the tool calls
+                    for tool_call in tool_calls:
+                        # Extract the tool name
+                        tool_name = tool_call["function"]["name"]
+
+                        # Extract the tool query
+                        tool_arguments = eval(tool_call["function"]["arguments"])
+                        tool_query = tool_arguments["query"]
+
+
+                        # Display an informative message with tool call details
+                        msg = f"\nAgent: The agent is calling the tool <tool>{tool_name}</tool> with the query <query>{tool_query}</query>. Please wait for the agent's answer..."
+                        content += msg
+                        print(msg)
+                else:
+                    # If the message doesn"t contain tool calls, extract and display the agent"s answer
+
+                    # Extract the agent"s answer
+                    agent_answer = message.content
+
+                    # Display the agent"s answer
+                    print(f"\nAgent:\n{agent_answer}")
+                    if message.content:
+                        content += f"{AIUtils.get_agent_response_string(message.content)}\n"
                 
         if "tools" in chunk:
             for message in chunk["tools"]["messages"]:
@@ -111,6 +145,11 @@ class AIUtils:
         if content.strip():
             messages.append(ChatMessage(role="assistant", content=content.strip()))
 
+        # todo-1: We're not making use of this data for actually charging to the account, yet. We're using our estimated value.
+        # if usage_metadata:
+        #     print(f">>>>>>>>>>>>>>>> Usage metadata: {usage_metadata}")
+
+        return usage_metadata
 
     # Old version of this method from when we were using `langgraph.prebuilt` `chat_agent_executor`` instead of `create_react_agent`, which I'm keeping
     # for future reference

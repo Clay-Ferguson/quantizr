@@ -99,8 +99,8 @@ public class MongoUpdate extends ServiceBase {
                     synchronized (TL.getSC()) {
                         TL.getDirtyNodes().forEach((key, value) -> {
                             if (!key.toHexString().equals(value.getIdStr())) {
-                                throw new RuntimeEx("Node originally cached as ID " + key.toHexString()
-                                        + " now has key" + value.getIdStr());
+                                throw new RuntimeEx("Node originally cached as ID " + key.toHexString() + " now has key"
+                                        + value.getIdStr());
                             }
                         });
 
