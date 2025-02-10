@@ -20,7 +20,6 @@ class FileUtils:
     @staticmethod
     def write_file(filename: str, content: str):
         """Writes content to a file."""
-
         with open(filename, "w", encoding="utf-8") as file:
             file.write(content)
 

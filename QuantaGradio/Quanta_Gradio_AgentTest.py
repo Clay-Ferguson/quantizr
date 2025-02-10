@@ -13,7 +13,7 @@ from langchain.chat_models.base import BaseChatModel
 import gradio as gr
 from gradio import ChatMessage
 from langchain.schema import HumanMessage
-from langgraph.prebuilt import chat_agent_executor
+from langgraph.prebuilt import create_react_agent
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
@@ -54,15 +54,19 @@ if __name__ == "__main__":
     llm: BaseChatModel = AIUtils.create_llm(0.0, AppConfig.cfg)
     tools = [AdditionTool("A tool that adds two numbers together")]
 
+    # Create the ReAct agent
+    agent = create_react_agent(
+        model=llm,
+        tools=tools,
+    )
+
     async def query_ai(prompt, messages):
         chat_history = AIUtils.gradio_messages_to_langchain(messages)
-        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
-    
         chat_history.append(HumanMessage(content=prompt))    
         messages.append(ChatMessage(role="user", content=prompt))
         yield messages, ""
         
-        async for chunk in agent_executor.astream({"messages": chat_history}):
+        async for chunk in agent.astream({"messages": chat_history}):
             AIUtils.handle_agent_response_item(chunk, messages, True)
             yield messages, ""            
 
@@ -76,4 +80,4 @@ if __name__ == "__main__":
         input = gr.Textbox(lines=1, label="Chat Message")
         input.submit(query_ai, [input, chatbot], [chatbot, input])
 
-    demo.launch()         
+    demo.launch()

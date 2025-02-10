@@ -7,7 +7,7 @@ from typing import List, Set
 from gradio import ChatMessage
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
-from langgraph.prebuilt import chat_agent_executor
+from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import BaseTool
 
 from common.python.agent.models import FileSources
@@ -97,9 +97,13 @@ class QuantaAgent:
                     tools = QuantaAgent.tool_set
                     print("Created Agent Tools")
                     
-                agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
+                agent = create_react_agent(
+                    model=llm,
+                    tools=tools,
+                )
+                
                 initial_message_len = len(messages)
-                response = agent_executor.invoke({"messages": messages})
+                response = agent.invoke({"messages": messages})
                 # print(f"Response: {response}") This prints too much
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
@@ -176,13 +180,16 @@ Final Prompt:
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
 
-        agent_executor = chat_agent_executor.create_tool_calling_executor(llm, QuantaAgent.tool_set)
+        agent = create_react_agent(
+            model=llm,
+            tools=QuantaAgent.tool_set,
+        )
         chat_history.append(HumanMessage(content=self.prompt))    
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages
         
         print("Processing agent responses...")
-        async for chunk in agent_executor.astream({"messages": chat_history}):
+        async for chunk in agent.astream({"messages": chat_history}):
             AIUtils.handle_agent_response_item(chunk, messages, show_tool_usage)
             yield messages            
             

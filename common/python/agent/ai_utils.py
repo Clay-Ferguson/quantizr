@@ -93,6 +93,31 @@ class AIUtils:
     def handle_agent_response_item(chunk, messages, include_tool_usage):
         print("AGENT RESPONSE CHUNK: "+str(chunk))
         content = ""
+        
+        if "agent" in chunk:
+            for message in chunk["agent"]["messages"]:
+                if message.content:
+                    content += f"{AIUtils.get_agent_response_string(message.content)}\n"
+                
+        if "tools" in chunk:
+            for message in chunk["tools"]["messages"]:
+                if message.content:
+                    content += f"🛠️ Tool {message.name}: {AIUtils.get_agent_response_string(message.content)}\n"
+           
+        if isinstance(chunk, str):
+            # Direct string output (common in simple responses)
+            content += chunk+"\n"            
+              
+        if content.strip():
+            messages.append(ChatMessage(role="assistant", content=content.strip()))
+
+
+    # Old version of this method from when we were using `langgraph.prebuilt` `chat_agent_executor`` instead of `create_react_agent`, which I'm keeping
+    # for future reference
+    @staticmethod
+    def handle_agent_response_item_OLD(chunk, messages, include_tool_usage):
+        print("AGENT RESPONSE CHUNK: "+str(chunk))
+        content = ""
         if "agent" in chunk:
             agnt = chunk["agent"]
             if agnt is not None and "messages" in agnt:
@@ -105,19 +130,6 @@ class AIUtils:
                 if toolz is not None and "messages" in toolz:
                     for msg in toolz["messages"]:
                         content += f"🛠️ Tool {msg.name}: {AIUtils.get_agent_response_string(msg.content)}\n"
-                
-        if "final_answer" in chunk:
-            # Final response from the agent
-            content += str(chunk["final_answer"])+"\n"
-            
-        if "intermediate_steps" in chunk:
-            # Intermediate reasoning steps
-            for step in chunk["intermediate_steps"]:
-                content += f"Thinking: {step.action.log}\n"
-        
-        if "output" in chunk:
-            # Generic output field
-            content += str(chunk["output"])+"\n"
                     
         if isinstance(chunk, str):
             # Direct string output (common in simple responses)

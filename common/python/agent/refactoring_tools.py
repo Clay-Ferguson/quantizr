@@ -285,6 +285,7 @@ class WriteFileTool(BaseTool):
         # ensure that all paths exist for the file
         FileUtils.ensure_folder_exists(full_file_name)
         
+        # If we have VSCode opened, editing this file, it will fail to write, and we need to handle this gracefully, rather than just fail, with no reason shown
         FileUtils.write_file(full_file_name, file_content)
         msg = f"Wrote File '{file_name}'"
         print(msg)
