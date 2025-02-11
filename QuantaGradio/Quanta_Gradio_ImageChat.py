@@ -57,14 +57,7 @@ if __name__ == "__main__":
         return HumanMessage(content=list(content))
 
     def predict(message, history):        
-        chat_history = []
-        
-        # Convert history to LangChain message format in chat_history
-        for msg in history:
-            if msg['role'] == "user":
-                chat_history.append(HumanMessage(content=msg['content']))
-            elif msg['role'] == "assistant":
-                chat_history.append(AIMessage(content=msg['content']))
+        chat_history = AIUtils.gradio_messages_to_langchain(history)
 
         # if 'message' is a dict object print "dict"
         if isinstance(message, dict):

@@ -95,6 +95,17 @@ class AIUtils:
         content = ""
         usage_metadata = None
         
+        # This is the chatbot node in the "Node Graph"
+        if "chatbot" in chunk:
+            for message in chunk["chatbot"]["messages"]:
+                if message.content:
+                    content += f"{AIUtils.get_agent_response_string(message.content)}\n"
+        
+        if "messages" in chunk:
+            for message in chunk["messages"]:
+                if message.content:
+                    content += f"{AIUtils.get_agent_response_string(message.content)}\n"
+                    
         if "agent" in chunk:
             for message in chunk["agent"]["messages"]:
                 # Capture usage metadata if available

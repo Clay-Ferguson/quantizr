@@ -24,13 +24,7 @@ if __name__ == "__main__":
     llm = AIUtils.create_llm(0.7, AppConfig.cfg)
 
     def predict(message, history):
-        chat_history = []        
-        for msg in history:
-            if msg['role'] == "user":
-                chat_history.append(HumanMessage(content=msg['content']))
-            elif msg['role'] == "assistant":
-                chat_history.append(AIMessage(content=msg['content']))
-                
+        chat_history = AIUtils.gradio_messages_to_langchain(history)       
         chat_history.append(HumanMessage(content=message))
         gpt_response = llm.invoke(chat_history)
         return gpt_response.content

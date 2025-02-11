@@ -170,15 +170,8 @@ Final Prompt:
         if QuantaAgent.tool_set is None:
             QuantaAgent.tool_set = init_tools(self.file_sources)
                 
-        # Convert messages to a format the agent can understand
-        chat_history = []
-        idx = 0        
-        for msg in messages:
-            if msg['role'] == "user":
-                chat_history.append(HumanMessage(content=msg['content']))
-                idx += 1 
-            elif msg['role'] == "assistant":
-                chat_history.append(AIMessage(content=msg['content']))
+        # Convert messages to a format the agent can understand &&&
+        chat_history = AIUtils.gradio_messages_to_langchain(messages) 
 
         agent = create_react_agent(
             model=llm,
