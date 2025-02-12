@@ -34,28 +34,32 @@ class AIUtils:
                     model=cfg.openai_model,
                     temperature=temperature,
                     api_key=cfg.openai_api_key,
-                    timeout=timeout
+                    timeout=timeout,
+                    cache=False
                 )
             elif cfg.ai_service == AIService.ANTHROPIC.value:
                 llm = ChatAnthropic(
                     model=cfg.anth_model, # type: ignore
                     temperature=temperature,
                     api_key=cfg.anth_api_key,
-                    timeout=timeout
+                    timeout=timeout,
+                    cache=False
                 ) # type: ignore 
             elif cfg.ai_service == AIService.GEMINI.value:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,
                     temperature=temperature,
                     api_key=cfg.gemini_api_key,
-                    timeout=timeout
+                    timeout=timeout,
+                    cache=False
             )
             elif cfg.ai_service == AIService.XAI.value:
                 llm = ChatXAI(
                     model=cfg.xai_model,
                     temperature=temperature,
                     api_key=cfg.xai_api_key,
-                    timeout=timeout
+                    timeout=timeout,
+                    cache=False
                 )
             else:
                 raise Exception(f"Invalid AI Service: {cfg.ai_service}")

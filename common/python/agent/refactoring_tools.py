@@ -5,7 +5,6 @@ import re
 from typing import Optional, Type, List
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
-
 from common.python.agent.project_loader import ProjectLoader
 from common.python.utils import Utils
 from .models import FileSources, TextBlock
@@ -43,13 +42,14 @@ class GetBlockInfoTool(BaseTool):
     name: str = "get_block_info"
     description: str = ""
     file_sources: FileSources = FileSources()
-    
     args_schema: Type[BaseModel] = GetBlockInfoInput
     return_direct: bool = False
+    cache: bool = False
 
     def __init__(self, file_sources: FileSources):
         super().__init__(description="Get Block Info Tool: Retrieves information about a named text block, including its location and complete content. Returns both the file path where the block is defined and the block's current content.")
         self.file_sources = file_sources
+        self.cache = False
 
     def _run(
         self,
@@ -74,13 +74,14 @@ class UpdateBlockTool(BaseTool):
     name: str = "update_block"
     description: str = ""
     file_sources: FileSources = FileSources()
-    
     args_schema: Type[BaseModel] = UpdateBlockInput
     return_direct: bool = False
+    cache: bool = False
 
     def __init__(self, file_sources: FileSources):
         super().__init__(description="Block Updater Tool: Updates a named block of text to set new content. This tool automatically knows how to find the right file to put the block in.")
         self.file_sources = file_sources
+        self.cache = False
 
     def _run(
         self,
@@ -151,14 +152,15 @@ class UpdateBlockTool(BaseTool):
 class CreateFileTool(BaseTool):
     name: str = "create_file"
     description: str = ""
-    
     args_schema: Type[BaseModel] = CreateFileInput
     return_direct: bool = False
     file_sources: FileSources = FileSources()
+    cache: bool = False
 
     def __init__(self, file_sources: FileSources):
         super().__init__(description="File Creator Tool: Creates a new file with the specified content. Subfolders will be created automatically if they don't exist.")
         self.file_sources = file_sources
+        self.cache = False
 
     def _run(
         self,
@@ -189,14 +191,15 @@ class DirectoryListingTool(BaseTool):
     name: str = "directory_listing"
     description: str = ""
     file_sources: FileSources = FileSources()
-    
     args_schema: Type[BaseModel] = DirectoryListingInput
     return_direct: bool = False
     base_path: str = ""
+    cache: bool = False
 
     def __init__(self, file_sources: FileSources):
         super().__init__(description="Directory Listing Tool: Gets a recursive directory listing of all files in a folder and subfolders.")
         self.file_sources = file_sources
+        self.cache = False
 
     def _run(
         self,
@@ -243,10 +246,12 @@ class ReadFileTool(BaseTool):
     args_schema: Type[BaseModel] = ReadFileInput
     return_direct: bool = False
     file_sources: FileSources = FileSources()
-
+    cache: bool = False
+    
     def __init__(self, file_sources: FileSources):
         super().__init__(description="File Reader Tool: Reads an existing file to get its text content")
         self.file_sources = file_sources
+        self.cache = False
 
     def _run(
         self,
@@ -267,10 +272,12 @@ class WriteFileTool(BaseTool):
     args_schema: Type[BaseModel] = WriteFileInput
     return_direct: bool = False
     file_sources: FileSources = FileSources()
+    cache: bool = False
 
     def __init__(self, file_sources: FileSources):
         super().__init__(description="File Writer Tool: Writes to a file with all new content. Any paths in the file name will be created automatically if they don't exist")
         self.file_sources = file_sources
+        self.cache = False
         
     def _run(
         self,
@@ -294,6 +301,7 @@ class WriteFileTool(BaseTool):
 @staticmethod
 def init_tools(file_sources: FileSources) -> List[BaseTool]:
     """Initialize tools for the agent."""
+    
     return [
         GetBlockInfoTool(file_sources),
         UpdateBlockTool(file_sources),

@@ -1,4 +1,5 @@
-"""Runs a basic ChatBot using Gradio interface and a true "Lang Graph" (StateGraph).
+"""Runs a basic ChatBot using Gradio interface and a true "Lang Graph" (StateGraph). We build a true
+LangGraph graph, but it's a simple one that only responds to the user prompt.
 
 https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-1-build-a-basic-chatbot
 """
@@ -7,11 +8,8 @@ import sys
 import os
 import gradio as gr
 from langchain.schema import HumanMessage
-
 from typing import Annotated
-
 from typing_extensions import TypedDict
-
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 
@@ -40,7 +38,8 @@ if __name__ == "__main__":
     llm = AIUtils.create_llm(0.7, AppConfig.cfg)
     
     def chatbot(state: State):
-        return {"messages": [llm.invoke(state["messages"])]}
+        ret = llm.invoke(state["messages"])
+        return {"messages": [ret]}
 
     graph_builder.add_node("chatbot", chatbot)
     graph_builder.add_edge(START, "chatbot")
@@ -53,6 +52,8 @@ if __name__ == "__main__":
         messages.append(gr.ChatMessage(role="user", content=prompt))
         yield messages, ""
         
+        # NOTE: calling this will cause all the "chatbot" nodes to be invoked as necessary (and all other nodes), which will run
+        # the AI as shown in functions above.
         async for chunk in graph.astream({"messages": chat_history}):
             AIUtils.handle_agent_response_item(chunk, messages, True)
             yield messages, ""   

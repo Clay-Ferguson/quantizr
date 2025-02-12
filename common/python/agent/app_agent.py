@@ -3,14 +3,13 @@
 import os
 import sys
 import time
-from typing import List, Set
+from typing import List
 from gradio import ChatMessage
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import BaseTool
 
-from common.python.agent.models import FileSources
 from ..utils import RefactorMode
 from .refactoring_tools import (
     init_tools
@@ -23,6 +22,7 @@ ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
+from common.python.agent.models import FileSources
 from common.python.agent.ai_utils import AIUtils
 
 class QuantaAgent:
@@ -219,6 +219,60 @@ Final Prompt:
                     else:
                         answer += str(item) + "\n"
         return answer
+
+    async def run_lang_graph(
+        self,
+        ai_service: str,
+        output_file_name: str,
+        messages,
+        show_tool_usage: bool, 
+        input_prompt: str,
+        file_sources: FileSources,
+        graph,
+    ):
+        """Runs the AI/Agent from a Gradio UI.
+        """
+        
+        self.file_sources = file_sources
+        self.prompt = input_prompt
+        self.mode = RefactorMode.REFACTOR.value
+
+        # default filename to timestamp if empty
+        if output_file_name == "":
+            output_file_name = self.ts
+        
+        self.build_system_prompt("")
+                
+        # Convert messages to a format the agent can understand &&&
+        chat_history = AIUtils.gradio_messages_to_langchain(messages) 
+
+        chat_history.append(HumanMessage(content=self.prompt))    
+        messages.append(ChatMessage(role="user", content=self.prompt))
+        yield messages     
+        
+        print("Processing agent responses...")
+        async for chunk in graph.astream({"messages": chat_history}):
+            AIUtils.handle_agent_response_item(chunk, messages, show_tool_usage)
+            yield messages       
+            
+        output = f"""AI Model Used: {ai_service}, Mode: {self.mode}, Timestamp: {self.ts}
+____________________________________________________________________________________
+Input Prompt: 
+{input_prompt}
+____________________________________________________________________________________
+LLM Output: 
+{self.answer}
+____________________________________________________________________________________
+System Prompt: 
+{self.system_prompt}
+____________________________________________________________________________________
+Final Prompt: 
+{self.prompt}
+"""
+
+        filename = f"{self.file_sources.data_folder}/{output_file_name}.txt"
+        FileUtils.write_file(filename, output)
+        print(f"Wrote Log File: {filename}")
 
     def get_file_type_mention(self, ext: str) -> str:
         file_type = ""
