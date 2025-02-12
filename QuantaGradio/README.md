@@ -2,7 +2,11 @@
 
 * `Quanta_Gradio_Agent.py` - Quanta Coding Agent. Most of the code for this app is in `common/python` folder of the Quantizr repository. The common code is used by several other projects.
 
+* `Quanta_Gradio_Agent_SG.py` - Same as `Quanta_Gradio_Agent.py` but with an actual StateGraph & Node Tree
+
 * `Quanta_Gradio_ChatTest.py` - Chat app
+
+* `Quanta_Gradio_ChatTest.py` - Same as `Quanta_Gradio_ChatTest.py` but with an actual StateGraph & Node Tree
 
 * `Quanta_Gradio_AgentTest.py` - Chat app with tool-calling
 
