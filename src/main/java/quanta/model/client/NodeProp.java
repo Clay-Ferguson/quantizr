@@ -129,6 +129,7 @@ public enum NodeProp {
     IN_PENDING_PATH("pendingPath", null), //
 
     OPEN_GRAPH("sn:og", null), //
+    OPEN_GRAPH_LAST_UPDATE("sn:ogLastUpdate", null), //
     TRUNCATED("trunc", null); //
 
     @JsonValue

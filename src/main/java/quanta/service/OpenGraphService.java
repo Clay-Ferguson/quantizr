@@ -25,7 +25,8 @@ public class OpenGraphService extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
 
-    // private Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
+    // private Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)",
+    // Pattern.CASE_INSENSITIVE);
     private final LRUMap<String, OpenGraph> ogCache = new LRUMap<>(1000);
     private static final String BROWSER_USER_AGENT =
             "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
@@ -56,11 +57,13 @@ public class OpenGraphService extends ServiceBase {
             openGraph.setMime(mime);
         }
 
-        // we can't trust what we get back from servers, but we do need to be sure URL is correct here
+        // we can't trust what we get back from servers, but we do need to be sure URL
+        // is correct here
         // ourselves.
         openGraph.setUrl(url);
 
-        // we allow storing a null if we got back a null. Cache it so we don't try again.
+        // we allow storing a null if we got back a null. Cache it so we don't try
+        // again.
         synchronized (ogCache) {
             ogCache.put(url, openGraph);
         }
@@ -112,22 +115,38 @@ public class OpenGraphService extends ServiceBase {
      * during SAVEs.
      */
     public void parseNode(SubNode node) {
+        // if we have no text content at all, clear the OPEN_GRAPH property and return
         if (StringUtils.isEmpty(node.getContent())) {
             node.set(NodeProp.OPEN_GRAPH.s(), null);
             return;
         }
 
-        if (node.getContent().toLowerCase().indexOf("http") == -1) {
+        // if we have no http or https links in the content, clear the OPEN_GRAPH property and return
+        if (node.getContent().toLowerCase().indexOf("http://") == -1
+                && node.getContent().toLowerCase().indexOf("https://") == -1) {
             node.set(NodeProp.OPEN_GRAPH.s(), null);
             return;
         }
 
-        ArrayList<String> ogList = null;
-
+        // if we have no http or https links in the content, clear the OPEN_GRAPH property and return
         List<String> lines = XString.tokenize(node.getContent(), "\n", true);
         if (lines == null || lines.size() == 0) {
+            node.set(NodeProp.OPEN_GRAPH.s(), null);
             return;
         }
+
+        // record current time and time of last update (or 0L if no last update set yet)
+        Long timeNow = System.currentTimeMillis();
+        Long lastUpdate = node.getInt(NodeProp.OPEN_GRAPH_LAST_UPDATE);
+
+        // if we have a last update and it's more than 7 days ago set forceReRead to
+        // true
+        boolean forceReRead = false;
+        if ((timeNow - lastUpdate) > 604800000L) {
+            forceReRead = true;
+        }
+
+        ArrayList<String> ogList = null;
 
         // iterate through each url and cache it
         for (String line : lines) {
@@ -154,22 +173,27 @@ public class OpenGraphService extends ServiceBase {
                 ogList = new ArrayList<>();
             }
 
-            // Stripping trailing slashes is a hack because my regex isn't perfect (todo-3: fix the regex)
+            // Stripping trailing slashes is a hack because my regex isn't perfect (todo-3:
+            // fix the regex)
             url = XString.stripIfEndsWith(url, "/");
             url = XString.stripIfEndsWith(url, "\\");
 
-            // set load=false if we already have this URL in our ogList
-            boolean load = true;
+            if (!forceReRead) {
+                // set load=false if we already have this URL in our ogList
+                boolean load = true;
 
-            for (String urlCheck : ogList) {
-                // just finding the URL is a hack but will be fine for now, to avoid parsing JSON
-                if (urlCheck.contains(url)) {
-                    load = false;
-                    break;
+                for (String urlCheck : ogList) {
+                    // just finding the URL is a hack but will be fine for now, to avoid parsing
+                    // JSON
+                    if (urlCheck.contains(url)) {
+                        load = false;
+                        break;
+                    }
+                }
+                if (!load) {
+                    continue;
                 }
             }
-            if (!load)
-                continue;
 
             OpenGraph og = getOpenGraph(url);
             String ogStr = XString.compactPrint(og);
@@ -181,5 +205,6 @@ public class OpenGraphService extends ServiceBase {
             }
         }
         node.set(NodeProp.OPEN_GRAPH.s(), ogList);
+        node.set(NodeProp.OPEN_GRAPH_LAST_UPDATE.s(), timeNow);
     }
 }

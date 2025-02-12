@@ -120,6 +120,7 @@ public class SubNode {
     @Field(LIKES)
     private HashSet<String> likes;
 
+    // todo-0: are mcid and prevMcid obsolete now? This was going to be part of version tracking right?
     public static final String MCID = "mcid";
     @Field(MCID)
     public String mcid;

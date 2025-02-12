@@ -1208,6 +1208,7 @@ export const enum NodeProp {
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",
+    OPEN_GRAPH_LAST_UPDATE = "sn:ogLastUpdate",
     TRUNCATED = "trunc",
 }
 
