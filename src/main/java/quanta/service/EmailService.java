@@ -51,7 +51,7 @@ public class EmailService extends ServiceBase {
      *
      * @Scheduled value is in milliseconds.
      *
-     * Runs immediately at startup, and then every 10 seconds
+     * Runs immediately at startup, and then every 30 seconds
      */
     @Scheduled(fixedDelay = 30000)
     public void run() {

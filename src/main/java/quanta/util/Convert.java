@@ -298,7 +298,7 @@ public class Convert extends ServiceBase {
             else if (prop instanceof Collection) {
                 value = prop;
             } else {
-                value = prop.toString();
+                value = prop == null ? null : prop.toString();
             }
             // log.trace(String.format("prop[%s]=%s", prop.getName(), value));
             PropertyInfo propInfo = new PropertyInfo(propName, value);

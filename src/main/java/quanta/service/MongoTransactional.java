@@ -110,6 +110,10 @@ public class MongoTransactional extends ServiceBase {
         return svc_mongoDelete.deleteNodeOrphans();
     }
 
+    public String cleanupOpenGraph() {
+        return svc_mongoDelete.cleanupOpenGraph();
+    }
+
     public DeleteFriendResponse cm_deleteFriend(String delUserNodeId, String parentType) {
         return svc_friend.deleteFriend(delUserNodeId, parentType);
     }

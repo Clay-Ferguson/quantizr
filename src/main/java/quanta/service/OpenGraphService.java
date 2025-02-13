@@ -58,8 +58,7 @@ public class OpenGraphService extends ServiceBase {
         }
 
         // we can't trust what we get back from servers, but we do need to be sure URL
-        // is correct here
-        // ourselves.
+        // is correct here ourselves.
         openGraph.setUrl(url);
 
         // we allow storing a null if we got back a null. Cache it so we don't try

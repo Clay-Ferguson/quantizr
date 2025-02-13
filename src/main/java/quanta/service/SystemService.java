@@ -82,8 +82,10 @@ public class SystemService extends ServiceBase {
     public void runScheduledMaintenance() {
         if (++maintenanceRunCount == 1)
             return; // skip first run, which triggers at startup
+
         svc_arun.run(() -> {
             svc_mongoTrans.gridMaintenanceScan();
+            svc_mongoTrans.cleanupOpenGraph();
             return null;
         });
     }

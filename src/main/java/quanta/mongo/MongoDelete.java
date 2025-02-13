@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
@@ -19,6 +20,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.NodeProp;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.DeleteNodesRequest;
@@ -152,6 +154,51 @@ public class MongoDelete extends ServiceBase {
         // 'bulkSetPropValOnParents'
         DeleteResult res = svc_ops.remove(q);
         log.debug("Nodes deleted: " + res.getDeletedCount());
+    }
+
+    public String cleanupOpenGraph() {
+        MongoTranMgr.ensureTran();
+        Query q = new Query();
+
+        // Calculate timestamp for one week ago
+        long oneWeekAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OPEN_GRAPH.s()).exists(true)//
+                .orOperator(//
+                        Criteria.where(SubNode.PROPS + "." + NodeProp.OPEN_GRAPH_LAST_UPDATE.s()).exists(false),
+                        Criteria.where(SubNode.PROPS + "." + NodeProp.OPEN_GRAPH_LAST_UPDATE.s()).lte(oneWeekAgo));
+
+        crit = svc_auth.addWriteSecurity(crit);
+        q.addCriteria(crit);
+
+        Val<BulkOperations> bops = new Val<>(null);
+        IntVal batchSize = new IntVal();
+
+        // scan all nodes with open graph property
+        svc_ops.forEach(q, node -> {
+            if (bops.getVal() == null) {
+                bops.setVal(svc_ops.bulkOps(BulkMode.UNORDERED));
+            }
+
+            Criteria crit2 = new Criteria("id").is(node.getId());
+            Query query = new Query().addCriteria(crit2);
+            Update update = new Update()//
+                    .unset(SubNode.PROPS + "." + NodeProp.OPEN_GRAPH.s())//
+                    .unset(SubNode.PROPS + "." + NodeProp.OPEN_GRAPH_LAST_UPDATE.s());
+            bops.getVal().updateOne(query, update);
+            batchSize.inc();
+
+            if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+                bops.getVal().execute();
+                batchSize.setVal(0);
+                bops.setVal(null);
+            }
+        });
+
+        if (bops.hasVal()) {
+            bops.getVal().execute();
+        }
+        return "Open Graph Cleanup complete.";
     }
 
     /*
