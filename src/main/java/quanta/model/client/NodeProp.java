@@ -77,10 +77,10 @@ public enum NodeProp {
 
     /*
      * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
+     * 
      * metadata rendering
      */
     MIME_EXT("sn:ext", null), //
-
     EMAIL("sn:email", null), //
     CODE("sn:code", null), //
 

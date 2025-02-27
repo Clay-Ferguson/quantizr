@@ -24,7 +24,6 @@ import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.PrincipalName;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;

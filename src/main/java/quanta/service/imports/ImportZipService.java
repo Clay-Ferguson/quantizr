@@ -12,7 +12,6 @@ import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
-import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.TL;
@@ -23,7 +22,7 @@ import quanta.util.TL;
  * have been actually exported from SubNode in order to import it, but merely have the proper
  * layout/content.
  */
-@Component 
+@Component
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ImportZipService.class);
@@ -55,8 +54,7 @@ public class ImportZipService extends ImportArchiveBase {
      *
      * Assumes ms has already been verified as owner of 'node'
      */
-    public SubNode importFromStream(InputStream inputStream, SubNode node,
-            boolean isNonRequestThread) {
+    public SubNode importFromStream(InputStream inputStream, SubNode node, boolean isNonRequestThread) {
         SessionContext sc = TL.getSC();
         if (used) {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");

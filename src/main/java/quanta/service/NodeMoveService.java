@@ -15,8 +15,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
-import quanta.model.client.Constant;
-import quanta.model.client.NodeProp;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.JoinNodesRequest;
