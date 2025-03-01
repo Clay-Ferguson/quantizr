@@ -13,12 +13,12 @@ public enum AIModel {
     OPENAI_O1_PREVIEW("openAi_o1Preview", "openai", "o1-preview", "OpenAI: ChatGPT o1-preview", "O1P", true, 128_000), //
     OPENAI_O1_MINI("openAi_o1Mini", "openai", "o1-mini", "OpenAI: ChatGPT o1-mini", "O1M", true, 128_000), //
 
-    PPLX_ONLINE("pplxAi_online", "perplexity", "sonar-reasoning-pro", "Perplexity: Recent News Aware",
-            "PPN", false, 127_000), //
+    PPLX_ONLINE("pplxAi_online", "perplexity", "sonar-reasoning-pro", "Perplexity: Recent News Aware", "PPN", false,
+            127_000), //
 
     ANTH("anthAi", "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true, 200_000), //
 
-    ANTH_SONNET("anthAi_sonnet", "anthropic", "claude-3-5-sonnet-20241022", "Anthropic: Claude 3.5 Sonnet", "ACS", true,
+    ANTH_SONNET("anthAi_sonnet", "anthropic", "claude-3-7-sonnet-20250219", "Anthropic: Claude 3.7 Sonnet", "ACS", true,
             200_000), // Sonnet
 
     GEMINI("geminiAi", "gemini", "gemini-1.5-pro", "Google: Gemini 1.5 Pro", "GEM", true, 2_000_000), //

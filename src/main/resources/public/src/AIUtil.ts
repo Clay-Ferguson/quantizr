@@ -58,7 +58,7 @@ export class AIUtil {
                 },
                 {
                     name: J.AIModel.ANTH_SONNET,
-                    description: "Anthropic: Claude 3.5 Sonnet",
+                    description: "Anthropic: Claude 3.7 Sonnet",
                     longDescription: "Anthropic's most powerful general-purpose AI (200K context, max $15/megatoken)"
                 });
         }

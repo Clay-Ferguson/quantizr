@@ -23,7 +23,7 @@ from common.python.agent.models import FileSources
 
 # #ai-model (WARNING: These values are in a Java file too (AIModel.java))
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
-ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20241022"
+ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-7-sonnet-20250219"
 OPENAI_MODEL_COMPLETION = "gpt-4o-2024-11-20"
 OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 OPENAI_MODEL_COMPLETION_O1_PREVIEW = "o1-preview"
