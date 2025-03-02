@@ -33,6 +33,7 @@ import quanta.util.ExportUtil;
 import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.StreamUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -45,6 +46,7 @@ import quanta.util.val.Val;
  * have just that one export as their 'scope'
  */
 public abstract class ExportArchiveBase extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
     private String shortFileName;
     private String fullFileName;
@@ -725,7 +727,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String relPath = fullPath.substring(rootPathParent.length());
         try {
             node.directSetPath(relPath);
-            json = svc_snUtil.toCanonicalJson(node);
+            json = SubNodeUtil.toCanonicalJson(node);
         } finally {
             node.directSetPath(fullPath);
         }

@@ -1207,7 +1207,7 @@ public class MongoRead extends ServiceBase {
         }
 
         // process all nodes to add to children (as unordered children at first) to each node they go under
-        nodeMap.forEach((k, n) -> {
+        nodeMap.forEach((_, n) -> {
             if (idMap != null) {
                 idMap.put(n.node.getIdStr(), n);
             }
@@ -1229,7 +1229,7 @@ public class MongoRead extends ServiceBase {
             }
         });
 
-        nodeMap.forEach((k, n) -> {
+        nodeMap.forEach((_, n) -> {
             if (n.children != null) {
                 n.children.sort((a, b) -> a.node.getOrdinal().compareTo(b.node.getOrdinal()));
             }

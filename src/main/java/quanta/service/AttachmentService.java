@@ -251,7 +251,7 @@ public class AttachmentService extends ServiceBase {
     public void fixAllAttachmentMimes(SubNode node) {
         if (node == null || node.getAttachments() == null)
             return;
-        node.getAttachments().forEach((String key, Attachment att) -> {
+        node.getAttachments().forEach((String _, Attachment att) -> {
             String mimeType = att.getMime();
             // ensure we have the best mimeType we can if not set in the data.
             if (StringUtils.isEmpty(mimeType)) {
@@ -920,7 +920,7 @@ public class AttachmentService extends ServiceBase {
             query.addCriteria(crit);
 
             svc_ops.forEach(query, n -> {
-                n.getAttachments().forEach((String key, Attachment att) -> {
+                n.getAttachments().forEach((String _, Attachment att) -> {
                     if (att.getBin() != null) {
                         GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
                         if (gridFile == null) {
@@ -1160,7 +1160,7 @@ public class AttachmentService extends ServiceBase {
     public long getTotalAttachmentBytes(SubNode node) {
         LongVal totalBytes = new LongVal();
         if (node != null && node.getAttachments() != null) {
-            node.getAttachments().forEach((String key, Attachment att) -> {
+            node.getAttachments().forEach((String _, Attachment att) -> {
                 if (att.getSize() > 0L) {
                     totalBytes.add(att.getSize());
                 }

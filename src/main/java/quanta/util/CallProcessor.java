@@ -54,7 +54,7 @@ public class CallProcessor extends ServiceBase {
         ResponseBase orb = new ResponseBase();
         Object ret = null;
 
-        try (PerfEvent pe = new PerfEvent("rpc." + command, TL.getSC().getUserName())) {
+        try (PerfEvent _ = new PerfEvent("rpc." + command, TL.getSC().getUserName())) {
             ret = runner.get();
             svc_mongoUpdate.saveSession();
 

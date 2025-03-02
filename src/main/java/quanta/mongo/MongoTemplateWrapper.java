@@ -44,7 +44,7 @@ public class MongoTemplateWrapper extends ServiceBase {
     private <T> T executeOperation(Query query, String operationName, Supplier<T> operation) {
         String user = TL.getSC() != null ? TL.getSC().getUserName() : "[admin-thread]";
 
-        try (PerfEvent pe = new PerfEvent(operationName, user)) {
+        try (PerfEvent _ = new PerfEvent(operationName, user)) {
             if (logging) {
                 log(operationName, query);
             }

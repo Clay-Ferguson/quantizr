@@ -1,7 +1,6 @@
 
 package quanta.rest.response;
 
-import java.math.BigDecimal;
 import quanta.model.NodeInfo;
 import quanta.rest.response.base.NodeChanges;
 import quanta.rest.response.base.ResponseBase;

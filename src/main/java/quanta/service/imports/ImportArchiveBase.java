@@ -102,11 +102,11 @@ public abstract class ImportArchiveBase extends ServiceBase {
                  * the obsolete values cannot be reused.
                  */
                 if (node.getAttachments() != null) {
-                    node.getAttachments().forEach((String key, Attachment att) -> {
+                    node.getAttachments().forEach((String _, Attachment att) -> {
                         att.setBin(null);
                     });
                 }
-                
+
                 int tries = 0;
                 String nodeName = node.getName();
                 String baseNodeName = nodeName;
@@ -150,8 +150,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
         String mimeType = att.getMime();
         String fileName = att.getFileName();
         LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
-        svc_attach.attachBinaryFromStream(true, attName, node, null, fileName, length, lzis, mimeType, -1, -1,
-                false, true, false, true, null, false, null);
+        svc_attach.attachBinaryFromStream(true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false,
+                true, false, true, null, false, null);
         return true;
     }
 }

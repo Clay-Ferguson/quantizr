@@ -1,7 +1,6 @@
 
 package quanta.rest.response;
 
-import java.math.BigDecimal;
 import quanta.rest.response.base.ResponseBase;
 
 public class AskSubGraphResponse extends ResponseBase {

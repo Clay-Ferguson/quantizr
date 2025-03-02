@@ -15,6 +15,7 @@ import quanta.exception.base.RuntimeEx;
  * See also: PgTranMgr.java
  */
 public class MongoTranMgr implements PlatformTransactionManager {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(MongoTranMgr.class);
     private final MongoTransactionManager delegate;
     private static final ThreadLocal<Boolean> tranActive = new ThreadLocal<>();

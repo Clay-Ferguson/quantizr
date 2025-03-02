@@ -215,7 +215,7 @@ public class MongoUtil extends ServiceBase {
             return false;
         }
         Val<Boolean> keysRemoved = new Val<>(false);
-        aclMap.forEach((String key, AccessControl ac) -> {
+        aclMap.forEach((String _, AccessControl ac) -> {
             if (ac.getKey() != null) {
                 ac.setKey(null);
                 keysRemoved.setVal(true);

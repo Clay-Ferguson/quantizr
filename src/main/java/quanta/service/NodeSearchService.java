@@ -438,9 +438,6 @@ public class NodeSearchService extends ServiceBase {
         int nonPublicCount = 0;
         int adminOwnedCount = 0;
         int userShareCount = 0;
-        int signedNodeCount = 0;
-        int unsignedNodeCount = 0;
-        int failedSigCount = 0;
     }
 
     public GetNodeStatsResponse cm_getNodeStats(GetNodeStatsRequest req) {
