@@ -48,11 +48,17 @@ public class NodeMoveService extends ServiceBase {
         return ret;
     }
 
-    /*
+    /**
+     * Sets the position of a node based on the target position specified in the request.
+     *
      * Moves the the node to a new ordinal/position location (relative to parent)
      *
      * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
      * first node under its parent.
+     * 
+     * @param req the request containing the node ID and the target position
+     * @return a response containing the changes made to the node
+     * @throws RuntimeEx if the node is not found or if the target position is invalid
      */
     public SetNodePositionResponse setNodePosition(SetNodePositionRequest req) {
         MongoTranMgr.ensureTran();
@@ -85,6 +91,12 @@ public class NodeMoveService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Moves the given node up in the order by swapping its ordinal value with the node above it. If
+     * there is no node above, the method does nothing.
+     *
+     * @param node the node to be moved up
+     */
     public void moveNodeUp(SubNode node) {
         SubNode nodeAbove = svc_mongoRead.getSiblingAbove(node, null);
         if (nodeAbove != null) {
@@ -95,6 +107,12 @@ public class NodeMoveService extends ServiceBase {
         svc_mongoUpdate.saveSession();
     }
 
+    /**
+     * Moves the given node down in the order by swapping its ordinal with the node below it. If there
+     * is no node below, the method does nothing.
+     *
+     * @param node the node to be moved down
+     */
     public void moveNodeDown(SubNode node) {
         SubNode nodeBelow = svc_mongoRead.getSiblingBelow(node, null);
         if (nodeBelow != null) {
@@ -105,6 +123,12 @@ public class NodeMoveService extends ServiceBase {
         svc_mongoUpdate.saveSession();
     }
 
+    /**
+     * Moves the specified node to the top of its parent's list of children.
+     *
+     * @param node The node to be moved to the top.
+     * @param nodeChanges The object that tracks changes to the node.
+     */
     public void moveNodeToTop(SubNode node, NodeChanges nodeChanges) {
         SubNode parentNode = svc_mongoRead.getParent(node);
         if (parentNode == null) {
@@ -121,6 +145,12 @@ public class NodeMoveService extends ServiceBase {
         svc_mongoUpdate.saveSession();
     }
 
+    /**
+     * Moves the specified node to the bottom of its parent's children list. This is done by setting the
+     * node's ordinal to one greater than the maximum ordinal of its siblings.
+     *
+     * @param node the node to be moved to the bottom
+     */
     public void moveNodeToBottom(SubNode node) {
         SubNode parentNode = svc_mongoRead.getParent(node);
         if (parentNode == null) {
@@ -131,20 +161,29 @@ public class NodeMoveService extends ServiceBase {
         svc_mongoUpdate.saveSession();
     }
 
+    // Joins the content of an array of nodes.
     public JoinNodesResponse cm_joinNodes(JoinNodesRequest req) {
         HashSet<String> nodesModified = new HashSet<String>();
         JoinNodesResponse ret = svc_mongoTrans.joinNodes(req, nodesModified);
         return ret;
     }
 
-    /*
+    /**
+     * Joins multiple nodes into a single target node. The content and attachments of the nodes to be
+     * joined are appended to the target node, and the joined nodes are then deleted.
+     * 
      * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
-     * one we keep and join to. If we are joining to a parent, we merge all the NodeIds onto the parent.
-     * We automatically detect the case where all the nodes are already under the same parent, and the
-     * parent has been sent as one of the nodes to join, and in that case we join all the nodes to the
-     * parent.
+     * one we keep and join to. If we are joining to a parent, we merge all the nodes indicated by
+     * NodeIds onto the parent. We automatically detect the case where all the nodes are already under
+     * the same parent, and the parent has been sent as one of the nodes to join, and in that case we
+     * join all the nodes to the parent.
      * 
      * If join to parent is true, that means we merge all the NodeIds onto their parent.
+     * 
+     * @param req The request containing the IDs of the nodes to be joined.
+     * @param nodesModified A set to keep track of the IDs of the nodes that were modified during the
+     *        operation.
+     * @return A response indicating the success or failure of the join operation.
      */
     public JoinNodesResponse joinNodes(JoinNodesRequest req, HashSet<String> nodesModified) {
         JoinNodesResponse res = new JoinNodesResponse();
@@ -158,7 +197,8 @@ public class NodeMoveService extends ServiceBase {
         SubNode node2 = null;
         boolean joinToParent = false;
 
-        // first load all nodes and make sure we own all.
+        // first load all nodes and make sure we own all. If we don't own any of these nodes, an exception
+        // will be thrown.
         for (String nodeId : req.getNodeIds()) {
             SubNode node = svc_mongoRead.getNode(nodeId);
             svc_auth.ownerAuth(node);
@@ -181,7 +221,7 @@ public class NodeMoveService extends ServiceBase {
                         node2 = node;
                     }
                 }
-                // If we have two paths already, maire sure this path is one of them, or else we have a total of
+                // If we have two paths already, make sure this path is one of them, or else we have a total of
                 // three which is not allowed.
                 else {
                     if (!parentPath1.equals(thisParentPath) && !parentPath2.equals(thisParentPath)) {
@@ -192,6 +232,9 @@ public class NodeMoveService extends ServiceBase {
             }
         }
 
+        // Next, we identify the target node, Which will be the node that everything is joined on to. We
+        // remove target node from the list of nodes because the list of nodes are the ones that we're going
+        // to now join.
         SubNode targetNode = null;
         if (parentPath2 != null) {
             joinToParent = true;
@@ -243,6 +286,8 @@ public class NodeMoveService extends ServiceBase {
             delIds.add(n.getIdStr());
         }
 
+        // And finally we save the target node which has been updated with content from all the other nodes
+        // and then we delete all those other nodes.
         targetNode.setContent(targetNode.getContent() + "\n\n" + sb.toString());
         targetNode.touch();
         nodesModified.add(targetNode.getIdStr());
@@ -251,8 +296,12 @@ public class NodeMoveService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
+    /**
+     * Moves or copies nodes from one location to another.
+     *
+     * @param req The request object containing details about the move operation.
+     * @param nodesModified A set of node IDs that have been modified during the operation.
+     * @return A response object containing the result of the move operation.
      */
     public MoveNodesResponse moveNodes(MoveNodesRequest req, HashSet<String> nodesModified) {
         MongoTranMgr.ensureTran();
@@ -307,6 +356,11 @@ public class NodeMoveService extends ServiceBase {
         List<SubNode> nodesToMove = new ArrayList<SubNode>();
         SubNode nodeParent = null;
 
+        /*
+         * Scan all the node IDs to verify that we own all of them. If we don't own any of them, an
+         * exception will be thrown. We also verify that all nodes are siblings. Additionally, we get the
+         * parent of the first node in the list, because we will need it later.
+         */
         for (String nodeId : nodeIds) {
             SubNode node = svc_mongoRead.getNode(nodeId);
             svc_auth.ownerAuth(node);
@@ -330,6 +384,8 @@ public class NodeMoveService extends ServiceBase {
 
         SubNode _nodeParent = nodeParent;
         HashSet<String> reservedPaths = new HashSet<String>();
+        // Run as admin because we've already verified ownership of all the nodes we're going to actually
+        // move.
         svc_arun.run(() -> {
             // process all nodes being moved.
             for (SubNode node : nodesToMove) {
@@ -383,9 +439,29 @@ public class NodeMoveService extends ServiceBase {
         });
     }
 
-    /*
-     * WARNING: This does NOT affect the path of 'graphRoot' itself, but only changes the location of
-     * all the children under it
+    /**
+     * Changes the path of a subgraph by updating the paths of all nodes within the subgraph. WARNING:
+     * This does NOT affect the path of 'graphRoot' itself, but only changes the location of all the
+     * children under it.
+     * 
+     * This is a recursive function that changes the path of all the children of the graphRoot node, and
+     * all their children, etc. It changes the path from oldPathPrefix to newPathPrefix. If copyPaste is
+     * true, then it will copy the nodes to the new location, otherwise it will move them. If copyPaste
+     * is true, then the nodesModified set will be populated with the new IDs of the nodes that were
+     * copied.
+     * 
+     * This is a very powerful function that can be used to move entire subgraphs from one location to
+     * another. It is used by the moveNodes function to move a set of nodes from one parent to another.
+     *
+     * @param graphRoot The root node of the subgraph whose paths are to be changed.
+     * @param oldPathPrefix The old path prefix that needs to be replaced.
+     * @param newPathPrefix The new path prefix to replace the old one.
+     * @param copyPaste If true, nodes are copied and pasted with new IDs and attachments removed.
+     * @param nodesModified A set of node IDs that have been modified (not used in the current
+     *        implementation).
+     * @param res The response object to store the result of the move operation (not used in the current
+     *        implementation).
+     * @throws RuntimeException If a node's path does not start with the expected original path.
      */
     public void changePathOfSubGraph(SubNode graphRoot, String oldPathPrefix, String newPathPrefix, boolean copyPaste,
             HashSet<String> nodesModified, MoveNodesResponse res) {
@@ -437,6 +513,9 @@ public class NodeMoveService extends ServiceBase {
         }
     }
 
+    // Whenever the front end wants to select all the nodes It can call this method and get all their
+    // IDS so that those IDS can be considered selected on the browser side and their check boxes next
+    // to each node will show up as checked.
     public SelectAllNodesResponse cm_selectAllNodes(SelectAllNodesRequest req) {
         SelectAllNodesResponse res = new SelectAllNodesResponse();
         String nodeId = req.getParentNodeId();

@@ -122,6 +122,14 @@ public class ExportJsonService extends ServiceBase {
     // return ret;
     // }
 
+    /**
+     * Saves a binary file to the file system.
+     *
+     * @param binFileName the name of the binary file to save
+     * @param targetFolder the folder where the file should be saved
+     * @param node the node containing the binary data
+     * @return true if the file was successfully saved, false otherwise
+     */
     private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
         boolean ret = false;
         if (binFileName != null) {

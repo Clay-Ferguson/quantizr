@@ -44,6 +44,14 @@ public class MongoAuth extends ServiceBase {
     private static SessionContext adminSC;
     private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
 
+    /**
+     * Retrieves the admin session context. If the admin session context is already initialized, it
+     * returns the existing instance. Otherwise, it initializes the admin session context by obtaining
+     * the root account node from the database, setting the user name to "ADMIN", and setting the user
+     * node ID to the root account node's ID.
+     *
+     * @return the admin session context
+     */
     public SessionContext getAdminSC() {
         if (adminSC != null) {
             return adminSC;
@@ -59,6 +67,17 @@ public class MongoAuth extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves the specified property of an account by its ID.
+     * 
+     * This method first attempts to retrieve the account node from a cache. If the node is found in the
+     * cache, the specified property is returned. If the node is not found in the cache, it is looked up
+     * in the database, cached for future access, and the specified property is returned.
+     * 
+     * @param accountId The ID of the account whose property is to be retrieved.
+     * @param prop The name of the property to retrieve.
+     * @return The value of the specified property, or null if the account or property is not found.
+     */
     public String getAccountPropById(String accountId, String prop) {
         String val = null;
         // try to get the node from the cache of nodes
@@ -78,9 +97,12 @@ public class MongoAuth extends ServiceBase {
         return val;
     }
 
-    /*
+    /**
      * Returns a list of all user names that are shared to on this node, including "public" if any are
      * public.
+     * 
+     * @param node the node for which to retrieve the shared users
+     * @return a list of usernames that have access to the node, or null if no users have access
      */
     public List<String> getUsersSharedTo(SubNode node) {
         List<String> userNames = null;
@@ -111,11 +133,26 @@ public class MongoAuth extends ServiceBase {
         return userNames;
     }
 
-    /*
-     * When a child is created under a parent we want to default the sharing on the child so that
-     * there's an explicit share to the owner of the parent (minus any share to 'child' user that may be
-     * in the parent Acl, because that would represent 'child' node sharing to himself which is never
-     * done)
+    /**
+     * Sets the default Access Control List (ACL) for a reply node (child) based on the parent node.
+     * 
+     * @param parent The parent node under which the reply node is being created. If the parent node is
+     *        null, or if it is an ACCOUNT node, the method does nothing.
+     * @param child The reply node for which the ACL is being set. If the child node is null, the method
+     *        does nothing.
+     * 
+     *        If the parent node is of type FRIEND, the method sets the ACL of the child node to be a
+     *        private message to the user represented by the FRIEND node. It retrieves the username from
+     *        the parent node's properties and finds the corresponding account node. If the account node
+     *        is found, it grants read-write access to the child node for that account.
+     * 
+     *        If the parent node is not of type FRIEND, the method sets the ACL of the child node to
+     *        share it with the owner of the parent node, granting read-write access.
+     * 
+     *        When a child is created under a parent we want to default the sharing on the child so that
+     *        there's an explicit share to the owner of the parent (minus any share to 'child' user that
+     *        may be in the parent Acl, because that would represent 'child' node sharing to himself
+     *        which is never done)
      */
     public void setDefaultReplyAcl(SubNode parent, SubNode child) {
         // if parent or child is null or parent is an ACCOUNT node do nothing here.
@@ -244,6 +281,13 @@ public class MongoAuth extends ServiceBase {
         }
     }
 
+    /**
+     * Validates that the current user has ownership of the specified node.
+     * 
+     * @param node the node to check ownership for
+     * @throws RuntimeEx if the node is null, the session is invalid, or the user does not own the node
+     * @throws ForbiddenException if the user does not have the required ownership of the node
+     */
     public void ownerAuth(SubNode node) {
         if (node == null) {
             throw new RuntimeEx("Auth Failed. Node did not exist.");
@@ -293,6 +337,22 @@ public class MongoAuth extends ServiceBase {
         }
     }
 
+    /**
+     * Authenticates the given node against the specified privileges.
+     * <p>
+     * This method checks if the server is fully initialized and if the node is not null. If the server
+     * is not fully initialized or the node is null, the method returns immediately.
+     * <p>
+     * If verbose logging is enabled, it logs the path of the node being authenticated.
+     * <p>
+     * If the current thread has admin privileges, it logs a success message and returns immediately, as
+     * admin users are allowed to perform any action.
+     * <p>
+     * Otherwise, it delegates the authentication to another method that handles the list of privileges.
+     *
+     * @param node the node to be authenticated
+     * @param privs the privileges to check against
+     */
     public void auth(SubNode node, PrivilegeType... privs) {
         // during server init no auth is required.
         if (node == null || !MongoRepository.fullInit) {
@@ -327,7 +387,23 @@ public class MongoAuth extends ServiceBase {
         return node.getIdStr().equals(node.getOwner().toHexString());
     }
 
-    /* Returns true if this user on this session has privType access to 'node' */
+    /**
+     * Authenticates a user based on the provided node and privileges.
+     * 
+     * This method performs several checks to determine if the user has the necessary privileges to
+     * access the given node. The checks include: - If the server is in the initialization phase, no
+     * authentication is required. - If the user has admin privileges, access is granted. - If the
+     * session context is null, an exception is thrown. - If the node has no owner, an exception is
+     * thrown. - If the user is the owner of the node or is transferring the node, access is granted. -
+     * If no privileges are specified, an exception is thrown. - If the user has the required privileges
+     * for the node, access is granted.
+     * 
+     * @param node The node to be accessed.
+     * @param priv The list of privileges required to access the node.
+     * @throws RuntimeEx If the session context is null, the node has no owner, or privileges are not
+     *         specified.
+     * @throws ForbiddenException If the user does not have the required privileges to access the node.
+     */
     public void auth(SubNode node, List<PrivilegeType> priv) {
         // during server init no auth is required.
         if (node == null || !MongoRepository.fullInit) {
@@ -380,10 +456,17 @@ public class MongoAuth extends ServiceBase {
         throw new ForbiddenException();
     }
 
-    /*
+    /**
      * NOTE: It is the normal flow that we expect sessionUserNodeId to be null for any anonymous
      * requests and this is fine because we are basically going to only be pulling 'public' acl to
      * check, and this is by design.
+     *
+     * Checks if the given node has the required privileges for the session user.
+     *
+     * @param node The node to check for privileges.
+     * @param sessionUserNodeId The ID of the session user.
+     * @param privs The list of privileges to check for.
+     * @return true if the node has all the required privileges for the session user, false otherwise.
      */
     public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
         HashMap<String, AccessControl> acl = node.getAc();
@@ -419,10 +502,17 @@ public class MongoAuth extends ServiceBase {
         return false;
     }
 
-    /*
-     * todo-1: this appears to return "rd,wr" as a single string in the privileges.privilegeName,
-     * whereas the SubNode itself I think stores them as separate strings in the AccessControl.prvs
-     * field. This is a bit confusing.
+
+    /**
+     * Retrieves the Access Control List (ACL) entries for a given node.
+     *
+     * @param node the node from which to retrieve the ACL entries
+     * @return a list of AccessControlInfo objects representing the ACL entries, or null if there are no
+     *         ACL entries
+     *
+     *         todo-1: this appears to return "rd,wr" as a single string in the
+     *         privileges.privilegeName, whereas the SubNode itself I think stores them as separate
+     *         strings in the AccessControl.prvs field. This is a bit confusing.
      */
     public List<AccessControlInfo> getAclEntries(SubNode node) {
         HashMap<String, AccessControl> aclMap = node.getAc();
@@ -441,6 +531,15 @@ public class MongoAuth extends ServiceBase {
         return ret.size() == 0 ? null : ret;
     }
 
+    /**
+     * Creates an AccessControlInfo object for a given principal ID and authentication type.
+     *
+     * @param principalId the ID of the principal (user or entity) for whom the access control info is
+     *        being created
+     * @param authType the type of authentication or privilege being granted
+     * @return an AccessControlInfo object containing the access control details for the specified
+     *         principal, or null if the principal ID does not correspond to a valid user
+     */
     public AccessControlInfo createAccessControlInfo(String principalId, String authType) {
         String displayName = null;
         String principalName = null;
@@ -497,6 +596,17 @@ public class MongoAuth extends ServiceBase {
         return svc_ops.count(q);
     }
 
+    /**
+     * Constructs a MongoDB query to search for subgraphs based on ACL (Access Control List) and
+     * ownership.
+     *
+     * @param pathToSearch the path under which to search for nodes. If null, the search will be
+     *        conducted under all user content.
+     * @param sharedToAny a list of user IDs to check if the nodes are shared with any of these users.
+     *        If null or empty, this criterion is ignored.
+     * @param ownerIdMatch the ObjectId of the owner to match. If null, this criterion is ignored.
+     * @return a Query object representing the constructed MongoDB query.
+     */
     private Query subGraphByAclUser_query(String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
         // this will be node.getPath() to search under the node, or null for searching
         // under all user content.
@@ -546,6 +656,14 @@ public class MongoAuth extends ServiceBase {
         return svc_ops.count(q);
     }
 
+    /**
+     * Constructs a MongoDB query to find subgraph nodes based on access control list (ACL) criteria.
+     *
+     * @param pathToSearch The path to search within the subgraph. If null, defaults to
+     *        NodePath.USERS_PATH.
+     * @param ownerIdMatch The ObjectId of the owner to match. If null, owner matching is not applied.
+     * @return A Query object representing the constructed MongoDB query.
+     */
     public Query subGraphByAcl_query(String pathToSearch, ObjectId ownerIdMatch) {
         List<Criteria> ands = new LinkedList<Criteria>();
         Query q = new Query();
@@ -568,6 +686,12 @@ public class MongoAuth extends ServiceBase {
         return q;
     }
 
+    /**
+     * Sets the current session context to the specified user.
+     *
+     * @param userName the username of the user to set the session context for
+     * @throws RuntimeEx if no user node is found for the specified username
+     */
     public void asUser(String userName) {
         AccountNode userNode = svc_user.getAccountByUserNameAP(userName);
         if (userNode == null) {

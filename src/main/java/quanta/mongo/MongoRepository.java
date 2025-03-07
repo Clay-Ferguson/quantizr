@@ -52,6 +52,19 @@ public class MongoRepository extends ServiceBase {
         close();
     }
 
+    /**
+     * Handles the ContextRefreshedEvent to initialize the MongoRepository. This method is triggered
+     * when the application context is refreshed. It ensures that the initialization process is
+     * performed only once.
+     * 
+     * The method performs the following steps: 1. Sets the security context to the admin security
+     * context. 2. Creates the admin user. 3. Checks if the application server is shutting down and
+     * exits if true. 4. Initializes the MongoRepository by creating all indexes and test accounts. 5.
+     * Broadcasts an AppStartupEvent to signal that the database is live and ready. 6. Removes abandoned
+     * nodes from the database. 7. Optionally pre-caches RSS feeds if the RSS pre-cache is enabled.
+     * 
+     * @param event the ContextRefreshedEvent that triggers this method
+     */
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
         super.handleContextRefresh(event);
@@ -61,7 +74,7 @@ public class MongoRepository extends ServiceBase {
         synchronized (lock) {
             if (initialized)
                 return;
-            
+
             TL.setSC(svc_auth.getAdminSC());
             svc_user.createAdminUser();
             // DO NOT DELETE
@@ -103,6 +116,12 @@ public class MongoRepository extends ServiceBase {
         }
     }
 
+    /**
+     * Closes the MongoClient connection and sets the application server to shutting down state. If the
+     * MongoRepository service is not initialized, the method returns immediately. This method is
+     * synchronized to ensure thread safety during the shutdown process. It logs the closing action and
+     * sets the MongoRepository service to null after closing the connection.
+     */
     public void close() {
         AppServer.setShuttingDown(true);
         if (ServiceBase.svc_mongoRepo == null)

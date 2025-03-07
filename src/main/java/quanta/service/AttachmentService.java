@@ -107,6 +107,12 @@ public class AttachmentService extends ServiceBase {
     @Autowired
     private GridFsTemplate grid;
 
+    /**
+     * Parses the uploaded files and converts them to markdown format if they are EML files.
+     *
+     * @param uploadFiles an array of MultipartFile objects representing the uploaded files.
+     * @return an UploadResponse object containing the list of converted markdown payloads.
+     */
     public UploadResponse cm_parseUploadFiles(MultipartFile[] uploadFiles) {
         UploadResponse resp = new UploadResponse();
         List<String> payloads = new LinkedList<String>();
@@ -131,8 +137,19 @@ public class AttachmentService extends ServiceBase {
         return resp;
     }
 
-    /*
-     * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
+    /**
+     * Uploads multiple files to a specified node. If the node already has an attachment, the files are
+     * uploaded underneath the current node. The method ensures that the user has enough storage space
+     * before uploading multiple files and handles different layouts based on the number of images
+     * uploaded.
+     *
+     * @param attName The name of the attachment.
+     * @param nodeId The ID of the target node.
+     * @param files An array of files to be uploaded.
+     * @param explodeZips A boolean indicating whether to explode zip files.
+     * @return A ResponseBase object indicating the result of the operation.
+     * @throws RuntimeEx If the nodeId is not provided, the node is not found, or any other exception
+     *         occurs during the process.
      */
     public ResponseBase uploadMultipleFiles(String attName, String nodeId, MultipartFile[] files, boolean explodeZips) {
         MongoTranMgr.ensureTran();
@@ -213,9 +230,27 @@ public class AttachmentService extends ServiceBase {
         return new ResponseBase();
     }
 
-    /*
-     * Gets the binary attachment from a supplied stream and loads it into the repository on the node
-     * specified in 'nodeId'
+    /**
+     * Attaches a binary stream to a node. Depending on the MIME type and other parameters, the method
+     * can handle different types of attachments such as emails, zip files, or generic binary data.
+     *
+     * @param importMode Indicates if the attachment is being imported.
+     * @param attName The name of the attachment.
+     * @param node The node to which the attachment will be added. Can be null if nodeId is provided.
+     * @param nodeId The ID of the node to which the attachment will be added. Used if node is null.
+     * @param fileName The name of the file being attached.
+     * @param size The size of the file being attached.
+     * @param is The input stream of the binary data.
+     * @param mimeType The MIME type of the file. Can be null if not determined.
+     * @param width The width of the image (if applicable).
+     * @param height The height of the image (if applicable).
+     * @param explodeZips Indicates if zip files should be exploded and their contents imported.
+     * @param calcImageSize Indicates if the image size should be calculated.
+     * @param closeStream Indicates if the input stream should be closed after processing.
+     * @param storeLocally Indicates if the file should be stored locally.
+     * @param sourceUrl The source URL of the file (if applicable).
+     * @param allowEmailParse Indicates if email parsing is allowed for this attachment.
+     * @param aiPrompt An AI prompt for processing the attachment (if applicable).
      */
     public void attachBinaryFromStream(boolean importMode, String attName, SubNode node, String nodeId, String fileName,
             long size, LimitedInputStreamEx is, String mimeType, int width, int height, boolean explodeZips,
@@ -248,6 +283,16 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    /**
+     * Fixes the MIME types of all attachments in the given node.
+     * 
+     * This method iterates over all attachments of the provided node and ensures that each attachment
+     * has a valid MIME type. If an attachment does not have a MIME type set, it attempts to determine
+     * the MIME type based on the attachment's URL.
+     * 
+     * @param node the node containing the attachments to be fixed. If the node or its attachments are
+     *        null, the method returns immediately.
+     */
     public void fixAllAttachmentMimes(SubNode node) {
         if (node == null || node.getAttachments() == null)
             return;
@@ -266,6 +311,25 @@ public class AttachmentService extends ServiceBase {
         });
     }
 
+    /**
+     * Saves a binary stream to a node, handling various configurations such as import mode, image size
+     * calculation, and local storage.
+     *
+     * @param importMode If true, the method operates in import mode.
+     * @param attName The name of the attachment.
+     * @param inputStream The input stream containing the binary data.
+     * @param mimeType The MIME type of the binary data.
+     * @param fileName The name of the file.
+     * @param size The size of the binary data.
+     * @param width The width of the image (if applicable).
+     * @param height The height of the image (if applicable).
+     * @param node The node to which the binary data will be saved.
+     * @param calcImageSize If true, the image size will be calculated.
+     * @param closeStream If true, the input stream will be closed after processing.
+     * @param storeLocally If true, the binary data will be stored locally.
+     * @param sourceUrl The source URL of the binary data.
+     * @param aiPrompt The AI prompt associated with the attachment.
+     */
     public void saveBinaryStreamToNode(boolean importMode, String attName, LimitedInputStreamEx inputStream,
             String mimeType, String fileName, long size, int width, int height, SubNode node, boolean calcImageSize,
             boolean closeStream, boolean storeLocally, String sourceUrl, String aiPrompt) {
@@ -369,7 +433,13 @@ public class AttachmentService extends ServiceBase {
         return "img" + String.valueOf(imgIdx);
     }
 
-    // appends all the attachments from sourceNode onto targetNode, leaving targetNode as is
+    /**
+     * Merges the attachments from the source node into the target node. If either the source node or
+     * the target node is null, the method returns immediately.
+     * 
+     * @param sourceNode the node from which attachments are to be merged
+     * @param targetNode the node into which attachments are to be merged
+     */
     public void mergeAttachments(SubNode sourceNode, SubNode targetNode) {
         if (sourceNode == null || targetNode == null)
             return;
@@ -383,6 +453,12 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves the maximum ordinal value from the attachments of the given node.
+     *
+     * @param node the node containing attachments
+     * @return the highest ordinal value among the attachments, or -1 if there are no attachments
+     */
     public int getMaxAttachmentOrdinal(SubNode node) {
         int max = -1;
         if (node.getAttachments() != null) {
@@ -396,8 +472,11 @@ public class AttachmentService extends ServiceBase {
         return max;
     }
 
-    /*
-     * Removes the attachment from the node specified in the request.
+    /**
+     * Deletes attachments from a specified node.
+     *
+     * @param req the request containing the node ID and attachment names to be deleted
+     * @return a response indicating the result of the delete operation
      */
     public DeleteAttachmentResponse deleteAttachment(DeleteAttachmentRequest req) {
         MongoTranMgr.ensureTran();
@@ -520,7 +599,13 @@ public class AttachmentService extends ServiceBase {
     }
 
     /**
-     * Downloads a file by name that is expected to be in the Admin Data Folder
+     * Retrieves a file from the server and writes it to the HTTP response.
+     *
+     * @param fileName the name of the file to retrieve
+     * @param disposition the content disposition for the response (e.g., "inline" or "attachment")
+     * @param response the HttpServletResponse to write the file to
+     * @throws RuntimeEx if the file name is invalid, the file is not found, or an error occurs during
+     *         file retrieval
      */
     public void cm_getFile(String fileName, String disposition, HttpServletResponse response) {
         if (fileName.contains(".."))
@@ -556,6 +641,15 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves a file from the file system and streams it as a response.
+     *
+     * @param nodeId The ID of the node containing the file information.
+     * @param disposition The content disposition for the response (e.g., "inline" or "attachment").
+     * @return A ResponseEntity containing the StreamingResponseBody to stream the file.
+     * @throws RuntimeEx if the user does not have admin privileges, the node is not found, the file
+     *         does not exist, or any other exception occurs during processing.
+     */
     public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(String nodeId, String disposition) {
         if (!TL.hasAdminPrivileges()) {
             throw new RuntimeEx("unauthorized");
@@ -596,6 +690,16 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves a stream resource for a given node and attachment name.
+     *
+     * @param headers HttpHeaders containing the request headers.
+     * @param nodeId The ID of the node to retrieve the attachment from.
+     * @param attName The name of the attachment to retrieve.
+     * @return A ResponseEntity containing a ResourceRegion for partial content streaming.
+     * @throws RuntimeEx if the node is not found, attachment info is missing, mimeType property is
+     *         missing, or file size is zero.
+     */
     public Object cm_getStreamResource(HttpHeaders headers, String nodeId, String attName) {
         BufferedInputStream inStream = null;
         ResponseEntity<ResourceRegion> ret = null;
@@ -636,6 +740,15 @@ public class AttachmentService extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Creates a {@link ResourceRegion} for the given {@link Resource} based on the specified HTTP
+     * headers. This method is typically used for serving partial content, such as video streaming.
+     *
+     * @param resource the resource to create a region for
+     * @param headers the HTTP headers containing the range information
+     * @return a {@link ResourceRegion} representing the requested part of the resource
+     * @throws IOException if an I/O error occurs while accessing the resource
+     */
     private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
         /*
          * todo-2: Will a smaller chunk size be better to get the video playing sooner after first clicked,
@@ -781,6 +894,19 @@ public class AttachmentService extends ServiceBase {
         return false;
     }
 
+    /**
+     * Writes a stream to the GridFS storage and updates the attachment information on the node.
+     *
+     * @param importMode a boolean indicating if the operation is in import mode
+     * @param attName the name of the attachment
+     * @param node the node to which the attachment belongs
+     * @param stream the input stream containing the data to be written
+     * @param fileName the name of the file to be stored
+     * @param mimeType the MIME type of the file
+     * @param userNode the user account node; if null, the session user account will be used
+     * 
+     * @throws RuntimeEx if the user account node is not found
+     */
     public void writeStream(boolean importMode, String attName, SubNode node, LimitedInputStreamEx stream,
             String fileName, String mimeType, AccountNode userNode) {
         // don't create attachment here, there shuold already be one, but we pass create=true anyway
@@ -852,6 +978,14 @@ public class AttachmentService extends ServiceBase {
         return is;
     }
 
+    /**
+     * Retrieves an InputStream for the specified attachment of a given node.
+     *
+     * @param node the node containing the attachment
+     * @param attName the name of the attachment to retrieve
+     * @return an InputStream of the attachment, or null if the node or attachment is not found
+     * @throws RuntimeEx if unable to get the InputStream or read the stream
+     */
     public InputStream getStreamByNode(SubNode node, String attName) {
         if (node == null)
             return null;
@@ -877,6 +1011,15 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves the count of items stored in the GridFS.
+     * 
+     * This method scans all files in the GridFS and counts them. It uses a brute force approach to
+     * iterate through each file and increment the count. The method is executed within a service
+     * context using svc_arun.run().
+     * 
+     * @return the total number of items in the GridFS
+     */
     @SuppressWarnings("unused")
     public int getGridItemCount() {
         return svc_arun.run(() -> {
@@ -898,6 +1041,15 @@ public class AttachmentService extends ServiceBase {
 
     int verifyAllAttachments_runCount = 0;
 
+    /**
+     * Scheduled method to verify all attachments in the system. This method runs at a fixed delay
+     * specified by VERIFY_FREQUENCY_MINS. It checks all nodes that have attachments and verifies if the
+     * corresponding binary files exist in the GridFS. If any attachments are missing their binary
+     * files, an email is sent to the developer with the details.
+     * 
+     * @return A string report of the verification process, including the number of binaries in use and
+     *         nodes missing attachments.
+     */
     @Scheduled(fixedDelay = VERIFY_FREQUENCY_MINS * 60 * 1000)
     public String verifyAllAttachments() {
         return svc_arun.run(() -> {
@@ -1169,6 +1321,14 @@ public class AttachmentService extends ServiceBase {
         return totalBytes.getVal();
     }
 
+    /**
+     * Pastes attachments from a source node to a target node.
+     * 
+     * @param req the request containing the source node ID, target node ID, and the keys of the
+     *        attachments to be pasted.
+     * @return a response containing the updated target node information.
+     * @throws RuntimeEx if the source node, target node, or any specified attachment is not found.
+     */
     public PasteAttachmentsResponse pasteAttachments(PasteAttachmentsRequest req) {
         MongoTranMgr.ensureTran();
         PasteAttachmentsResponse res = new PasteAttachmentsResponse();

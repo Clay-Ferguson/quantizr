@@ -23,7 +23,7 @@ import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class SchemaOrgService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
     private static HashMap<String, Object> schema = null;
@@ -41,6 +41,20 @@ public class SchemaOrgService extends ServiceBase {
         loadJson("classpath:public/schemaorg/schemaorg-all-https.jsonld");
     }
 
+    /**
+     * Loads a JSON file and parses its content into a schema.
+     * 
+     * @param fileName the name of the JSON file to load.
+     * 
+     *        This method attempts to load a JSON file specified by the fileName parameter. It reads the
+     *        file content into a HashMap and assigns it to the schema variable. If the schema is null
+     *        after reading, it logs a debug message and initializes an empty HashMap. If the schema is
+     *        successfully loaded, it calls the parseSchema method and sets the classMap to null to
+     *        allow garbage collection.
+     * 
+     *        In case of any exceptions during the process, it logs an error message with the fileName
+     *        and the exception details.
+     */
     public void loadJson(String fileName) {
         try {
             Resource resource = context.getResource(fileName);
@@ -65,6 +79,18 @@ public class SchemaOrgService extends ServiceBase {
         }
     }
 
+    /**
+     * Parses the Schema.org data to build and organize classes and properties.
+     * 
+     * This method performs the following steps: 1. Scans the graph to build Schema.org classes. 2.
+     * Scans the graph again to distribute properties into the classes. 3. Sorts the list of classes by
+     * their labels. 4. Simplifies class IDs by removing the "schema:" prefix. 5. Sorts the properties
+     * within each class by their labels.
+     * 
+     * The method assumes that the schema data is structured as a graph where each item is a HashMap
+     * containing a "@type" key that indicates whether the item is a class ("rdfs:Class") or a property
+     * ("rdf:Property").
+     */
     private void parseSchema() {
         List<?> graph = (List<?>) schema.get("@graph"); // will be ArrayList<Object>
         if (graph == null)
@@ -115,6 +141,14 @@ public class SchemaOrgService extends ServiceBase {
         }
     }
 
+    /**
+     * Sets up a SchemaOrgClass object using the provided map item and adds it to the classMap and
+     * classList.
+     *
+     * @param mitem a HashMap containing the properties of the SchemaOrgClass. Expected keys are "@id",
+     *        "rdfs:label", and "rdfs:comment".
+     * @throws RuntimeEx if the "rdfs:label" property is not available in the map item.
+     */
     private void setupClass(HashMap<?, ?> mitem) {
         Object id = mitem.get("@id");
         if (id instanceof String sid) {
@@ -161,6 +195,19 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:source");
     }
 
+    /**
+     * Sets up the domain includes for a given SchemaOrgProp object.
+     * 
+     * @param sop The SchemaOrgProp object to set up the domain includes for.
+     * @param prop A HashMap containing the properties of the schema, including the domain includes.
+     * 
+     *        This method processes the "schema:domainIncludes" property from the provided HashMap. If
+     *        the property is a HashMap, it calls setupDomainObj to handle it. If the property is a
+     *        List, it iterates through the list and calls setupDomainObj for each HashMap element. If
+     *        the property is neither a HashMap nor a List, it logs a debug message indicating the
+     *        inability to process the domain includes. Finally, it removes the "schema:domainIncludes"
+     *        property from the HashMap to free up memory.
+     */
     private void setupDomainIncludes(SchemaOrgProp sop, HashMap<?, ?> prop) {
         Object domains = prop.get("schema:domainIncludes");
         // handle if object
@@ -180,6 +227,17 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:domainIncludes");
     }
 
+    /**
+     * Sets up the range includes for a given SchemaOrgProp object based on the provided property map.
+     * This method handles both single object and list of objects for the "schema:rangeIncludes" key. If
+     * the value is a HashMap, it processes it as a single object. If the value is a List, it iterates
+     * through the list and processes each item as a HashMap. If the value is neither, it logs a debug
+     * message indicating the inability to get domainIncludes. Finally, it removes the
+     * "schema:domainIncludes" key from the property map.
+     *
+     * @param sop the SchemaOrgProp object to set up the range includes for
+     * @param prop the property map containing the "schema:rangeIncludes" key and its value
+     */
     private void setupRangeIncludes(SchemaOrgProp sop, HashMap<?, ?> prop) {
         Object ranges = prop.get("schema:rangeIncludes");
         // handle if object
@@ -199,6 +257,14 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:domainIncludes");
     }
 
+    /**
+     * Sets up a domain object by extracting and assigning properties from the given parameters.
+     *
+     * @param sop The SchemaOrgProp object to be set up.
+     * @param prop A HashMap containing properties, including "rdfs:label".
+     * @param domain An Object representing the domain, expected to be a HashMap with an "@id" key.
+     * @throws RuntimeEx if the "rdfs:label" property cannot be parsed.
+     */
     private void setupDomainObj(SchemaOrgProp sop, HashMap<?, ?> prop, Object domain) {
         HashMap<?, ?> mdomain = (HashMap<?, ?>) domain;
         Object domainId = mdomain.get("@id");

@@ -3,6 +3,7 @@ package quanta.service;
 import java.util.HashSet;
 import quanta.mongo.model.SubNode;
 
+// todo-0: move into a models folder.
 public class WordStats {
     public String word;
     public long count;

@@ -60,6 +60,15 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     @Autowired
     private AppProp appProp;
 
+    /**
+     * Creates and returns a MongoDatabaseFactory bean.
+     * 
+     * This method attempts to create a MongoDatabaseFactory using a MongoClient. If the connection to
+     * MongoDB fails, it returns null and sets a flag indicating the connection failure. If the factory
+     * is already created, it returns the existing factory.
+     * 
+     * @return MongoDatabaseFactory instance if the connection is successful, otherwise null.
+     */
     @Override
     @Bean
     public MongoDatabaseFactory mongoDbFactory() {
@@ -89,6 +98,23 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return new MongoTranMgr(new MongoTransactionManager(dbFactory));
     }
 
+    /**
+     * Creates and returns a MongoClient instance.
+     * 
+     * This method attempts to connect to a MongoDB instance using the configuration properties defined
+     * in the application. If the connection fails, it retries up to 30 times, with a 5-second delay
+     * between each attempt. If the connection still fails after 30 attempts, it sets the
+     * connectionFailed flag to true and throws a RuntimeException.
+     * 
+     * The method supports optional MongoDB authentication using credentials specified in the
+     * application properties. It also configures the MongoClient with a custom codec registry to
+     * support storing objects containing other POJOs.
+     * 
+     * @return MongoClient instance if the connection is successful, or null if the connectionFailed
+     *         flag is set.
+     * @throws RuntimeException if the MongoDB host or port properties are missing, or if unable to
+     *         connect to MongoDB after 30 attempts.
+     */
     @Override
     public MongoClient mongoClient() {
         if (connectionFailed)

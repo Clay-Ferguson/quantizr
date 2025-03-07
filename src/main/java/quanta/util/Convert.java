@@ -42,10 +42,22 @@ public class Convert extends ServiceBase {
     // indicates we need generate the correct logicalOrdinal
     public static int LOGICAL_ORDINAL_GENERATE = -2;
 
-    /*
-     * Generates a NodeInfo object, which is the primary data type that is also used on the
-     * browser/client to encapsulate the data for a given node which is used by the browser to render
-     * the node.
+    /**
+     * Converts a SubNode to a NodeInfo object with various options for customization.
+     *
+     * @param adminOnly If true, only admin nodes are included.
+     * @param sc The session context.
+     * @param node The node to convert.
+     * @param initNodeEdit If true, initializes node edit.
+     * @param logicalOrdinal The logical ordinal value.
+     * @param allowInlineChildren If true, allows inline children.
+     * @param lastChild If true, indicates this is the last child.
+     * @param getFollowers If true, retrieves followers.
+     * @param loadLikes If true, loads likes.
+     * @param accountNodeMap A map of account nodes.
+     * @return The converted NodeInfo object.
+     * @throws ForbiddenException If the node is not admin-owned and the user lacks admin privileges.
+     * @throws RuntimeEx If the node has no owner.
      */
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, SubNode node, boolean initNodeEdit,
             long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean getFollowers,
@@ -164,6 +176,17 @@ public class Convert extends ServiceBase {
         svc_snUtil.removeProp(props, NodeProp.VOTE.s());
     }
 
+    /**
+     * Processes the inline children of a given node and updates the node information accordingly.
+     *
+     * @param sc The session context containing user-specific data.
+     * @param node The node whose inline children are to be processed.
+     * @param initNodeEdit A flag indicating whether the node is being initialized for editing.
+     * @param allowInlineChildren A flag indicating whether inline children are allowed.
+     * @param lastChild A flag indicating whether this is the last child node.
+     * @param loadLikes A flag indicating whether to load likes for the node.
+     * @param nodeInfo The NodeInfo object to be updated with the processed children.
+     */
     private void processInlineChildren(SessionContext sc, SubNode node, boolean initNodeEdit,
             boolean allowInlineChildren, boolean lastChild, boolean loadLikes, NodeInfo nodeInfo) {
         boolean hasInlineChildren = false;
@@ -199,6 +222,13 @@ public class Convert extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves the size of an image from the given attachment.
+     * 
+     * @param att the attachment containing image metadata
+     * @return an ImageSize object containing the width and height of the image if available, or default
+     *         values (0, 0) if an error occurs or the attachment is null
+     */
     public static ImageSize getImageSize(Attachment att) {
         ImageSize imageSize = new ImageSize();
         if (att != null) {
@@ -219,6 +249,14 @@ public class Convert extends ServiceBase {
         return imageSize;
     }
 
+    /**
+     * Builds a list of PropertyInfo objects from the properties of a given node.
+     *
+     * @param sc the session context
+     * @param node the node from which properties are extracted
+     * @param initNodeEdit a flag indicating whether to initialize node edit
+     * @return a sorted list of PropertyInfo objects, or null if the node has no properties
+     */
     public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, boolean initNodeEdit) {
         List<PropertyInfo> props = null;
         HashMap<String, Object> propMap = node.getProps();
@@ -239,6 +277,21 @@ public class Convert extends ServiceBase {
         return props;
     }
 
+    /**
+     * Parses the properties of a BSON document and converts them into a HashMap.
+     * 
+     * @param doc the BSON document to parse
+     * @return a HashMap containing the parsed properties
+     * 
+     *         This method processes each property in the provided BSON document. If a property is an
+     *         array, it iterates through each element of the array and attempts to convert it to a
+     *         type-safe object if a specific type is defined. If the type is not defined or the
+     *         conversion fails, the original object is added to the list. For non-array properties, the
+     *         method directly adds the property to the HashMap.
+     * 
+     *         If a property is a BSON document and cannot be converted to a specific type, an error is
+     *         logged.
+     */
     public static HashMap<String, Object> parseNodeProps(org.bson.Document doc) {
         HashMap<String, Object> props = new HashMap<>();
         // process each property to load
@@ -288,6 +341,17 @@ public class Convert extends ServiceBase {
 
     }
 
+    /**
+     * Converts a property of a node to a PropertyInfo object.
+     *
+     * @param sc the session context containing user-specific settings
+     * @param node the node containing the property
+     * @param propName the name of the property
+     * @param prop the property value to be converted
+     * @param initNodeEdit a flag indicating whether the node is being initialized for editing
+     * @return a PropertyInfo object containing the property name and its converted value
+     * @throws RuntimeEx if an exception occurs during the conversion process
+     */
     public PropertyInfo toPropInfo(SessionContext sc, SubNode node, String propName, Object prop,
             boolean initNodeEdit) {
         try {

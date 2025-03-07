@@ -102,8 +102,18 @@ public class RSSFeedService extends ServiceBase {
     private static final int REFRESH_FREQUENCY_MINS = 480; // 8 hrs
     private static Object cacheLock = new Object();
 
-    /*
-     * Runs immediately at startup, and then every few minutes, to refresh the feedCache.
+    /**
+     * Scheduled task that runs at a fixed delay defined by REFRESH_FREQUENCY_MINS. This method checks
+     * if the initialization is complete, if daemons are enabled, and if the MongoRepository is fully
+     * initialized before proceeding. If any of these conditions are not met, the method returns
+     * immediately.
+     * 
+     * The task is executed within a synchronized block to ensure thread safety. It checks if the
+     * application server is shutting down or if scheduling is disabled, and if so, it logs a debug
+     * message and exits.
+     * 
+     * If all conditions are met, it logs a debug message indicating the refresh of the RSS feed cache,
+     * calls the refreshFeedCache method, and clears the aggregate and proxy caches.
      */
     @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
     public void run() {
@@ -125,6 +135,14 @@ public class RSSFeedService extends ServiceBase {
         });
     }
 
+    /**
+     * Retrieves the status of RSS feeds, including any failed or redirected feeds.
+     *
+     * @return A string summarizing the status of the feeds. If there are failed feeds, they will be
+     *         listed under "Failed Feeds". If there are redirected feeds, they will be listed under
+     *         "Redirected Feeds". If there are no issues, the string "No feed issues." will be
+     *         returned.
+     */
     public String getFeedStatus() {
         String ret = "";
         if (failedFeeds.size() > 0) {
@@ -146,6 +164,16 @@ public class RSSFeedService extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Refreshes the RSS feed cache by reloading all previously failed and successful feeds.
+     * 
+     * This method first retries loading all feeds that previously failed. If a feed is successfully
+     * loaded, it is counted as a success; otherwise, it is counted as a failure. After retrying the
+     * failed feeds, it reloads all feeds that were previously successful.
+     * 
+     * @return A string message indicating the number of feeds that were successfully refreshed and the
+     *         number of failures.
+     */
     public String refreshFeedCache() {
         if (refreshingCache) {
             return "Cache refresh was already in progress.";
@@ -187,6 +215,16 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
+    /**
+     * Aggregates RSS feeds from a list of URLs and populates the provided list of SyndEntry objects.
+     * The method reads all the feeds from the web, filters entries by their published date, sorts them
+     * by the published date in descending order, and then paginates the results based on the specified
+     * page number.
+     *
+     * @param urls the list of URLs to fetch RSS feeds from
+     * @param entries the list to populate with aggregated and paginated SyndEntry objects
+     * @param page the page number to extract from the aggregated entries
+     */
     public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
         try {
             // Reads all the feeds from the web and creates 'entries' for all content.
@@ -226,6 +264,28 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
+    /**
+     * Pre-caches RSS feeds for admin-owned nodes.
+     * <p>
+     * This method retrieves all nodes of type RSS_FEED under the root node "/r" and caches the feeds
+     * specified in the RSS_FEED_SRC property of each node. Only nodes owned by an admin are considered.
+     * The method ensures that duplicate URLs are not cached by using a HashSet.
+     * <p>
+     * If an error occurs while processing a feed, the error is logged, and the method continues
+     * processing the remaining feeds.
+     * <p>
+     * The caching process involves:
+     * <ul>
+     * <li>Retrieving the root node "/r".</li>
+     * <li>Finding all sub-nodes of type RSS_FEED under the root node.</li>
+     * <li>Checking if each node is admin-owned.</li>
+     * <li>Extracting and splitting the RSS_FEED_SRC property by newline to get individual URLs.</li>
+     * <li>Adding valid URLs to a set to avoid duplicates.</li>
+     * <li>Caching each URL in the set.</li>
+     * </ul>
+     * <p>
+     * This method is synchronized on the cacheLock object to ensure thread safety.
+     */
     public void preCacheAdminFeeds() {
         synchronized (cacheLock) {
             log.debug("preCacheAdminFeeds()");
@@ -278,6 +338,17 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves an RSS feed from the specified URL. The feed can be fetched from the cache or directly
+     * from the web. If the feed has previously failed, it will attempt to retrieve it from the cache.
+     * 
+     * @param url The URL of the RSS feed.
+     * @param fromCache If true, the feed will be fetched from the cache if available.
+     * @param index The current index of the feed being processed (used for logging purposes).
+     * @param maxIndex The maximum index of feeds being processed (used for logging purposes).
+     * @return The retrieved SyndFeed object.
+     * @throws RuntimeEx If there is an error while fetching or parsing the feed.
+     */
     public SyndFeed getFeed(String url, boolean fromCache, int index, int maxIndex) {
         String originalUrl = url;
 
@@ -458,6 +529,16 @@ public class RSSFeedService extends ServiceBase {
     }
 
     // See also: https://github.com/OWASP/java-html-sanitizer
+    /**
+     * Sanitizes the given HTML string by applying a predefined policy to remove or escape potentially
+     * harmful content. The method first replaces special quotes in the HTML string, then applies the
+     * sanitization policy. If the policy is not already initialized, it is created with specific
+     * sanitizers excluding images. Finally, if the sanitized HTML exceeds 1000 characters, it truncates
+     * the string and appends an ellipsis.
+     *
+     * @param html the HTML string to be sanitized
+     * @return the sanitized HTML string, potentially truncated if it exceeds 1000 characters
+     */
     private String sanitizeHtml(String html) {
         if (StringUtils.isEmpty(html))
             return html;
@@ -481,6 +562,12 @@ public class RSSFeedService extends ServiceBase {
         return html;
     }
 
+    /**
+     * Retrieves multiple RSS feeds and aggregates them if necessary.
+     *
+     * @param req the request containing the list of URLs and pagination information
+     * @return a response containing the aggregated RSS feed or a single RSS feed
+     */
     public GetMultiRssResponse cm_getMultiRssFeed(GetMultiRssRequest req) {
         GetMultiRssResponse res = new GetMultiRssResponse();
 
@@ -522,6 +609,13 @@ public class RSSFeedService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Converts a SyndFeed object to an RssFeed object.
+     *
+     * @param feed the SyndFeed object to be converted
+     * @param addFeedTitles a boolean indicating whether to add feed titles to the entries
+     * @return the converted RssFeed object
+     */
     public RssFeed convertToFeed(SyndFeed feed, boolean addFeedTitles) {
         RssFeed rf = new RssFeed();
         rf.setTitle(feed.getTitle());
@@ -555,6 +649,13 @@ public class RSSFeedService extends ServiceBase {
         return rf;
     }
 
+    /**
+     * Processes a given SyndEntry and maps its data to an RssFeedEntry.
+     *
+     * @param entry the SyndEntry to process
+     * @param e the RssFeedEntry to populate with data from the SyndEntry
+     * @return true if the entry was processed successfully
+     */
     private boolean processEntry(SyndEntry entry, RssFeedEntry e) {
         if (entry.getDescription() != null) {
             e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
@@ -664,6 +765,13 @@ public class RSSFeedService extends ServiceBase {
     // }
     // }
 
+    /**
+     * Processes the modules of a given SyndEntry and populates the corresponding RssFeedEntry with
+     * relevant data.
+     *
+     * @param entry The SyndEntry containing the modules to be processed.
+     * @param e The RssFeedEntry to be populated with data extracted from the modules.
+     */
     private void processModules(SyndEntry entry, RssFeedEntry e) {
         if (entry.getModules() != null) {
             for (Module m : entry.getModules()) {
@@ -742,8 +850,12 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
-    /*
-     * Makes feed be a cloned copy of cachedFeed but with only the specific 'page' of results extracted
+    /**
+     * Clones the specified page of entries from the cached feed into the provided feed.
+     *
+     * @param feed The feed to populate with cloned entries.
+     * @param cachedFeed The cached feed from which entries are cloned.
+     * @param page The page number of entries to clone (1-based index).
      */
     private void cloneFeedForPage(SyndFeed feed, SyndFeed cachedFeed, int page) {
         feed.setEncoding(cachedFeed.getEncoding());
@@ -775,6 +887,12 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
+    /**
+     * Generates an RSS feed for a given node and writes it to the provided writer.
+     *
+     * @param nodeId the ID of the node for which the RSS feed is to be generated
+     * @param writer the Writer to which the RSS feed will be written
+     */
     public void getRssFeed(String nodeId, Writer writer) {
         SubNode node = svc_mongoRead.getNode(nodeId);
         SyndFeed feed = new SyndFeedImpl();
@@ -833,6 +951,16 @@ public class RSSFeedService extends ServiceBase {
         writeFeed(feed, writer);
     }
 
+    /**
+     * Ensures that the given SyndFeed object has valid values for its properties. If any property is
+     * null or empty, it sets a default value.
+     *
+     * @param feed the SyndFeed object to be fixed. If null, the method returns immediately. - Encoding:
+     *        defaults to "UTF-8" if empty. - FeedType: defaults to "rss_2.0" if empty. - Title:
+     *        defaults to an empty string if empty. - Description: defaults to an empty string if empty.
+     *        - Author: defaults to an empty string if empty. - Link: defaults to an empty string if
+     *        empty.
+     */
     private void fixFeed(SyndFeed feed) {
         if (feed == null)
             return;
@@ -850,6 +978,17 @@ public class RSSFeedService extends ServiceBase {
             feed.setLink("");
     }
 
+    /**
+     * Writes the provided SyndFeed to the given Writer.
+     *
+     * This method first fixes the feed using the fixFeed method, then converts the feed to a string
+     * with pretty printing enabled. The resulting string is further processed by convertStreamChars
+     * before being written to the Writer.
+     *
+     * @param feed the SyndFeed to be written. Must not be null.
+     * @param writer the Writer to which the feed will be written. Must not be null.
+     * @throws RuntimeEx if an error occurs during the writing process.
+     */
     private void writeFeed(SyndFeed feed, Writer writer) {
         if (writer != null && feed != null) {
             try {

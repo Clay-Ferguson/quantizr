@@ -23,6 +23,13 @@ import quanta.util.val.IntVal;
 public class TransferService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TransferService.class);
 
+    /**
+     * Transfers a node from one user to another based on the provided request.
+     *
+     * @param req the request containing details for the node transfer
+     * @return a response indicating the result of the transfer operation
+     * @throws RuntimeEx if the node or user specified in the request is not found
+     */
     public TransferNodeResponse transferNode(TransferNodeRequest req) {
         MongoTranMgr.ensureTran();
         TransferNodeResponse res = new TransferNodeResponse();
@@ -76,8 +83,30 @@ public class TransferService extends ServiceBase {
         return res;
     }
 
-    public void transferNode(String op, SubNode node, SubNode fromUserNode, SubNode toUserNode,
-            IntVal ops) {
+    /**
+     * Transfers a node between users based on the specified operation.
+     *
+     * @param op The transfer operation to perform. Possible values are defined in {@link TransferOp}.
+     * @param node The node to be transferred.
+     * @param fromUserNode The user node from which the transfer is initiated. Can be null.
+     * @param toUserNode The user node to which the transfer is directed.
+     * @param ops An instance of {@link IntVal} to keep track of the number of operations performed.
+     *
+     *        The method performs the following operations based on the value of {@code op}:
+     *        <ul>
+     *        <li>{@code TransferOp.TRANSFER}: Transfers ownership of the node to {@code toUserNode} and
+     *        shares the node with the original owner.</li>
+     *        <li>{@code TransferOp.ACCEPT}: Accepts the transfer and shares the node back to the
+     *        original owner.</li>
+     *        <li>{@code TransferOp.REJECT}: Rejects the transfer and reverts ownership back to the
+     *        original owner.</li>
+     *        <li>{@code TransferOp.RECLAIM}: Reclaims the node if the current user initiated the
+     *        transfer.</li>
+     *        </ul>
+     *
+     *        The method silently ignores encrypted nodes and nodes not owned by the current user.
+     */
+    public void transferNode(String op, SubNode node, SubNode fromUserNode, SubNode toUserNode, IntVal ops) {
         if (node.getContent() != null && node.getContent().startsWith(Constant.ENC_TAG.s())) {
             // for now we silently ignore encrypted nodes during transfers. This needs some more thought
             // (todo-2)

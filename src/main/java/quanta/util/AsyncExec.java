@@ -30,6 +30,20 @@ public class AsyncExec extends ServiceBase {
         run(new ThreadLocalsContext(), runnable);
     }
 
+    /**
+     * Executes a given Runnable asynchronously within a specific ThreadLocalsContext.
+     * 
+     * @param tlc the ThreadLocalsContext to set values into the thread, can be null
+     * @param runnable the Runnable to be executed asynchronously
+     * 
+     *        This method captures the current stack trace before executing the Runnable to aid in
+     *        debugging if the asynchronous execution fails. It increments an execution counter to track
+     *        the number of concurrent executions and updates the maximum concurrent executions if
+     *        necessary. If a ThreadLocalsContext is provided, it sets the context values into the
+     *        thread before running the Runnable. Any exceptions thrown during the execution are logged
+     *        along with the captured stack trace. Finally, it ensures that thread-local variables are
+     *        removed and decrements the execution counter.
+     */
     private void run(ThreadLocalsContext tlc, Runnable runnable) {
         // We have to get the stackTrace ahead of time, so that if the async thread fails we can log
         // what was actually happening that launched the executor/thread that failed.

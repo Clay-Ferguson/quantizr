@@ -55,7 +55,11 @@ public class MongoDelete extends ServiceBase {
     }
 
     /**
-     * This method assumes security check is already done.
+     * Deletes all nodes under the specified path in the MongoDB database. This method assumes security
+     * check is already done.
+     *
+     * @param path the path of the parent node under which all nodes will be deleted
+     * @return the number of nodes deleted
      */
     public long deleteUnderPath(String path) {
         Query q = new Query();
@@ -156,6 +160,20 @@ public class MongoDelete extends ServiceBase {
         log.debug("Nodes deleted: " + res.getDeletedCount());
     }
 
+    /**
+     * Cleans up Open Graph properties from nodes in the MongoDB database.
+     * 
+     * This method performs the following steps: 1. Ensures a transaction is started. 2. Creates a query
+     * to find nodes with Open Graph properties that are either: - Missing the last update timestamp, or
+     * - Have a last update timestamp older than one week. 3. Adds write security criteria to the query.
+     * 4. Iterates over the nodes matching the query and performs the following actions: - Initializes
+     * bulk operations if not already initialized. - Creates a query to find the current node by its ID.
+     * - Creates an update operation to remove the Open Graph properties from the node. - Adds the
+     * update operation to the bulk operations. - Executes the bulk operations if the batch size exceeds
+     * the maximum allowed. 5. Executes any remaining bulk operations after the iteration.
+     * 
+     * @return A message indicating the completion of the Open Graph cleanup.
+     */
     public String cleanupOpenGraph() {
         MongoTranMgr.ensureTran();
         Query q = new Query();
@@ -375,6 +393,15 @@ public class MongoDelete extends ServiceBase {
         log.debug("TOTAL DELETED: " + totalDeleted.getVal());
     }
 
+    /**
+     * Performs a pre-delete check on a list of node IDs to determine if the nodes can be deleted.
+     * 
+     * @param nodeIds A list of node IDs to check for deletion.
+     * @return A DeleteNodesResponse containing a warning message if there are nodes owned by other
+     *         users or if subgraphs exist, otherwise returns null.
+     * @throws RuntimeEx if the user is not found or if a non-admin user attempts to delete a node they
+     *         do not own.
+     */
     public DeleteNodesResponse preDeleteCheck(List<String> nodeIds) {
         SessionContext sc = TL.getSC();
         int mineCount = 0;
@@ -420,8 +447,13 @@ public class MongoDelete extends ServiceBase {
         return null;
     }
 
-    /*
-     * Deletes the set of nodes specified in the request
+    /**
+     * Deletes the specified nodes from the database.
+     *
+     * @param force If true, bypasses the pre-delete check and forces deletion.
+     * @param nodeIds A list of node IDs to be deleted.
+     * @return A DeleteNodesResponse object containing the result of the delete operation.
+     * @throws RuntimeEx if the user account is not found.
      */
     public DeleteNodesResponse deleteNodes(boolean force, List<String> nodeIds) {
         if (!force) {
@@ -522,6 +554,13 @@ public class MongoDelete extends ServiceBase {
         return bops;
     }
 
+    /**
+     * Deletes nodes in bulk that are owned by the current user but are not descendants under the user's
+     * own tree root.
+     * 
+     * @return DeleteNodesResponse containing the result message of the bulk delete operation.
+     * @throws RuntimeEx if the user account is not found.
+     */
     public DeleteNodesResponse bulkDeleteNodes() {
         DeleteNodesResponse res = new DeleteNodesResponse();
         AccountNode userNode = svc_user.getSessionUserAccount();
@@ -548,6 +587,13 @@ public class MongoDelete extends ServiceBase {
         return res;
     }
 
+    /**
+     * Deletes nodes based on the provided request.
+     *
+     * @param req the request containing the details for the delete operation
+     * @return a response containing the result of the delete operation
+     * @throws RuntimeEx if the node specified in the request for jump target is not found
+     */
     public DeleteNodesResponse cm_delete(DeleteNodesRequest req) {
         DeleteNodesResponse res = null;
         String jumpTarget = null;

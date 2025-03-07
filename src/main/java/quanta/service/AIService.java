@@ -35,6 +35,19 @@ import quanta.util.XString;
 public class AIService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
+    /**
+     * Generates an AI response based on the provided question and context.
+     *
+     * @param agentic Indicates if the AI should act as a coding agent.
+     * @param node The node containing prior chat history, can be null.
+     * @param question The question to be answered by the AI, used if node is null.
+     * @param system The system configuration for the AI service, can be null.
+     * @param svc The AI model service to be used.
+     * @return The AI response containing the answer to the question.
+     * @throws RuntimeEx If no AI service is selected, the user is unknown, or there is an error parsing
+     *         the response.
+     * @throws MessageException If the user has insufficient funds.
+     */
     public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc) {
         if (svc == null) {
             throw new RuntimeEx("No AI service selected.");
@@ -132,6 +145,14 @@ public class AIService extends ServiceBase {
     }
 
     // #ai-model
+    /**
+     * Retrieves the API key for the specified AI service.
+     *
+     * @param service the name of the AI service for which the API key is requested. Valid values are
+     *        "anthropic", "openai", "perplexity", "gemini", and "xai".
+     * @return the API key associated with the specified service.
+     * @throws RuntimeEx if the specified service is unknown.
+     */
     private String getApiKey(String service) {
         switch (service) {
             case "anthropic":
@@ -149,6 +170,14 @@ public class AIService extends ServiceBase {
         }
     }
 
+    /**
+     * Builds the chat history by traversing up the node tree and collecting messages. Alternates
+     * between question and answer nodes to construct the conversation history.
+     *
+     * @param node The starting node from which to build the chat history.
+     * @param messages The list to which the chat messages will be added.
+     * @param system The system configuration object that may be updated during the process.
+     */
     private void buildChatHistory(SubNode node, List<AIMessage> messages, SystemConfig system) {
         if (system.getAgentNodeId() == null) {
             svc_aiUtil.parseAIConfig(node, system);

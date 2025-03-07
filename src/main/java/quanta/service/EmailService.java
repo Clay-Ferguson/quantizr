@@ -101,6 +101,13 @@ public class EmailService extends ServiceBase {
         runCountdown = 0;
     }
 
+    /**
+     * Sends emails for all provided nodes. This method iterates through each node, retrieves the email
+     * recipient, subject, and content, and sends the email if all required properties are present. The
+     * node is deleted after the email is sent to prevent duplicate emails.
+     *
+     * @param nodes an Iterable of SubNode objects containing email details.
+     */
     private void sendAllMail(Iterable<SubNode> nodes) {
         synchronized (getLock()) {
             for (SubNode node : nodes) {

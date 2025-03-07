@@ -142,6 +142,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
         res.setFileName(outputFile);
     }
 
+    /**
+     * Exports the node and its subgraph tree based on the provided nodeId.
+     * 
+     * @param nodeId The ID of the node to be exported.
+     * @return The name of the exported file.
+     * @throws RuntimeEx if the admin data folder does not exist or if an error occurs during export.
+     * 
+     *         The method performs the following steps: 1. Checks if the admin data folder exists when
+     *         publishing. 2. Retrieves the subgraph tree of the node. 3. Pre-processes the tree to
+     *         ensure all nodes are public if required. 4. Opens an output stream for the export file if
+     *         not publishing. 5. Authenticates the owner of the node. 6. Processes the entire exported
+     *         tree. 7. Writes the main file and any additional information if necessary. 8. Closes the
+     *         output stream and deletes the file if the export was not successful.
+     */
     public String export(String nodeId) {
         if (publishing && !FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
             throw new RuntimeEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
@@ -234,6 +248,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 .getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Generates an HTML string by populating a template with the provided table of contents (toc) and
+     * body content.
+     *
+     * @param toc The table of contents to be included in the HTML. If empty, a different template
+     *        without TOC is used.
+     * @param body The main body content to be included in the HTML.
+     * @return A string containing the generated HTML with the provided content.
+     */
     private String generateHtml(String toc, String body) {
         String templateFile = toc.length() > 0 ? "/public/export-includes/html/html-template-with-toc.html"
                 : "/public/export-includes/html/html-template.html";
@@ -288,6 +311,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
         addFileEntry("index.md", content.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Recursively processes a tree of nodes for export, handling various conditions such as publishing
+     * sub-sites, checking for public access, and skipping nodes marked for no export.
+     *
+     * @param rootPath The root path for the export.
+     * @param parentFolder The folder path of the parent node.
+     * @param tn The current tree node being processed.
+     * @param nodeStack A stack of nodes being processed.
+     * @param level The current level in the tree hierarchy.
+     * @param parentId The ID of the parent node.
+     */
     private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
             String parentId) {
         SubNode node = tn.node;
@@ -337,6 +371,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
+    /**
+     * Concatenates the content of all child nodes of the given TreeNode.
+     *
+     * @param tn the TreeNode whose children's content is to be concatenated
+     * @return a String containing the concatenated content of all child nodes, separated by two newline
+     *         characters. If the TreeNode has no children, an empty string is returned.
+     */
     String concatAllChildren(TreeNode tn) {
         if (tn.children == null || tn.children.size() == 0) {
             return "";
@@ -374,6 +415,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return folder;
     }
 
+    /**
+     * Processes the given content string to generate a short, sanitized text suitable for use as a
+     * filename.
+     * 
+     * Steps performed: 1. Trims the input content. 2. Removes the first line if it is an XML comment.
+     * 3. Extracts the first line of the remaining content. 4. Trims leading '#' characters. 5. Replaces
+     * any invalid filename characters with a dash ('-'). 6. Truncates the result to a maximum of 60
+     * characters, breaking at the last dash if possible. 7. Trims trailing dashes.
+     * 
+     * @param content The input content string to be processed.
+     * @return A sanitized, short version of the input content suitable for use as a filename.
+     */
     private String getShortNodeText(String content) {
         if (content == null)
             return "";
@@ -411,7 +464,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return linkName.trim();
     }
 
-    /*
+    /**
+     * Processes the export of a node and its attachments, generating content in the specified format
+     * (Markdown or HTML).
+     *
      * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, because we let
      * exceptions bubble all the way up to abort and even cause the zip file itself (to be deleted)
      * since it was unable to be written to completely successfully.
@@ -420,6 +476,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * extension.
      * 
      * Returns true if the children were processed and no further drill down on the tree is needed
+     * 
+     * @param parentFolder The parent folder path where the node's content will be exported.
+     * @param deeperPath The deeper path within the parent folder for the node's content.
+     * @param tn The TreeNode representing the node to be processed.
+     * @param writeFile A boolean indicating whether to write the content to a file.
+     * @param level The level of the node in the tree structure.
+     * @param isTopRow A boolean indicating if the node is the top row.
+     * @param publishedSubSite A boolean indicating if the node is part of a published sub-site.
+     * @return A boolean indicating whether the processing of the node's children is complete.
+     * @throws RuntimeEx If an exception occurs during the processing of the node.
      */
     private boolean processNodeExport(String parentFolder, String deeperPath, TreeNode tn, boolean writeFile, int level,
             boolean isTopRow, boolean publishedSubSite) {
@@ -581,6 +647,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Extracts the title from the given content. The title is defined as the substring from the start
+     * of the content up to the first newline character. If there is no newline character, the entire
+     * content is considered as the title. The title is then trimmed to a maximum length of 50
+     * characters.
+     *
+     * @param content the content from which to extract the title
+     * @return the extracted title, trimmed to a maximum of 50 characters
+     */
     private String getTitleFromContent(String content) {
         String title = null;
         int newLineIdx = content.indexOf("\n");
@@ -596,9 +671,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return title.trim();
     }
 
-    // Tokenize contentVal into lines and remove any lines that are just a single
-    // dash, but leave intact
-    // any inside code blocks
+    /**
+     * Tokenize contentVal into lines and remove any lines that are just a single dash, but leave intact
+     * any inside code blocks
+     */
     private void removeSpecialSyntax(Val<String> contentVal) {
         String[] lines = contentVal.getVal().split("\n");
         StringBuilder sb = new StringBuilder();
@@ -635,6 +711,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return sb.toString();
     }
 
+    /**
+     * Extracts the heading text from the given content if it is a valid Markdown heading.
+     *
+     * @param content the content to extract the heading from
+     * @return the extracted heading text, or null if the content is null or not a valid Markdown
+     *         heading
+     */
     private String extractHeadingText(String content) {
         if (content == null)
             return null;
@@ -657,6 +740,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return null;
     }
 
+    /**
+     * Adds a node to the table of contents (ToC) if the ToC inclusion flag is set.
+     *
+     * @param node The node to be added to the ToC.
+     * @param level The level of the node in the hierarchy.
+     * @param content The content of the node.
+     * @param publishedSubSite A flag indicating if the node is part of a published sub-site.
+     */
     private void addToTableOfContents(SubNode node, int level, String content, boolean publishedSubSite) {
         if (includeToC) {
             String heading = extractHeadingText(content);
@@ -693,6 +784,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return lev;
     }
 
+    /**
+     * Writes files for a given node based on the specified content type.
+     *
+     * @param parentFolder The parent folder where the files will be written.
+     * @param node The node for which files are being written.
+     * @param content The content to be written to the file.
+     * @param atts A list of attachments associated with the node.
+     */
     private void writeFilesForNode(String parentFolder, SubNode node, String content, List<Attachment> atts) {
         String fileName = getFileNameFromNode(node);
         String json = getNodeJson(node);
@@ -768,6 +867,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return fileName;
     }
 
+    /**
+     * Writes an attachment file for a given node to the specified parent folder.
+     *
+     * @param parentFolder The parent folder where the attachment file will be written.
+     * @param node The node associated with the attachment.
+     * @param path The path where the attachment file will be stored.
+     * @param att The attachment to be written.
+     */
     private void writeAttachmentFileForNode(String parentFolder, SubNode node, String path, Attachment att) {
         if (att.getMime() == null)
             return;
@@ -832,9 +939,21 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    /*
+    /**
+     * Handles the attachment of a node by generating appropriate URLs and markdown or HTML links based
+     * on the content type and other parameters.
+     * 
      * If 'content' is passes as non-null then the ONLY thing we do is inject any File Tags onto that
      * content and return the content
+     *
+     * @param node The node containing the attachment.
+     * @param injectingTag A flag indicating whether a tag is being injected.
+     * @param content The content to which the attachment link will be appended.
+     * @param deeperPath The deeper path for the attachment.
+     * @param parentFolder The parent folder for the attachment.
+     * @param writeFile A flag indicating whether to write the file.
+     * @param att The attachment to be handled.
+     * @param figNum The figure number for the attachment, if applicable.
      */
     private void handleAttachment(SubNode node, boolean injectingTag, Val<String> content, String deeperPath,
             String parentFolder, boolean writeFile, Attachment att, int figNum) {

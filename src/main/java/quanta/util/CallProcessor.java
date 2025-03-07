@@ -96,6 +96,24 @@ public class CallProcessor extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Sets the response details in the provided ResponseBase object.
+     *
+     * @param orb The ResponseBase object to set the response details in.
+     * @param code The HTTP status code to set in the response.
+     * @param e The exception that occurred, if any.
+     *
+     *        This method sets the HTTP status code in the ResponseBase object. If the status code
+     *        indicates an error or an exception is provided, it sets an appropriate message in the
+     *        response. If the exception is an instance of RuntimeEx, the exception's message is
+     *        included in the response; otherwise, a generic error message is set.
+     * 
+     *        If an exception is provided and the stack trace is not already set in the response, the
+     *        stack trace is added to the response and logged. If the exception is an instance of
+     *        MessageException, the message code from the exception is also set in the response.
+     * 
+     *        If response logging is enabled, the response is pretty-printed and logged.
+     */
     private void setResponse(ResponseBase orb, int code, Exception e) {
         orb.setCode(code);
 

@@ -46,6 +46,21 @@ public class AppFilter extends GenericFilterBean {
     // turns on some logging (not too verbose)
     public static boolean debug = true;
 
+    /**
+     * Filters incoming HTTP requests and responses. This method performs several tasks: - Checks if the
+     * application is ready to handle requests. - Manages the HTTP session, creating a new one if
+     * necessary. - Logs request URLs and parameters. - Processes audit logs if auditing is enabled. -
+     * Retrieves or creates a session context from Redis. - Updates the session context's last active
+     * time. - Passes the request and response along the filter chain. - Saves the session context to
+     * Redis if it contains a user token. - Handles runtime and general exceptions by sending
+     * appropriate error responses. - Ensures proper cleanup and unlocking of resources.
+     *
+     * @param req the ServletRequest object that contains the client's request
+     * @param res the ServletResponse object that contains the filter's response
+     * @param chain the FilterChain for invoking the next filter or the resource
+     * @throws IOException if an I/O error occurs during the processing of the request
+     * @throws ServletException if the request could not be handled
+     */
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -140,6 +155,15 @@ public class AppFilter extends GenericFilterBean {
         }
     }
 
+    /**
+     * Retrieves the SessionContext from Redis using the provided token.
+     *
+     * @param token the token used to retrieve the SessionContext from Redis
+     * @param sc the current SessionContext, which may be replaced if a valid token is found
+     * @param session the current HTTP session
+     * @return the SessionContext retrieved from Redis, or null if the token is invalid or unknown
+     * @throws UnauthorizedException if the token is invalid or unknown
+     */
     private SessionContext getScFromRedis(String token, SessionContext sc, HttpSession session) {
         if (!StringUtils.isEmpty(token)) {
             sc = ServiceBase.svc_redis.get(token);
@@ -158,6 +182,19 @@ public class AppFilter extends GenericFilterBean {
         return sc;
     }
 
+    /**
+     * Acquires a mutex lock for the given HTTP request and session if necessary.
+     * 
+     * This method checks the request URI and determines whether to use a lock. If the URI matches
+     * certain paths, locking is bypassed. Otherwise, it attempts to acquire a lock from the session
+     * attributes.
+     * 
+     * @param httpReq the HttpServletRequest object containing the request details.
+     * @param session the HttpSession object associated with the request.
+     * @return the acquired ReentrantLock if locking is used, otherwise null.
+     * @throws InterruptedException if the current thread is interrupted while waiting for the lock.
+     * @throws ServerTooBusyException if the lock cannot be acquired within the specified timeout.
+     */
     private ReentrantLock getMutex(HttpServletRequest httpReq, HttpSession session) throws InterruptedException {
         boolean useLock = true;
         // bypass locking for these
@@ -185,6 +222,11 @@ public class AppFilter extends GenericFilterBean {
         return mutex;
     }
 
+    /**
+     * Logs the URL and parameters of the given HTTP request if debugging is enabled.
+     * 
+     * @param httpReq the HttpServletRequest containing the request details
+     */
     private void logUrlAndParams(HttpServletRequest httpReq) {
         if (Const.debugFilterEntry || debug) {
             String url = "URI=" + httpReq.getRequestURI();
@@ -199,6 +241,16 @@ public class AppFilter extends GenericFilterBean {
         }
     }
 
+    /**
+     * Retrieves the authentication token from the HTTP request. The method attempts to obtain the token
+     * in the following order: 1. From the "Bearer" HTTP header. 2. From the URL parameter specified by
+     * {@link Const#BEARER_TOKEN}. 3. From the HTTP session attribute specified by
+     * {@link Const#BEARER_TOKEN}.
+     *
+     * @param httpReq the HTTP request object containing the client's request
+     * @param session the HTTP session associated with the request
+     * @return the authentication token if found, otherwise null
+     */
     private String getToken(HttpServletRequest httpReq, HttpSession session) {
         // first try to get the token from the HTTP header
         String token = httpReq.getHeader("Bearer");
@@ -216,6 +268,15 @@ public class AppFilter extends GenericFilterBean {
         return token;
     }
 
+    /**
+     * Sends an error response to the client with the specified message and status code. Logs the error
+     * message and exception.
+     *
+     * @param res the HttpServletResponse to send the error to
+     * @param msg the error message to send
+     * @param code the HTTP status code to send
+     * @param e the exception that caused the error
+     */
     private void sendError(HttpServletResponse res, String msg, int code, Exception e) {
         ExUtil.error(log, "Failed in " + msg, e);
         try {
@@ -463,6 +524,12 @@ public class AppFilter extends GenericFilterBean {
         }
     }
 
+    /**
+     * Post-processes the HTTP request and response by logging relevant information.
+     *
+     * @param sreq the HttpServletRequest object, which contains the client's request
+     * @param sres the HttpServletResponse object, which contains the response to the client
+     */
     private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
         try {
             if (sreq == null || sres == null)

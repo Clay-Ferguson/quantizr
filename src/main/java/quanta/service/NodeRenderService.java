@@ -54,6 +54,21 @@ import quanta.util.val.Val;
 public class NodeRenderService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
+    /**
+     * Generates the index page for the given parameters.
+     *
+     * @param nameOnAdminNode The name of the admin node.
+     * @param nameOnUserNode The name of the user node.
+     * @param userName The name of the user.
+     * @param id The ID of the node.
+     * @param search The search query.
+     * @param name The name of the node.
+     * @param signupCode The signup code.
+     * @param login The login status.
+     * @param view The view parameter.
+     * @param model The model to add attributes to.
+     * @return The name of the view to render.
+     */
     public String cm_getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
             String search, String name, String signupCode, String login, String view, Model model) {
         HashMap<String, Object> attrs = getThymeleafAttribs();
@@ -150,9 +165,13 @@ public class NodeRenderService extends ServiceBase {
         return map;
     }
 
-    /*
-     * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
-     * page, this method gets called once per page and retrieves all the data for that page.
+    /**
+     * Renders a node based on the provided request. This is the call that gets all the data to show on
+     * a page. Whenever user is browsing to a new page, this method gets called once per page and
+     * retrieves all the data for that page.
+     *
+     * @param req the request containing parameters for rendering the node
+     * @return the response containing the rendered node information
      */
     public RenderNodeResponse cm_renderNode(RenderNodeRequest req) {
         RenderNodeResponse res = new RenderNodeResponse();
@@ -271,6 +290,22 @@ public class NodeRenderService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Processes and renders a node, including its children, based on the given parameters.
+     *
+     * @param adminOnly Indicates if the operation is restricted to admin users only.
+     * @param req The request object containing parameters for rendering the node.
+     * @param res The response object to store the results of the rendering process.
+     * @param node The node to be processed and rendered.
+     * @param scanToNode The node to scan to, if applicable.
+     * @param logicalOrdinal The logical ordinal position of the node.
+     * @param level The depth level of the node in the hierarchy.
+     * @param limit The maximum number of child nodes to render.
+     * @param showReplies Indicates if replies (child nodes) should be shown.
+     * @param accountNodeMap A map of account nodes for reference.
+     * @return A NodeInfo object containing the rendered node information, or null if the node cannot be
+     *         rendered.
+     */
     public NodeInfo processRenderNode(boolean adminOnly, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
             SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies,
             HashMap<String, AccountNode> accountNodeMap) {
@@ -473,12 +508,19 @@ public class NodeRenderService extends ServiceBase {
         return nodeInfo;
     }
 
-    /*
+    /**
+     * Parses the given orderBy string to create a Sort object. The orderBy string should be in the
+     * format "property direction", where direction is either "asc" or "desc". If the direction is not
+     * specified, it defaults to "asc".
+     * 
      * Nodes can have a propety like orderBy="priority asc", and that allow the children to be displayed
      * in that order.
      *
      * parses something like "priority asc" into a Sort object, assuming the field is in the property
      * array of the node, rather than the name of an actual SubNode object member property.
+     * 
+     * @param orderBy the string specifying the property and direction to sort by
+     * @return a Sort object representing the sorting order
      */
     private Sort parseOrderBy(String orderBy) {
         Sort sort = null;
@@ -514,6 +556,12 @@ public class NodeRenderService extends ServiceBase {
         return cm_renderNode(req);
     }
 
+    /**
+     * Populates the social card properties of a given node into the provided model.
+     *
+     * @param node the node containing the information to populate the social card properties
+     * @param model the model to which the social card properties will be added
+     */
     public void populateSocialCardProps(SubNode node, Model model) {
         if (node == null)
             return;
@@ -527,6 +575,12 @@ public class NodeRenderService extends ServiceBase {
         model.addAttribute("ogUrl", metaInfo.getUrl());
     }
 
+    /**
+     * Renders a calendar based on the provided request.
+     *
+     * @param req the request containing the node ID for which the calendar is to be rendered
+     * @return a response containing the rendered calendar items
+     */
     public RenderCalendarResponse cm_renderCalendar(RenderCalendarRequest req) {
         RenderCalendarResponse res = new RenderCalendarResponse();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
@@ -555,8 +609,10 @@ public class NodeRenderService extends ServiceBase {
     }
 
     /**
-     * Generates breadcrumbs that are displayed at the top of the page. It is called recursively to walk
-     * up the tree and generate the list of breadcrumbs.
+     * Generates a list of breadcrumb information for the given node and its ancestors.
+     *
+     * @param node the starting node for which breadcrumbs are to be generated
+     * @param list the list to which breadcrumb information will be added
      */
     public void getBreadcrumbs(SubNode node, LinkedList<BreadcrumbInfo> list) {
         try {

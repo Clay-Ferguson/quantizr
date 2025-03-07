@@ -22,6 +22,22 @@ public class GraphNodesService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
     private int guid = 0;
 
+    /**
+     * Generates a graph response based on the provided graph request.
+     * 
+     * @param req the graph request containing the search definition and node ID
+     * @return a GraphResponse object containing the root node and its subgraph
+     * 
+     *         The method performs the following steps: 1. Retrieves the search definition from the
+     *         request. 2. Initializes a map to store graph nodes by their path. 3. Creates a root
+     *         GraphNode from the node specified by the request's node ID. 4. Depending on whether
+     *         search text is provided, either retrieves the subgraph or performs a subgraph search. 5.
+     *         Constructs GraphNode objects for each result and adds them to the map. 6. Processes the
+     *         nodes to ensure a coherent and complete tree structure. 7. Sets the root node in the
+     *         response and returns the response.
+     * 
+     * @throws RuntimeEx if an exception occurs during processing
+     */
     public GraphResponse cm_graphNodes(GraphRequest req) {
         SearchDefinition def = req.getSearchDefinition();
         HashMap<String, GraphNode> mapByPath = new HashMap<>();
@@ -91,6 +107,14 @@ public class GraphNodesService extends ServiceBase {
         return name;
     }
 
+    /**
+     * Processes the nodes in the given map by ensuring all parent nodes are present and then adding
+     * each node to the child list of its parent node.
+     *
+     * @param rootPath the root path of the graph
+     * @param rootLevel the level of the root node
+     * @param mapByPath a map of node paths to GraphNode objects
+     */
     private void processNodes(String rootPath, int rootLevel, HashMap<String, GraphNode> mapByPath) {
         // collection to hold keys so we don't get concurrent modification
         // exception when updating the map.
@@ -125,6 +149,15 @@ public class GraphNodesService extends ServiceBase {
         }
     }
 
+    /**
+     * Ensures that there are enough parent nodes in the map to reach the specified root path. If a
+     * parent node does not exist in the map, it creates one and continues to check its parent.
+     *
+     * @param rootPath The root path that all nodes should eventually connect to.
+     * @param rootLevel The level of the root path in the hierarchy.
+     * @param path The current path for which to ensure parent nodes.
+     * @param mapByPath A map of paths to their corresponding GraphNode objects.
+     */
     public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
         if (path == null || path.length() < 3)
             return;

@@ -85,6 +85,25 @@ public class MongoCreate extends ServiceBase {
      *
      * relPath can be null if no path is known
      */
+    /**
+     * Creates a new node with the specified parameters.
+     *
+     * @param parent The parent node under which the new node will be created. Can be null for root
+     *        nodes.
+     * @param relPath The relative path for the new node. If null, a default path of "?" will be used.
+     * @param type The type of the new node. If null, a default type of NodeType.NONE will be used.
+     * @param nodeClass The class type of the node to be created. If null, a default SubNode will be
+     *        created.
+     * @param ordinal The ordinal position of the new node. If null and updateOrdinals is true, it will
+     *        be calculated.
+     * @param location The location where the new node will be created.
+     * @param properties A list of properties to be set on the new node.
+     * @param ownerId The owner ID of the new node. If null, the current user's node ID will be used.
+     * @param updateOrdinals A flag indicating whether to update the ordinals of the new node.
+     * @param updateParent A flag indicating whether to update the parent node's hasChildren property.
+     * @param nodeChanges An object representing changes to the node.
+     * @return The newly created SubNode.
+     */
     public SubNode createNode(SubNode parent, String relPath, String type, Class<? extends SubNode> nodeClass,
             Long ordinal, CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId,
             boolean updateOrdinals, boolean updateParent, NodeChanges nodeChanges) {
@@ -142,6 +161,16 @@ public class MongoCreate extends ServiceBase {
         }
     }
 
+    /**
+     * Prepares the ordinal value for a node based on the specified location.
+     *
+     * @param location The location where the node should be created (FIRST, LAST, or ORDINAL).
+     * @param parent The parent node under which the new node will be created.
+     * @param ordinal The initial ordinal value, which may be adjusted based on the location.
+     * @param nodeChanges The object tracking changes to the node.
+     * @return The adjusted ordinal value for the new node.
+     * @throws RuntimeEx If the specified location is unknown.
+     */
     private Long prepOrdinalForLocation(CreateNodeLocation location, SubNode parent, Long ordinal,
             NodeChanges nodeChanges) {
         switch (location) {

@@ -66,6 +66,20 @@ public class ExportServicePDF extends ServiceBase {
         }
     }
 
+    /**
+     * Exports a node to a PDF file.
+     *
+     * @param nodeId The ID of the node to export.
+     * @throws RuntimeEx if the admin data folder does not exist or if an error occurs during export.
+     *
+     *         This method performs the following steps: 1. Checks if the admin data folder exists. 2.
+     *         Retrieves the tree structure of the node to be exported. 3. Preprocesses the tree to
+     *         prepare for export. 4. Generates the export file name and full file path. 5. If
+     *         requested, updates the headings based on the node's path. 6. Recursively processes the
+     *         node tree to generate markdown content. 7. Converts the markdown content to HTML. 8.
+     *         Generates the final HTML content for the PDF. 9. Writes the HTML content to a PDF file.
+     *         10. Ensures the file is deleted on exit if it was successfully written.
+     */
     private void exportNodeToFile(String nodeId) {
         if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
             throw new RuntimeEx("adminDataFolder does not exist.");
@@ -112,6 +126,17 @@ public class ExportServicePDF extends ServiceBase {
         }
     }
 
+    /**
+     * Recursively processes a tree node and its children.
+     *
+     * @param tn The current tree node to process.
+     * @param level The current level in the tree hierarchy.
+     * 
+     *        This method processes the given tree node and appends a Table of Contents (TOC) marker if
+     *        the level is 0 and the request includes a TOC. It then recursively processes each child
+     *        node unless the child node has a "sn:noexport" property, in which case the child node is
+     *        skipped.
+     */
     private void recurseNode(TreeNode tn, int level) {
         if (tn.node == null)
             return;
@@ -134,6 +159,18 @@ public class ExportServicePDF extends ServiceBase {
         }
     }
 
+    /**
+     * Processes a given TreeNode and generates its corresponding markdown representation.
+     * 
+     * @param tn the TreeNode to process
+     * 
+     *        The method performs the following steps: 1. Initializes the markdown string with a divider
+     *        line if required. 2. Appends the node ID and owner information if required. 3. Retrieves
+     *        and formats the node content using a plugin if available. 4. Updates the headings in the
+     *        content based on the node's level in the tree. 5. Substitutes properties in the content
+     *        and injects figure links. 6. Writes images associated with the node. 7. Appends the final
+     *        markdown string to the overall markdown content.
+     */
     private void processNode(TreeNode tn) {
         String nodeMarkdown = req.isDividerLine() ? "\n----\n" : "\n";
 
@@ -171,6 +208,14 @@ public class ExportServicePDF extends ServiceBase {
         markdown.append(nodeMarkdown);
     }
 
+    /**
+     * Replaces placeholders in the given content with corresponding property values from the provided
+     * node.
+     * 
+     * @param content The content containing placeholders in the format {{propertyName}}.
+     * @param node The node containing properties to substitute into the content.
+     * @return The content with placeholders replaced by their corresponding property values.
+     */
     private String insertPropertySubstitutions(String content, SubNode node) {
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
@@ -184,6 +229,17 @@ public class ExportServicePDF extends ServiceBase {
         return content;
     }
 
+    /**
+     * Embeds images from the attachments of a given TreeNode into the provided content.
+     * 
+     * This method processes all attachments of the TreeNode, filters out non-image attachments, and
+     * generates HTML <img> tags for image attachments. It handles special cases for GIF files, sets
+     * appropriate styles for image sizes, and constructs the image source URLs.
+     * 
+     * @param tn The TreeNode containing the attachments to be processed.
+     * @param content The content into which the images will be embedded.
+     * @return The content with embedded images.
+     */
     private String writeImages(TreeNode tn, String content) {
         List<Attachment> atts = tn.node.getOrderedAttachments();
         if (atts == null)

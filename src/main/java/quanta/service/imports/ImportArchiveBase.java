@@ -31,6 +31,22 @@ public abstract class ImportArchiveBase extends ServiceBase {
     public SubNode curNode;
     public HashSet<String> reservedPaths = new HashSet<>();
 
+    /**
+     * Processes an archive entry file during import.
+     *
+     * @param entry The archive entry representing the file to be processed.
+     * @param zis The input stream of the archive entry.
+     * @param ownerId The ID of the owner of the node being imported.
+     *
+     *        This method handles the import of files from an archive. It processes attachments, HTML
+     *        files, and JSON files. For attachments, it checks if the current node has attachments and
+     *        processes them accordingly. For JSON files, it unmarshals the JSON content into a SubNode
+     *        object, assigns a new path and owner, and saves the node. HTML files are ignored during
+     *        the import as the data is expected to be in JSON files.
+     *
+     *        The method ensures that the parent check is disabled during processing and re-enabled
+     *        afterward. It also handles exceptions by throwing a RuntimeEx with the caught exception.
+     */
     public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
         String name = entry.getName();
         int lastSlashIdx = name.lastIndexOf("/");
@@ -129,11 +145,19 @@ public abstract class ImportArchiveBase extends ServiceBase {
         }
     }
 
-    /*
+    /**
+     * Imports a binary attachment from an archive entry into a node.
+     * 
      * This method assumes node has already been loaded which means as we process the zip stream we're
      * expecting the JSON for the node to be encountered before any of the attachments.
      *
      * Returns true only if we imported a file.
+     * 
+     * @param entry The archive entry containing the binary data.
+     * @param node The node to which the binary attachment will be added.
+     * @param zis The input stream to read the binary data from.
+     * @param attName The name of the attachment to be imported.
+     * @return true if the binary attachment was successfully imported, false otherwise.
      */
     public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String attName) {
         HashMap<String, Attachment> atts = node.getAttachments();

@@ -22,12 +22,21 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class DataTransferRateFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(DataTransferRateFilter.class);
     public static double totalBytesSent = 0;
     public static double totalTime = 0; // nano seconds
 
+    /**
+     * Filters the request and response to measure the data transfer rate.
+     *
+     * @param request the ServletRequest object that contains the client's request
+     * @param response the ServletResponse object that contains the filter's response
+     * @param chain the FilterChain for invoking the next filter or the resource
+     * @throws IOException if an I/O error occurs during the filtering process
+     * @throws ServletException if a servlet error occurs during the filtering process
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -64,7 +73,7 @@ public class DataTransferRateFilter extends GenericFilterBean {
         if (httpReq.getQueryString() != null) {
             prefix += " q=" + httpReq.getQueryString();
         }
-        Map<?,?> params = httpReq.getParameterMap();
+        Map<?, ?> params = httpReq.getParameterMap();
         if (params != null && params.size() > 0) {
             prefix += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
         }

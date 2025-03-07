@@ -40,6 +40,22 @@ public class UserFeedService extends ServiceBase {
     // private static List<String> excludeTypes = Arrays.asList( //
     // NodeType.FRIEND.s(), //
     // NodeType.POSTS.s());
+    /**
+     * Checks for new messages for the user based on the last active time.
+     * 
+     * @param req the request object containing necessary information for checking messages
+     * @return a response object containing the number of new messages
+     * 
+     *         This method performs the following steps: 1. Retrieves the session context and
+     *         initializes the response object. 2. If the user is anonymous, returns an empty response.
+     *         3. Sets up the search path and query criteria to limit the search to markdown types and
+     *         comments. 4. Retrieves the root node for the current user. 5. If the root node is null or
+     *         the last active time is zero, returns an empty response. 6. Adds criteria to the query to
+     *         find nodes modified since the last active time. 7. Adds criteria to ensure the nodes
+     *         belong to the current user. 8. Adds read security criteria to the query. 9. Executes the
+     *         query and counts the number of new nodes. 10. Sets the number of new messages in the
+     *         response and returns it.
+     */
     public CheckMessagesResponse cm_checkMessages(CheckMessagesRequest req) {
         SessionContext sc = TL.getSC();
         CheckMessagesResponse res = new CheckMessagesResponse();
@@ -354,6 +370,15 @@ public class UserFeedService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves a list of unique hashtags from the user's friends.
+     *
+     * This method fetches all friend nodes and extracts hashtags from their tags. Only strings that
+     * start with a '#' are considered as valid hashtags.
+     *
+     * @return a LinkedList containing unique hashtags from the user's friends, or null if no friend
+     *         nodes are found.
+     */
     public LinkedList<String> getFriendsHashTags() {
         HashSet<String> friendsHashTagsSet = new HashSet<>();
         List<SubNode> allFriendNodes = svc_user.getSpecialNodesList(null, NodeType.FRIEND_LIST.s(), null, true, null);

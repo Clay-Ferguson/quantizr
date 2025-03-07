@@ -26,6 +26,13 @@ public class StripeController extends ServiceBase implements ErrorController {
     private static Logger log = LoggerFactory.getLogger(StripeController.class);
     private static int entryCounter = 0;
 
+    /**
+     * Handles Stripe webhook events.
+     *
+     * @param payload The payload of the Stripe event.
+     * @param sigHeader The Stripe-Signature header to verify the event.
+     * @return ResponseEntity with the result of the event handling.
+     */
     @PostMapping("/stripe/webhook")
     public ResponseEntity<String> handleStripeEvent(@RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {

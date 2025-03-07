@@ -96,6 +96,13 @@ public class UserManagerService extends ServiceBase {
 
     public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
 
+    /**
+     * Retrieves an existing SseEmitter associated with the given token or creates a new one if it
+     * doesn't exist. The SseEmitter is configured with a very long timeout to prevent it from expiring.
+     * 
+     * @param token the unique identifier for the SseEmitter
+     * @return the SseEmitter associated with the given token
+     */
     public SseEmitter getPushEmitter(String token) {
         SseEmitter emitter = pushEmitters.get(token);
         if (emitter == null) {
@@ -112,6 +119,18 @@ public class UserManagerService extends ServiceBase {
         return emitter;
     }
 
+    /**
+     * Authenticates the bearer token from the request.
+     * <p>
+     * This method retrieves the SessionContext from the ThreadLocal storage. If the SessionContext is
+     * null or the user name in the SessionContext is empty, it throws a RuntimeException. It then
+     * retrieves the bearer token from the request and validates it against the user name in the
+     * SessionContext. If the token is invalid, it throws an UnauthorizedException.
+     * </p>
+     *
+     * @throws RuntimeEx if the SessionContext is null or the user name is empty.
+     * @throws UnauthorizedException if the bearer token is invalid.
+     */
     public void authBearer() {
         SessionContext sc = TL.getSC();
         if (sc == null) {
@@ -147,9 +166,16 @@ public class UserManagerService extends ServiceBase {
         return sc != null && (userName == null || sc.getUserName().equals(userName));
     }
 
-    /*
-     * Note that this function does 'succeed' even with ANON user given, and just considers that an
-     * anonymouse user
+    /**
+     * Handles the login process for users. This method supports anonymous users, admin users, and
+     * regular users. It performs authentication and sets up the session context accordingly. Note that
+     * this function does 'succeed' even with ANON user given, and just considers that an anonymouse
+     * user
+     *
+     * @param httpReq The HTTP servlet request.
+     * @param req The login request containing user credentials and other login information.
+     * @return A LoginResponse object containing the result of the login process.
+     * @throws RuntimeEx If authentication fails or the user is not found.
      */
     public LoginResponse login(HttpServletRequest httpReq, LoginRequest req) {
         MongoTranMgr.ensureTran();
@@ -214,7 +240,19 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    /* This is called only upon successful login of a non-anon user */
+    /**
+     * Sets the authenticated user information in the session context.
+     *
+     * @param sc the session context to update with authenticated user information
+     * @param userName the name of the authenticated user
+     * @param userNodeId the ObjectId of the user's node
+     * @throws RuntimeEx if the userName is "anon"
+     *
+     *         This method generates a new user token if one is not already set in the session context.
+     *         The session context is shared across swarm replicas via Redis, so the token is only
+     *         generated if it is not already present. The method also sets the userName and userNodeId
+     *         in the session context.
+     */
     public void setAuthenticated(SessionContext sc, String userName, ObjectId userNodeId) {
         if (userName.equals(PrincipalName.ANON.s())) {
             throw new RuntimeEx("invalid call to setAuthenticated for anon.");
@@ -250,9 +288,14 @@ public class UserManagerService extends ServiceBase {
                 create);
     }
 
-    /*
-     * caller can optionally pass userNode if it's already available, or else it will be looked up using
-     * userName
+    /**
+     * Processes the login for a user.
+     *
+     * @param res The response object to be populated with login details.
+     * @param userNode The account node of the user. If null, it will be fetched using the userName.
+     * @param userName The username of the user attempting to log in.
+     * @param asymEncKey The asymmetric encryption key for the user, if available.
+     * @throws RuntimeEx If the user is not found or if the userNode id is null.
      */
     public void processLogin(LoginResponse res, AccountNode userNode, String userName, String asymEncKey) {
         SessionContext sc = TL.getSC();
@@ -286,6 +329,17 @@ public class UserManagerService extends ServiceBase {
         svc_mongoUpdate.save(userNode);
     }
 
+    /**
+     * Closes the user account associated with the current session.
+     * 
+     * This method performs the following actions: 1. Ensures a MongoDB transaction is started. 2. Logs
+     * the account closure action. 3. Runs an asynchronous task to delete the account node associated
+     * with the user. 4. Invalidates the current HTTP session.
+     * 
+     * @param req the request object containing details for closing the account
+     * @param session the current HTTP session
+     * @return a response object indicating the result of the account closure
+     */
     public CloseAccountResponse closeAccount(CloseAccountRequest req, HttpSession session) {
         MongoTranMgr.ensureTran();
         CloseAccountResponse res = new CloseAccountResponse();
@@ -341,13 +395,23 @@ public class UserManagerService extends ServiceBase {
         userNode.set(NodeProp.BIN_TOTAL, binTotal);
     }
 
-    /*
+    /**
      * Processes last step of signup, which is validation of registration code. This means user has
      * clicked the link they were sent during the signup email verification, and they are sending in a
      * signupCode that will turn on their account and actually create their account.
      *
      * We return whatever a message would be to the user that just says if the signupCode was accepted
      * or not and it's displayed on welcome.html only.
+     * 
+     * This method validates the signup code and performs the necessary actions based on the state of
+     * the account node associated with the signup code.
+     * 
+     * @param signupCode the signup code provided by the user
+     * @return a message indicating the result of the signup code processing: - "Signup Complete. You
+     *         may login now." if the signup is already complete - "processSignupCode should not be
+     *         called for admin user." if the signup code belongs to an admin user - "Signup Successful.
+     *         You may login now." if the signup is successful - "Signup Code is invalid." if the signup
+     *         code is invalid
      */
     public String processSignupCode(String signupCode) {
         log.debug("User is trying signupCode: " + signupCode);
@@ -385,6 +449,21 @@ public class UserManagerService extends ServiceBase {
      * Processes a signup request from a user. We create the user root node in a pending state, and like
      * all other user accounts all information specific to that user that we currently know is held in
      * that node (i.e. preferences)
+     *
+     * @param req The SignupRequest object containing user details such as username, password, email,
+     * and captcha.
+     * 
+     * @param automated A boolean indicating whether the signup process is automated.
+     * 
+     * @return SignupResponse containing the result of the signup process, including any errors
+     * encountered.
+     *
+     * The method performs the following steps: 1. Ensures a transaction is started. 2. Initializes a
+     * SignupResponse object with an HTTP OK status. 3. Trims and logs the username and email from the
+     * request. 4. Validates the username, password, and email, updating the response with any errors.
+     * 5. Checks if the email is already in use and updates the response if so. 6. If the signup is not
+     * automated, verifies the captcha and updates the response if incorrect. 7. If there are no errors,
+     * initiates the signup process or initializes a new user based on the automated flag.
      */
     public SignupResponse signup(SignupRequest req, boolean automated) {
         MongoTranMgr.ensureTran();
@@ -440,9 +519,16 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    /*
+    /**
+     * Initiates the signup process for a new user.
+     * 
      * Adds user to the list of pending accounts and they will stay in pending status until their
      * signupCode has been used to validate their email address.
+     *
+     * @param userName the username of the new user
+     * @param password the password for the new user
+     * @param emailAdr the email address of the new user
+     * @throws RuntimeEx if a user with the given username already exists
      */
     public void initiateSignup(String userName, String password, String emailAdr) {
         AccountNode ownerNode = getAccountByUserNameAP(userName);
@@ -471,6 +557,13 @@ public class UserManagerService extends ServiceBase {
         prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
     }
 
+    /**
+     * Retrieves user account information based on the provided request.
+     *
+     * @param req the request containing the necessary information to retrieve the user account info
+     * @return a response containing the user account information or an error message if the user is
+     *         unknown
+     */
     public GetUserAccountInfoResponse cm_getUserAccountInfo(GetUserAccountInfoRequest req) {
         GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
         String userName = TL.getSC().getUserName();
@@ -493,6 +586,13 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Adds credit to a user's account based on their email address.
+     *
+     * @param emailAdr the email address of the user to whom the credit will be added
+     * @param amount the amount of credit to be added to the user's account
+     * @param timestamp the timestamp of the transaction
+     */
     public void addCreditByEmail(String emailAdr, BigDecimal amount, long timestamp) {
         AccountNode ownerNode = svc_user.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
         if (ownerNode != null) {
@@ -510,6 +610,23 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
+    /**
+     * Saves the user preferences.
+     *
+     * @param req the request containing the user preferences to be saved
+     * @return the response indicating the result of the save operation
+     * 
+     *         This method retrieves the current user preferences from the session context. If the
+     *         session has timed out and the preferences are null, it returns an empty response.
+     *         Otherwise, it updates the user preferences with the values provided in the request.
+     * 
+     *         The method ensures that the preferences are being updated for the correct user by
+     *         verifying the user name associated with the preferences node. If the user names do not
+     *         match, it throws a RuntimeException.
+     * 
+     *         The preferences are then assigned as properties on the node and also updated in the
+     *         session context.
+     */
     public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {
         SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
         UserPreferences userPrefs = TL.getSC().getUserPreferences();
@@ -558,6 +675,12 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Saves the user profile information.
+     *
+     * @param req the request object containing user profile data to be saved
+     * @return a response object indicating the success or failure of the operation
+     */
     public SaveUserProfileResponse saveUserProfile(SaveUserProfileRequest req) {
         MongoTranMgr.ensureTran();
         SaveUserProfileResponse res = new SaveUserProfileResponse();
@@ -589,7 +712,14 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    /* Takes in blockedWords and returns them as a unique and sorted array, each on a separate line */
+    /**
+     * Processes a string of blocked words, removing duplicates and sorting them.
+     * 
+     * @param blockedWords a string containing blocked words separated by spaces, newlines, carriage
+     *        returns, tabs, or commas
+     * @return a string of unique blocked words sorted in alphabetical order, separated by newlines, or
+     *         null if the input is null
+     */
     public String processBlockedWords(String blockedWords) {
         if (blockedWords == null)
             return null;
@@ -604,7 +734,13 @@ public class UserManagerService extends ServiceBase {
         return String.join("\n", wordsList);
     }
 
-    /* The code pattern here is very similar to addFriendInternal */
+    /**
+     * Blocks a list of users specified in the request. The code pattern here is very similar to
+     * addFriendInternal
+     *
+     * @param req the request containing the list of usernames to be blocked
+     * @return a response indicating the result of the block operation
+     */
     public BlockUserResponse cm_blockUsers(BlockUserRequest req) {
         BlockUserResponse res = new BlockUserResponse();
         String userName = TL.getSC().getUserName();
@@ -619,6 +755,14 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Blocks a user by adding them to the blocked list of the account performing the block. If the user
+     * is already in the blocked list but in an obsolete path, the obsolete entry is deleted.
+     *
+     * @param userToBlock The username of the user to be blocked.
+     * @param accntIdDoingBlock The ObjectId of the account performing the block.
+     * @param blockedList The node representing the blocked list where the user will be added.
+     */
     private void blockUser(String userToBlock, ObjectId accntIdDoingBlock, SubNode blockedList) {
         SubNode userNode = svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
 
@@ -636,6 +780,13 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
+    /**
+     * Exports a list of people (friends or blocks) to a text file and writes it to the HTTP response.
+     *
+     * @param response The HttpServletResponse object to which the file will be written.
+     * @param disposition The content disposition of the response (e.g., "inline" or "attachment").
+     * @param listType The type of list to export ("friendList" or "blockList").
+     */
     public void cm_exportPeople(HttpServletResponse response, String disposition, String listType) {
         try {
             StringBuilder sb = new StringBuilder();
@@ -697,6 +848,15 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Adjusts the credit balance of a user by a specified amount. If the amount is greater than zero,
+     * the operation requires admin privileges.
+     *
+     * @param userId the ID of the user whose credit balance is to be adjusted
+     * @param amount the amount to adjust the credit balance by; positive to add credit, negative to
+     *        subtract
+     * @return the new credit balance after adjustment
+     */
     public BigDecimal adjustCredit(String userId, BigDecimal amount) {
         // if amount greater than 0, add credit, else subtract
         if (amount.compareTo(BigDecimal.ZERO) > 0) {
@@ -716,6 +876,13 @@ public class UserManagerService extends ServiceBase {
         return balance;
     }
 
+    /**
+     * Retrieves the balance of a user based on their user ID.
+     *
+     * @param userId the ID of the user whose balance is to be retrieved
+     * @return the balance of the user as a BigDecimal. If the user does not exist or an error occurs,
+     *         returns a balance of 0.
+     */
     public BigDecimal getUserBalance(String userId) {
         BigDecimal balance = new BigDecimal(0);
         AccountNode userNode = svc_user.getAccountNodeAP(userId);
@@ -729,12 +896,21 @@ public class UserManagerService extends ServiceBase {
         return balance;
     }
 
-    /*
+    /**
+     * Retrieves the user profile for a given user.
+     * 
      * Abbreviated flag means don't get ALL the info for the user but an abbreviated object that's
      * faster to generate like what we need when someone is logging in and the login endpoint needs
      * their own profile info as fast as possible.
      *
      * caller should pass in 'userNode' if it's available or else userId will be used to get it.
+     *
+     * @param userId The ID of the user whose profile is to be retrieved. If null, the profile of the
+     *        session user is retrieved.
+     * @param _userNode The account node of the user. If null, it will be fetched based on the userId or
+     *        session user.
+     * @param abbreviated If true, retrieves an abbreviated version of the user profile.
+     * @return The user profile of the specified user.
      */
     public UserProfile getUserProfile(String userId, AccountNode _userNode, boolean abbreviated) {
         String sessionUserName = TL.getSC().getUserName();
@@ -800,6 +976,13 @@ public class UserManagerService extends ServiceBase {
         });
     }
 
+    /**
+     * Retrieves a friendly display name from the given user node. If the display name is not available,
+     * it falls back to the username.
+     *
+     * @param userNode the user node from which to extract the display name or username
+     * @return the display name if available, otherwise the username
+     */
     public String getFriendlyNameFromNode(AccountNode userNode) {
         String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
         if (StringUtils.isEmpty(displayName)) {
@@ -811,6 +994,13 @@ public class UserManagerService extends ServiceBase {
         return displayName;
     }
 
+    /**
+     * Checks if a given user is followed by the current user.
+     *
+     * @param inUserNode The account node of the user to check.
+     * @param maybeFollowedUser The username of the user who might be followed.
+     * @return true if the current user follows the specified user, false otherwise.
+     */
     public boolean userIsFollowedByMe(AccountNode inUserNode, String maybeFollowedUser) {
         String userName = TL.getSC().getUserName();
         SubNode friendsList =
@@ -824,6 +1014,13 @@ public class UserManagerService extends ServiceBase {
         return userNode != null;
     }
 
+    /**
+     * Checks if a specified user is blocked by the current user.
+     *
+     * @param inUserNode The account node of the user to check.
+     * @param maybeBlockedUser The username of the user to check.
+     * @return true if the specified user is blocked by the current user, false otherwise.
+     */
     public boolean userIsBlockedByMe(AccountNode inUserNode, String maybeBlockedUser) {
         String userName = TL.getSC().getUserName();
         SubNode blockedList = svc_user.getBlockedUsers(userName, false);
@@ -844,6 +1041,14 @@ public class UserManagerService extends ServiceBase {
         return userPrefs;
     }
 
+    /**
+     * Retrieves the user preferences for a given user.
+     *
+     * @param userName the name of the user whose preferences are to be retrieved
+     * @param _prefsNode an optional SubNode containing the preferences; if null, preferences will be
+     *        fetched based on the userName
+     * @return a UserPreferences object containing the user's preferences
+     */
     public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
         UserPreferences userPrefs = new UserPreferences();
         svc_arun.run(() -> {
@@ -938,6 +1143,20 @@ public class UserManagerService extends ServiceBase {
                 && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
     }
 
+    /**
+     * Handles the password reset request for a user.
+     * 
+     * @param req the request containing the username and email address
+     * @return a response indicating the result of the password reset request
+     * 
+     *         The method performs the following steps: 1. Validates the username. 2. Checks if the user
+     *         exists. 3. Verifies that the provided email address matches the user's email address. 4.
+     *         Generates an authentication code and sets it in the user's account. 5. Saves the updated
+     *         user account information. 6. Sends an email to the user with a link to reset their
+     *         password.
+     * 
+     *         If any validation fails, an appropriate error message is set in the response.
+     */
     public ResetPasswordResponse cm_resetPassword(ResetPasswordRequest req) {
         ResetPasswordResponse res = new ResetPasswordResponse();
         svc_arun.run(() -> {
@@ -987,6 +1206,12 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves the people associated with a specific node.
+     *
+     * @param nodeId the ID of the node to retrieve people from
+     * @return a GetPeopleResponse object containing the people associated with the node
+     */
     public GetPeopleResponse getPeopleOnNode(String nodeId) {
         GetPeopleResponse res = new GetPeopleResponse();
         SubNode node = svc_mongoRead.getNode(nodeId);
@@ -1033,6 +1258,12 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Builds a FriendInfo object from the given AccountNode.
+     *
+     * @param userNode the AccountNode representing the user
+     * @return a FriendInfo object populated with information from the AccountNode
+     */
     public FriendInfo buildPersonInfoFromAccntNode(AccountNode userNode) {
         FriendInfo fi = new FriendInfo();
         String displayName = svc_user.getFriendlyNameFromNode(userNode);
@@ -1048,6 +1279,14 @@ public class UserManagerService extends ServiceBase {
         return fi;
     }
 
+    /**
+     * Retrieves a list of people (friends or blocked users) for a given user.
+     *
+     * @param userName the name of the user for whom to retrieve the list of people
+     * @param type the type of people to retrieve; should be either "friends" or "blocks"
+     * @return a GetPeopleResponse object containing the list of people
+     * @throws RuntimeEx if the provided type is invalid
+     */
     public GetPeopleResponse getPeople(String userName, String type) {
         GetPeopleResponse res = new GetPeopleResponse();
         String nodeType = null;
@@ -1402,6 +1641,17 @@ public class UserManagerService extends ServiceBase {
         svc_mongoUtil.createPublicNodes();
     }
 
+    /**
+     * Creates a new user account with the specified details.
+     *
+     * @param newUserName the username for the new account
+     * @param email the email address for the new account
+     * @param password the password for the new account
+     * @param automated a flag indicating if the account creation is automated
+     * @param postsNodeVal a container for the posts node of the new user
+     * @return the created AccountNode
+     * @throws RuntimeEx if the user already exists or if the username is "admin"
+     */
     public AccountNode createUser(String newUserName, String email, String password, boolean automated,
             Val<SubNode> postsNodeVal) {
         AccountNode userNode = svc_user.getAccountByUserNameAP(newUserName);

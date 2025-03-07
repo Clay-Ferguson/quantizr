@@ -37,6 +37,13 @@ public class OpenGraphService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves the OpenGraph data for a given URL. If the URL has been previously cached, the cached
+     * data is returned. Otherwise, the OpenGraph data is parsed from the URL and cached for future use.
+     *
+     * @param url the URL to retrieve OpenGraph data for
+     * @return the OpenGraph data for the given URL
+     */
     public OpenGraph getOpenGraph(String url) {
         url = XString.stripIfEndsWith(url, "/");
         url = XString.stripIfEndsWith(url, "\\");
@@ -69,6 +76,13 @@ public class OpenGraphService extends ServiceBase {
         return openGraph;
     }
 
+    /**
+     * Parses the Open Graph metadata from the given URL.
+     *
+     * @param urlStr the URL of the web page to parse
+     * @return an OpenGraph object containing the parsed metadata
+     * @throws Exception if an error occurs while connecting to the URL or parsing the document
+     */
     public OpenGraph parseOpenGraph(String urlStr) throws Exception {
         OpenGraph openGraph = new OpenGraph();
         Connection con = Jsoup.connect(urlStr);

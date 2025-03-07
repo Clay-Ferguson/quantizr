@@ -124,6 +124,16 @@ public class MongoRead extends ServiceBase {
         return false;
     }
 
+    /**
+     * Retrieves the count of child elements for a given path.
+     * 
+     * This method first checks if the specified path has no children using the `noChildren` method. If
+     * there are no children, it returns 0 immediately. Otherwise, it constructs a query to count the
+     * number of child elements.
+     * 
+     * @param path the path for which to count child elements
+     * @return the number of child elements for the specified path
+     */
     public long getChildCount(String path) {
         // statistically I think it pays off to always try the faster way and then assume worst case is that
         // we might have warmed up the MongoDb for what the following query will need.
@@ -136,6 +146,16 @@ public class MongoRead extends ServiceBase {
         return svc_ops.count(q);
     }
 
+    /**
+     * Retrieves the recursive count of child nodes for a given path.
+     * 
+     * This method first checks if the given path has no children using the `noChildren` method. If
+     * there are no children, it returns 0. Otherwise, it constructs a query to count the number of
+     * child nodes recursively.
+     * 
+     * @param path the path for which to count child nodes
+     * @return the number of child nodes recursively
+     */
     public long getChildCountRecursive(String path) {
         // statistically I think it pays off to always try the faster way and then assume worst case is that
         // we might have warmed up the MongoDb for what the following query will need.
@@ -148,6 +168,17 @@ public class MongoRead extends ServiceBase {
         return svc_ops.count(q);
     }
 
+    /**
+     * Determines if the given node has any children.
+     * 
+     * This method first checks if the node already has a known children status (non-null value). If so,
+     * it returns that value. Otherwise, it checks if there are any direct children of the node by
+     * examining its path, updates the node's children status, and saves the node if it is marked as
+     * dirty.
+     * 
+     * @param node the node to check for children
+     * @return true if the node has children, false otherwise
+     */
     public boolean hasChildren(SubNode node) {
         // if the node knows it's children status (non-null value) return that.
         if (SubNode.USE_HAS_CHILDREN && node.getHasChildren() != null) {
@@ -279,6 +310,17 @@ public class MongoRead extends ServiceBase {
      *
      * 2) "userName:nodeName" (a named node some user has created)
      */
+
+    /**
+     * Retrieves a SubNode by its name. The name can be in two formats: 1. A global name without a user
+     * prefix. 2. A name with a user prefix in the format 'userName:nodeName'.
+     *
+     * @param name The name of the node to retrieve. Can be in the format 'userName:nodeName' or just
+     *        'nodeName'.
+     * @param accntNode An optional output parameter to hold the AccountNode if the name contains a user
+     *        prefix.
+     * @return The SubNode corresponding to the given name, or null if no such node is found.
+     */
     public SubNode getNodeByName(String name, Val<SubNode> accntNode) {
         Query q = new Query();
         if (name == null)
@@ -341,6 +383,16 @@ public class MongoRead extends ServiceBase {
      * 5) name of an admin-owned node formatted as ":nodeName"
      * 6) access node by type '~typeName' (admin account) or '~userName~typeName' (user account)
      * </pre>
+     *
+     * Retrieves a SubNode based on the provided identifier.
+     *
+     * @param identifier The identifier of the node. This can be: - A tilde-prefixed identifier ("~")
+     *        indicating a user node by type. - A colon-prefixed identifier (":") indicating a node
+     *        name. - A slash-prefixed identifier ("/") indicating a node path. - A plain identifier
+     *        indicating a node ID.
+     * @param accntNode An optional Val<SubNode> object that may be used in some lookup cases.
+     * @return The SubNode corresponding to the identifier, or null if not found.
+     * @throws RuntimeException If the identifier is the root node ("/").
      */
     public SubNode getNode(String identifier, Val<SubNode> accntNode) {
         if (identifier == null)
@@ -399,6 +451,14 @@ public class MongoRead extends ServiceBase {
         return findNodeByPath(path, SubNode.class);
     }
 
+    /**
+     * Finds a node by its path.
+     *
+     * @param <T> the type of the node extending SubNode
+     * @param path the path of the node to find
+     * @param clazz the class type of the node
+     * @return the node found at the specified path, or null if no node is found
+     */
     public <T extends SubNode> T findNodeByPath(String path, Class<T> clazz) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
@@ -449,6 +509,16 @@ public class MongoRead extends ServiceBase {
         return getNode(parentPath);
     }
 
+    /**
+     * Retrieves the IDs of the children nodes of the specified node.
+     *
+     * @param node the parent node whose children IDs are to be retrieved
+     * @param ordered if true, the children IDs will be returned in ascending order based on their
+     *        ordinal value
+     * @param limit the maximum number of children IDs to retrieve; if null, no limit is applied
+     * @return a list of IDs of the children nodes of the specified node; if the node has no children,
+     *         an empty list is returned
+     */
     public List<String> getChildrenIds(SubNode node, boolean ordered, Integer limit) {
         if (noChildren(node)) {
             return Collections.<String>emptyList();
@@ -481,9 +551,22 @@ public class MongoRead extends ServiceBase {
         return nodeIds;
     }
 
-    /*
+    /**
+     * Retrieves the children nodes of a given path with optional sorting, limiting, skipping, and
+     * criteria.
+     *
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node.
+     * 
+     * @param path The path of the parent node whose children are to be retrieved.
+     * @param sort The sorting criteria to apply to the results.
+     * @param limit The maximum number of children to retrieve.
+     * @param skip The number of children to skip before starting to retrieve.
+     * @param textCriteria Additional text-based criteria to filter the children.
+     * @param moreCriteria Additional criteria to filter the children.
+     * @param preCheck If true, performs a preliminary check to see if the parent node has any children.
+     * @return An iterable collection of SubNode objects representing the children of the specified
+     *         path.
      */
     public Iterable<SubNode> getChildren(String path, Sort sort, Integer limit, int skip, TextCriteria textCriteria,
             Criteria moreCriteria, boolean preCheck) {
@@ -564,6 +647,13 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    /**
+     * Retrieves the minimum ordinal value of the children of the specified node. If the node has no
+     * children, returns 0.
+     *
+     * @param node the parent node whose minimum child ordinal is to be found
+     * @return the minimum ordinal value of the children, or 0 if there are no children
+     */
     public Long getMinChildOrdinal(SubNode node) {
         if (noChildren(node))
             return 0L;
@@ -580,8 +670,14 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
-    // if 'parent' of 'node' is known it should be passed in, or else null passed in, and parent will be
-    // looked up instead
+    /**
+     * Retrieves the sibling node that is immediately above the given node in the ordinal order.
+     *
+     * @param node The node for which the sibling above is to be found.
+     * @param parent The parent node of the given node. If null, the parent will be determined
+     *        automatically.
+     * @return The sibling node above the given node, or null if no such sibling exists.
+     */
     public SubNode getSiblingAbove(SubNode node, SubNode parent) {
         if (parent == null) {
             parent = getParent(node);
@@ -604,8 +700,15 @@ public class MongoRead extends ServiceBase {
         return svc_ops.findOne(q);
     }
 
-    // if 'parent' of 'node' is known it should be passed in, or else null passed in, and parent will be
-    // looked up instead
+    /**
+     * Retrieves the sibling node that is immediately below the given node in the ordinal order.
+     *
+     * @param node The current node for which the sibling below is to be found.
+     * @param parent The parent node of the current node. If null, the parent will be determined
+     *        automatically.
+     * @return The sibling node that is immediately below the given node, or null if no such sibling
+     *         exists.
+     */
     public SubNode getSiblingBelow(SubNode node, SubNode parent) {
         if (parent == null) {
             parent = getParent(node);
@@ -676,6 +779,26 @@ public class MongoRead extends ServiceBase {
      * prop is optional and if non-null means we should search only that one field.
      *
      * timeRangeType: futureOnly, pastOnly, pastDue, all
+     */
+    /**
+     * Searches the subgraph of a given node based on various criteria.
+     *
+     * @param node The root node of the subgraph to search.
+     * @param prop The property to search within.
+     * @param text The text to search for.
+     * @param sortField The field to sort the results by.
+     * @param sortDir The direction to sort the results (ASC or DESC).
+     * @param limit The maximum number of results to return.
+     * @param skip The number of results to skip.
+     * @param fuzzy Whether to use fuzzy search.
+     * @param caseSensitive Whether the search should be case sensitive.
+     * @param timeRangeType The type of time range to filter by (e.g., futureOnly, today, pastOnly,
+     *        overdue, all).
+     * @param recursive Whether to search recursively through the subgraph.
+     * @param requirePriority Whether to filter results to only those with a priority greater than 0.
+     * @param requireAttachment Whether to filter results to only those with attachments.
+     * @param requireDate Whether to filter results to only those with a date property.
+     * @return An iterable collection of SubNode objects that match the search criteria.
      */
     public Iterable<SubNode> searchSubGraph(SubNode node, String prop, String text, String sortField, String sortDir,
             int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
@@ -840,6 +963,17 @@ public class MongoRead extends ServiceBase {
         return svc_ops.find(q);
     }
 
+    /**
+     * Executes a MongoDB aggregation query to retrieve SubNode documents in a specific tree depth
+     * order.
+     *
+     * @param limit the maximum number of documents to return
+     * @param skip the number of documents to skip before starting to return documents
+     * @param ands a list of additional criteria to apply to the query
+     * @param textCriteria the text criteria for full-text search, if any
+     * @param sort the sorting criteria to apply to the query
+     * @return an iterable collection of SubNode documents that match the query criteria
+     */
     private Iterable<SubNode> queryByTreeDepthOrder(int limit, int skip, List<Criteria> ands, TextCriteria textCriteria,
             Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
@@ -867,6 +1001,17 @@ public class MongoRead extends ServiceBase {
         return results.getMappedResults();
     }
 
+    /**
+     * Executes a MongoDB aggregation query to retrieve a list of SubNode objects ordered by content
+     * length. The query can include additional criteria and full-text search criteria.
+     *
+     * @param limit the maximum number of results to return
+     * @param skip the number of results to skip
+     * @param ands a list of additional criteria to apply to the query
+     * @param textCriteria the full-text search criteria to apply, if any
+     * @param sort the sorting criteria to apply to the results
+     * @return an iterable collection of SubNode objects that match the query criteria
+     */
     private Iterable<SubNode> queryByConentLenOrder(int limit, int skip, List<Criteria> ands, TextCriteria textCriteria,
             Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
@@ -894,6 +1039,15 @@ public class MongoRead extends ServiceBase {
         return results.getMappedResults();
     }
 
+    /**
+     * Retrieves an iterable collection of SubNode objects that are linked to a specified node and match
+     * a given search criteria.
+     *
+     * @param nodeId the ID of the node to search for linked nodes
+     * @param search the name of the link to match
+     * @return an iterable collection of SubNode objects that are linked to the specified node and match
+     *         the given search criteria
+     */
     public Iterable<SubNode> getLinkedNodes(String nodeId, String search) {
         SubNode node = getNode(nodeId);
 
@@ -913,6 +1067,14 @@ public class MongoRead extends ServiceBase {
         return svc_ops.find(q);
     }
 
+    /**
+     * Retrieves an iterable collection of SubNode objects that have a specific nodeId in their links.
+     * The results are filtered based on read security criteria and sorted by modification time in
+     * descending order.
+     *
+     * @param nodeId the ID of the node to search for in the links of SubNode objects.
+     * @return an iterable collection of SubNode objects matching the criteria.
+     */
     public Iterable<SubNode> getRdfSubjects(String nodeId) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.LINKS).elemMatch(Criteria.where(NodeLink.ID).is(nodeId));
@@ -995,6 +1157,15 @@ public class MongoRead extends ServiceBase {
      * not existing. Caller can pass userNode if its available, or else userName will be used to look it
      * up
      */
+    /**
+     * Finds a node by user and type.
+     *
+     * @param node The node to search within.
+     * @param userNode The account node of the user. If null, it will be fetched using the userName.
+     * @param userName The username of the user.
+     * @param type The type of the node to find.
+     * @return The found SubNode, or null if no matching node is found.
+     */
     public SubNode findNodeByUserAndType(SubNode node, AccountNode userNode, String userName, String type) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
@@ -1013,8 +1184,12 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
+    /**
+     * Finds a child SubNode of the given node that matches the specified type.
+     *
+     * @param node the parent node to search within
+     * @param type the type of the child node to find
+     * @return the first SubNode that matches the specified type, or null if no matching child is found
      */
     public SubNode findSubNodeByType(SubNode node, String type) {
         if (noChildren(node)) {
@@ -1051,6 +1226,17 @@ public class MongoRead extends ServiceBase {
         return svc_ops.count(q);
     }
 
+    /**
+     * Constructs a MongoDB query to find nodes of a specific type under a given path.
+     *
+     * @param node The root node under which to search for nodes.
+     * @param type The type of nodes to search for.
+     * @param recursive If true, the search will include all descendant nodes; otherwise, only direct
+     *        children.
+     * @param sort The sorting criteria for the query results, or null for no sorting.
+     * @param limit The maximum number of results to return, or null for no limit.
+     * @return A Query object representing the constructed MongoDB query.
+     */
     public Query typedNodesUnderPath_query(SubNode node, String type, boolean recursive, Sort sort, Integer limit) {
         Query q = new Query();
         Criteria crit = recursive ? svc_mongoUtil.subGraphCriteria(node.getPath())
@@ -1118,8 +1304,15 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    // Starts at 'leafId' node and goes up the tree to build a linear chain of nodes parent by parent
-    // until get get to root of what this user can access or else the first "noexport" node.
+    /**
+     * Constructs a tree structure representing the thread graph starting from the specified leaf node.
+     *
+     * Starts at 'leafId' node and goes up the tree to build a linear chain of nodes parent by parent //
+     * until get get to root of what this user can access or else the first "noexport" node.
+     * 
+     * @param leafId the ID of the leaf node from which to start building the thread graph tree
+     * @return the root of the constructed thread graph tree
+     */
     public TreeNode getThreadGraphTree(String leafId) {
         SubNode curNode = getNode(leafId);
         TreeNode curTreeNode = new TreeNode(curNode);
@@ -1147,6 +1340,20 @@ public class MongoRead extends ServiceBase {
     }
 
     // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
+    /**
+     * Constructs a tree structure of nodes starting from a specified root node, optionally filtered by
+     * criteria and search definitions.
+     *
+     * @param rootId The ID of the root node from which to start building the tree.
+     * @param criteria Criteria to filter the nodes in the subgraph.
+     * @param idMap A map to store the relationship between node IDs and their corresponding TreeNode
+     *        objects.
+     * @param def Search definition to filter nodes based on search criteria and include their
+     *        ancestors.
+     * @return The root TreeNode of the constructed tree.
+     * @throws RuntimeEx If the root node cannot be accessed or if the number of nodes exceeds the
+     *         maximum allowed size.
+     */
     public TreeNode getSubGraphTree(String rootId, Criteria criteria, HashMap<String, TreeNode> idMap,
             SearchDefinition def) {
         SubNode rootNode = getNode(new ObjectId(rootId));
@@ -1237,6 +1444,14 @@ public class MongoRead extends ServiceBase {
         return rootTreeNode;
     }
 
+    /**
+     * Retrieves a flat list of sub-nodes starting from a given root node.
+     *
+     * @param rootId The ID of the root node from which to start the sub-graph traversal.
+     * @param includeComments A boolean flag indicating whether to include comment nodes in the result.
+     * @param def The search definition containing criteria for filtering nodes.
+     * @return A list of sub-nodes in a flat structure.
+     */
     public List<SubNode> getFlatSubGraph(final String rootId, boolean includeComments, SearchDefinition def) {
         LinkedList<SubNode> doc = new LinkedList<>();
         Criteria typeCriteria = null;
@@ -1249,6 +1464,14 @@ public class MongoRead extends ServiceBase {
         return doc;
     }
 
+    /**
+     * Traverses a tree structure starting from the given TreeNode and adds each node to the provided
+     * LinkedList. The nodes are added in a depth-first manner, and children nodes are sorted by their
+     * ordinal value before traversal.
+     * 
+     * @param tn The root TreeNode from which to start the traversal.
+     * @param doc The LinkedList to which the nodes will be added.
+     */
     void traverseTree(TreeNode tn, LinkedList<SubNode> doc) {
         doc.add(tn.node);
 

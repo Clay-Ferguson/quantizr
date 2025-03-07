@@ -39,6 +39,17 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
     }
 
     // WARNING: Using @ApplicationEvent here doesn't work for some reason, so don't try that.
+    /**
+     * Handles the ContextClosedEvent to perform a graceful shutdown of the application.
+     * <p>
+     * This method is triggered when the application context is closed. It ensures that any ongoing
+     * transactions are completed, pauses the connector, and attempts to shut down the executor service
+     * gracefully within a specified timeout period. If the executor service does not shut down within
+     * the timeout, a warning is logged and the shutdown proceeds forcefully.
+     * </p>
+     *
+     * @param event the ContextClosedEvent indicating that the application context is closing
+     */
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         log.debug("GracefulShudown: ContextClosedEvent");

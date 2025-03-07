@@ -12,6 +12,16 @@ import quanta.service.AclService;
 public class ExportUtil {
     private static Logger log = LoggerFactory.getLogger(ExportUtil.class);
 
+    /**
+     * Replaces placeholders in the content with figure numbers based on the provided tree items.
+     * 
+     * This method searches for patterns in the content that match the format {{figure:[node_name]}}. It
+     * then replaces these patterns with the corresponding figure numbers from the tree items.
+     * 
+     * @param treeItemsByNodeName A HashMap containing TreeNode objects indexed by their node names.
+     * @param content The content string in which the placeholders will be replaced.
+     * @return The content string with the placeholders replaced by the corresponding figure numbers.
+     */
     public static String injectFigureLinks(HashMap<String, TreeNode> treeItemsByNodeName, String content) {
         // using regex we find the pattern {{figure:[node_name]}} and iterate over all of them where the
         // [node_name]
@@ -54,8 +64,17 @@ public class ExportUtil {
         return content;
     }
 
-    // This method is used to pre-process the tree and set the figNumStart for each node
-    // and returns the current global figNumStart.
+    /**
+     * Pre-processes a tree of nodes, assigning figure numbers to nodes with attachments, checking for
+     * public access if required, and collecting nodes by their names.
+     *
+     * @param treeItemsByNodeName A map to collect nodes by their names.
+     * @param figNumStart The starting figure number to assign to nodes with attachments.
+     * @param root The root node of the tree to process.
+     * @param requirePublic If true, only public nodes are processed; otherwise, an exception is thrown.
+     * @return The next figure number to be assigned after processing the tree.
+     * @throws MessageException If requirePublic is true and a non-public node is encountered.
+     */
     public static int prePocessTree(HashMap<String, TreeNode> treeItemsByNodeName, int figNumStart, TreeNode root,
             boolean requirePublic) {
         // if we're publishing and this node is NOT public then throw exception

@@ -59,6 +59,13 @@ import quanta.util.XString;
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
+    /**
+     * Handles the like or unlike action for a node.
+     * 
+     * @param req the request containing the node ID and the like/unlike action
+     * @return a response indicating the result of the like/unlike action
+     * @throws RuntimeEx if the node with the specified ID cannot be found
+     */
     public LikeNodeResponse likeNode(LikeNodeRequest req) {
         MongoTranMgr.ensureTran();
         LikeNodeResponse res = new LikeNodeResponse();
@@ -93,6 +100,13 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Saves the node based on the provided request.
+     *
+     * @param req the request containing the node information to be saved
+     * @return the response containing the saved node information
+     * @throws RuntimeEx if the text length exceeds 64K or if the node name is invalid or already in use
+     */
     public SaveNodeResponse saveNode(SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();
         NodeInfo nodeInfo = req.getNode();
@@ -225,6 +239,13 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Toggles the expanded state of a node based on the user's current state or the default state of
+     * the node.
+     *
+     * @param req the request containing the node ID for which the expanded state is to be toggled
+     * @return a response containing the updated node information with the new expanded state
+     */
     public SetExpandedResponse cm_toggleExpanded(SetExpandedRequest req) {
         SetExpandedResponse res = new SetExpandedResponse();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
@@ -356,6 +377,12 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Links a source node to a target node by creating a new link and adding it to the source node.
+     *
+     * @param req the request containing the source node ID, target node ID, link name, and embed flag
+     * @return a response indicating the result of the link operation
+     */
     public LinkNodesResponse cm_linkNodes(LinkNodesRequest req) {
         LinkNodesResponse res = new LinkNodesResponse();
         SubNode sourceNode = svc_mongoRead.getNode(req.getSourceNodeId());
@@ -401,6 +428,14 @@ public class NodeEditService extends ServiceBase {
         return new UpdateHeadingsResponse();
     }
 
+    /**
+     * Translates the headings in the given node content to the specified level.
+     * 
+     * @param nodeContent the content of the node, which may contain headings
+     * @param level the level to which the headings should be translated (0-5)
+     * @return the node content with headings translated to the specified level, or null if the input is
+     *         null
+     */
     public String translateHeadingsForLevel(final String nodeContent, int level) {
         if (level < 0) {
             level = 0;
@@ -478,6 +513,13 @@ public class NodeEditService extends ServiceBase {
         return ret.toString().trim();
     }
 
+    /**
+     * Modifies a subgraph of nodes based on the provided request.
+     *
+     * @param req the request containing the details for modifying the subgraph
+     * @return a response indicating the number of nodes that were updated
+     * @throws RuntimeEx if the target set specified in the request is invalid
+     */
     public ModifySubGraphResponse modifySubGraph(ModifySubGraphRequest req) {
         MongoTranMgr.ensureTran();
         ModifySubGraphResponse res = new ModifySubGraphResponse();
@@ -518,9 +560,14 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    /*
+    /**
+     * Performs a search and replace operation on a node and optionally its subgraph.
+     * 
      * todo-3: we should be using a bulk update in here and using a streaming resultset instead of
      * holding it all in memory
+     * 
+     * @param req the request containing the search and replace parameters
+     * @return a response indicating the number of nodes that were updated
      */
     public SearchAndReplaceResponse searchAndReplace(SearchAndReplaceRequest req) {
         MongoTranMgr.ensureTran();
@@ -555,6 +602,16 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Processes hashtags for a given node based on the specified action.
+     *
+     * @param node the node to process hashtags for
+     * @param hashtags a space-separated string of hashtags to add or remove
+     * @param action the action to perform, either "addHashtags", "removeHashtags", or
+     *        "clearAllHashtags"
+     * @return true if the node's tags were changed, false otherwise
+     * @throws RuntimeEx if an invalid action is specified
+     */
     private boolean processHashtags(SubNode node, String hashtags, String action) {
         if (action.equals("clearAllHashtags")) {
             node.setTags(null);
@@ -613,6 +670,15 @@ public class NodeEditService extends ServiceBase {
         return changed;
     }
 
+    /**
+     * Replaces occurrences of a specified search string with a replacement string in the content of a
+     * given node.
+     *
+     * @param node the node whose content is to be modified
+     * @param search the string to search for in the node's content
+     * @param replace the string to replace the search string with
+     * @return true if the search string was found and replaced; false otherwise
+     */
     private boolean replaceText(SubNode node, String search, String replace) {
         String content = node.getContent();
         if (content == null)
@@ -651,6 +717,18 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Initializes the node editing process.
+     *
+     * @param req the request object containing the node ID and other parameters
+     * @return the response object containing the node information or an error message
+     *
+     *         This method handles the initialization of node editing. If the request indicates that the
+     *         user wants to edit their friend node, it retrieves the friend node ID based on the
+     *         provided node ID. It then fetches the node from the database and checks if the node
+     *         exists. If the node is found, it verifies the user's authorization to edit the node and
+     *         converts the node to a NodeInfo object to be included in the response.
+     */
     public InitNodeEditResponse cm_initNodeEdit(InitNodeEditRequest req) {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();

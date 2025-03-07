@@ -13,6 +13,15 @@ public class GifSequenceWriter {
     protected ImageWriteParam params;
     protected IIOMetadata metadata;
 
+    /**
+     * Constructs a GifSequenceWriter.
+     *
+     * @param out the ImageOutputStream to write the GIF to
+     * @param imageType the type of images to be written (e.g., BufferedImage.TYPE_INT_ARGB)
+     * @param delay the delay time between frames in milliseconds
+     * @param loop whether the GIF should loop continuously (true) or not (false)
+     * @throws IOException if an I/O error occurs during writing
+     */
     public GifSequenceWriter(ImageOutputStream out, int imageType, int delay, boolean loop) throws IOException {
         writer = ImageIO.getImageWritersBySuffix("gif").next();
         params = writer.getDefaultWriteParam();
@@ -26,6 +35,13 @@ public class GifSequenceWriter {
         writer.prepareWriteSequence(null);
     }
 
+    /**
+     * Configures the root metadata for a GIF image.
+     *
+     * @param delay the delay time between frames in hundredths of a second
+     * @param loop whether the GIF should loop continuously (true) or not (false)
+     * @throws IIOInvalidTreeException if the metadata tree cannot be modified
+     */
     private void configureRootMetadata(int delay, boolean loop) throws IIOInvalidTreeException {
         String metaFormatName = metadata.getNativeMetadataFormatName();
         IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(metaFormatName);

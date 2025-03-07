@@ -33,9 +33,13 @@ public class CryptoService extends ServiceBase {
 
     public CryptoService() {}
 
-    /*
-     * some day we need to find a cleaner way to parse JWK, but this seems to be the best solution
-     * everyone is using based on my google searches.
+    /**
+     * Parses a JSON Web Key (JWK) from a JSON string and returns the corresponding RSA public key. Some
+     * day we need to find a cleaner way to parse JWK, but this seems to be the best solution everyone
+     * is using based on my google searches.
+     *
+     * @param jwkJson the JSON string representing the JWK
+     * @return the RSA public key, or null if the JWK could not be parsed
      */
     public PublicKey parseJWK(String jwkJson) {
         PublicKey pubKey = null;
@@ -120,6 +124,12 @@ public class CryptoService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Saves the public keys for the current user.
+     *
+     * @param req the request containing the public keys to be saved
+     * @return a response indicating the result of the save operation
+     */
     public SavePublicKeyResponse cm_savePublicKeys(SavePublicKeyRequest req) {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = TL.getSC().getUserName();

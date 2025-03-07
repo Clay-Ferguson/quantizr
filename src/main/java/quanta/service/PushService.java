@@ -20,12 +20,15 @@ import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class PushService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(PushService.class);
 
-    /*
+    /**
      * Notify all users being shared to on this node, or everyone if the node is public.
+     *
+     * @param sessionsPushed A set of session IDs that have already been pushed to.
+     * @param node The node that has been updated.
      */
     public void pushNodeUpdateToBrowsers(HashSet<String> sessionsPushed, SubNode node) {
         svc_async.run(() -> {
@@ -59,8 +62,19 @@ public class PushService extends ServiceBase {
         });
     }
 
-    private void maybePushToBrowser(HashSet<String> sessionsPushed, SubNode node,
-            HashSet<String> usersSharedToSet, boolean isPublic, SessionContext sc) {
+    /**
+     * Determines whether to push updates to the browser based on the session context and node
+     * ownership.
+     *
+     * @param sessionsPushed A set of session tokens that have already been pushed to, to avoid
+     *        redundant pushes.
+     * @param node The node that may be pushed to the browser.
+     * @param usersSharedToSet A set of usernames that the node is shared with.
+     * @param isPublic A flag indicating if the node is public.
+     * @param sc The session context containing user and session information.
+     */
+    private void maybePushToBrowser(HashSet<String> sessionsPushed, SubNode node, HashSet<String> usersSharedToSet,
+            boolean isPublic, SessionContext sc) {
         // if we know we already just pushed to this session, we can skip it in here.
         if (sessionsPushed != null && sessionsPushed.contains(sc.getUserToken())) {
             return;
@@ -97,13 +111,21 @@ public class PushService extends ServiceBase {
         }
     }
 
+    /**
+     * Pushes a notification message to the browser for a given session context and node.
+     *
+     * @param sc the session context containing user session information
+     * @param sessionsPushed a set of session tokens that have already been pushed to, to avoid
+     *        duplicate pushes
+     * @param node the node to be converted to NodeInfo and pushed to the browser
+     */
     public void pushToBrowser(SessionContext sc, HashSet<String> sessionsPushed, SubNode node) {
         if (sessionsPushed != null && sessionsPushed.contains(sc.getUserToken())) {
             return;
         }
 
         // build our push message payload
-        NodeInfo info = svc_convert.toNodeInfo( false, sc, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
+        NodeInfo info = svc_convert.toNodeInfo(false, sc, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
                 false, true, null);
 
         if (info != null) {
@@ -117,6 +139,14 @@ public class PushService extends ServiceBase {
         }
     }
 
+    /**
+     * Pushes information to the client associated with the given session context. If the current
+     * replica is not the one the client is connected to, the information is published to Redis PubSub
+     * for the correct replica to handle.
+     *
+     * @param sc the session context containing user session information
+     * @param info the information to be pushed to the client
+     */
     public void pushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
         if (sc == null) {
@@ -156,6 +186,14 @@ public class PushService extends ServiceBase {
         }
     }
 
+    /**
+     * Attempts to push a message to the browser if the current instance is the correct replica.
+     *
+     * @param rinfo The information about the browser push, including the token and payload. The token
+     *        is used to retrieve the corresponding SseEmitter. The payload contains the data to be
+     *        pushed to the browser.
+     * @throws RuntimeEx if there is an error while processing the payload or pushing the information.
+     */
     public void maybePushToBrowser(RedisBrowserPushInfo rinfo) {
         SseEmitter emitter = UserManagerService.pushEmitters.get(rinfo.getToken());
 
@@ -172,12 +210,19 @@ public class PushService extends ServiceBase {
         }
     }
 
+    /**
+     * Pushes information to a client session identified by the given token.
+     *
+     * @param token the token identifying the client session
+     * @param info the information to be pushed to the client session
+     */
     public void pushInfo(String token, ServerPushInfo info) {
         svc_async.run(() -> {
             SessionContext sc = svc_redis.get(token);
             if (sc == null) {
-                // todo-2: We were getting this a LOT in the log file, just from outdated sessions (i think) so let's ignore it for now.
-                // throw new RuntimeEx("bad token for push emitter: " + token); 
+                // todo-2: We were getting this a LOT in the log file, just from outdated sessions (i think) so
+                // let's ignore it for now.
+                // throw new RuntimeEx("bad token for push emitter: " + token);
                 return;
             }
             SseEmitter pushEmitter = svc_user.getPushEmitter(token);

@@ -70,6 +70,14 @@ public class NodeSearchService extends ServiceBase {
      */
     private static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
+    /**
+     * Renders a document based on the provided request.
+     *
+     * @param req the request containing the details for rendering the document, including the search
+     *        definition and root node ID.
+     * @return a response containing the rendered document, search results, and breadcrumbs.
+     * @throws RuntimeEx if the root node specified in the request is not found.
+     */
     public RenderDocumentResponse cm_renderDocument(RenderDocumentRequest req) {
         SearchDefinition def = req.getSearchDefinition();
         if (def != null && !StringUtils.isEmpty(def.getName())) {
@@ -101,6 +109,24 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Searches for nodes based on the provided search request.
+     *
+     * @param req the search request containing search criteria and options
+     * @return a response containing the search results and related information
+     * @throws RuntimeEx if the search request is invalid or if an error occurs during the search
+     *
+     *         The search can be performed based on different properties of the nodes: - If the search
+     *         property is "node.id", it searches for a node with the specified ID. - If the search
+     *         property is "node.name", it searches for a node with the specified name. - If the search
+     *         type is linked nodes, RDF subjects, or users, it performs the corresponding specialized
+     *         search. - Otherwise, it performs a general subgraph search based on the search text and
+     *         other criteria.
+     *
+     *         The method also handles saving the search definition if provided, and it supports various
+     *         search options such as sorting, pagination, fuzzy search, case sensitivity, and filtering
+     *         by different node attributes.
+     */
     public NodeSearchResponse cm_search(NodeSearchRequest req) {
         SearchDefinition def = req.getSearchDefinition();
         if (def != null && !StringUtils.isEmpty(def.getName())) {
@@ -206,6 +232,13 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Saves the given search definition for the currently signed-in user. If a search definition with
+     * the same name already exists, it will be replaced. Otherwise, the new search definition will be
+     * added to the user's list of search definitions.
+     *
+     * @param def the search definition to save
+     */
     private void saveSearchDefinition(SearchDefinition def) {
         // lookup user node for the signed in user
         AccountNode userNode = svc_user.getSessionUserAccount();
@@ -241,6 +274,12 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
+    /**
+     * Searches for nodes linked to a specified node and adds the search results to the response.
+     *
+     * @param req the request containing the search criteria and node ID
+     * @param res the response object to which search results will be added
+     */
     private void searchLinkedNodes(NodeSearchRequest req, NodeSearchResponse res) {
         SearchDefinition def = req.getSearchDefinition();
         int counter = 0;
@@ -257,6 +296,12 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
+    /**
+     * Searches for RDF subjects based on the provided request and adds the results to the response.
+     *
+     * @param req the request containing the node ID to search for RDF subjects
+     * @param res the response object to which the search results will be added
+     */
     private void searchRdfSubjects(NodeSearchRequest req, NodeSearchResponse res) {
         int counter = 0;
         for (SubNode node : svc_mongoRead.getRdfSubjects(req.getNodeId())) {
@@ -272,6 +317,14 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
+    /**
+     * Performs a user search based on the provided search request and populates the search results.
+     * This method runs with administrative privileges to access account nodes.
+     *
+     * @param userDoingAction The username of the user performing the action.
+     * @param req The search request containing the search definition and pagination information.
+     * @param searchResults The list to be populated with the search results.
+     */
     private void userSearch(String userDoingAction, NodeSearchRequest req, List<NodeInfo> searchResults) {
         SearchDefinition def = req.getSearchDefinition();
         int counter = 0;
@@ -309,6 +362,19 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
+    /**
+     * Retrieves shared nodes based on the specified request parameters.
+     *
+     * @param req the request containing parameters for retrieving shared nodes
+     * @return a response containing the list of shared nodes
+     *
+     *         The method searches for shared nodes under the account root of the current user. It
+     *         supports filtering by share target and access options (read/write). The search results
+     *         are paginated based on the page number and rows per page specified in the request.
+     *
+     *         Note: The method currently searches only under the account root. Future enhancements may
+     *         include searching under a selected node or globally.
+     */
     public GetSharedNodesResponse cm_getSharedNodes(GetSharedNodesRequest req) {
         GetSharedNodesResponse res = new GetSharedNodesResponse();
         List<NodeInfo> searchResults = new LinkedList<>();
@@ -360,6 +426,12 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Deletes a search definition from the user's search definitions.
+     *
+     * @param req the request containing the name of the search definition to delete
+     * @return a response containing the updated list of search definitions
+     */
     public DeleteSearchDefResponse cm_deleteSearchDef(DeleteSearchDefRequest req) {
         DeleteSearchDefResponse res = new DeleteSearchDefResponse();
         SubNode userNode = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
@@ -386,6 +458,16 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves the search definitions for the current user.
+     *
+     * @param req the request object containing any necessary parameters
+     * @return a response object containing the list of search definitions
+     * 
+     *         This method fetches the user node from the database and retrieves the search definitions
+     *         stored in the user's properties. It removes any null entries from the list and sorts the
+     *         search definitions by name before returning them in the response.
+     */
     public GetSearchDefsResponse cm_getSearchDefs(GetSearchDefsRequest req) {
         GetSearchDefsResponse res = new GetSearchDefsResponse();
         SubNode userNode = svc_mongoRead.getNode(TL.getSC().getUserNodeId());
@@ -405,6 +487,12 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves a list of bookmarks for the current user.
+     *
+     * @param req the request object containing parameters for retrieving bookmarks
+     * @return a GetBookmarksResponse object containing the list of bookmarks
+     */
     public GetBookmarksResponse cm_getBookmarks(GetBookmarksRequest req) {
         List<Bookmark> bookmarks = new LinkedList<>();
         List<SubNode> bookmarksNode = svc_user.getSpecialNodesList(null, NodeType.BOOKMARK_LIST.s(), null, true, null);
@@ -440,6 +528,12 @@ public class NodeSearchService extends ServiceBase {
         int userShareCount = 0;
     }
 
+    /**
+     * Retrieves statistics for a specified node and its subgraph.
+     *
+     * @param req the request containing the node ID and options for retrieving words, tags, and votes
+     * @return a response containing the node statistics, top words, top votes, and top tags
+     */
     public GetNodeStatsResponse cm_getNodeStats(GetNodeStatsRequest req) {
         GetNodeStatsResponse res = new GetNodeStatsResponse();
         boolean countVotes = true;
@@ -539,6 +633,20 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Processes statistics for a given node.
+     *
+     * @param node The node to process.
+     * @param req The request containing parameters for getting node statistics.
+     * @param stats The statistics object to update.
+     * @param uniqueVoters A set of unique voter IDs.
+     * @param strictFiltering Whether strict filtering is enabled.
+     * @param uniqueUsersSharedTo A set of unique users the node is shared to.
+     * @param countVotes Whether to count votes.
+     * @param wordMap A map of words to their statistics.
+     * @param tagMap A map of tags to their statistics.
+     * @param voteMap A map of votes to their statistics.
+     */
     private void processStatsForNode(SubNode node, GetNodeStatsRequest req, Stats stats, //
             HashSet<ObjectId> uniqueVoters, boolean strictFiltering, HashSet<String> uniqueUsersSharedTo,
             boolean countVotes, HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap,

@@ -72,6 +72,14 @@ public class RedisService extends ServiceBase {
     // Note: This happens to be about the same as the session timeout, but doesn't need to be
     int redisService_runCount = 0;
 
+    /**
+     * Scheduled maintenance task that runs at a fixed delay. This method performs periodic maintenance
+     * operations on Redis sessions. It increments the run count, checks initialization status, and
+     * skips the first run. If there are active sessions, it checks their last active time and deletes
+     * sessions that have timed out based on the configured session timeout.
+     * 
+     * The method uses a Redis transaction to ensure atomicity of the delete operations.
+     */
     @Scheduled(fixedDelay = 60 * DateUtil.MINUTE_MILLIS)
     public void maintenance() {
         redisService_runCount++;

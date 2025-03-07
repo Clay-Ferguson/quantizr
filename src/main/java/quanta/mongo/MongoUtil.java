@@ -45,6 +45,8 @@ import quanta.util.val.Val;
 
 /**
  * Verious utilities related to MongoDB persistence
+ * 
+ * todo-0: all the index-related stuff in here needs to go in an index-specific utils class.
  */
 @Component
 public class MongoUtil extends ServiceBase {
@@ -57,6 +59,19 @@ public class MongoUtil extends ServiceBase {
      */
     static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOQSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
+    /**
+     * Validates the given SubNode object.
+     * 
+     * This method performs several checks and validations on the provided node: 1. Checks if the node
+     * is marked as dirty and logs a warning if it is. 2. Ensures the node has an owner. If not, throws
+     * a RuntimeException. 3. Ensures nodes of type ACCOUNT or REPO_ROOT do not have any sharing. If
+     * they do, throws a RuntimeException. 4. Ensures home nodes are always unpublished. 5. Fixes any
+     * attachments associated with the node. 6. Verifies and sets the parent path of the node.
+     * 
+     * @param node the SubNode object to be validated
+     * @throws RuntimeException if the node has no owner or if nodes of type ACCOUNT or REPO_ROOT have
+     *         sharing
+     */
     public static void validate(SubNode node) {
         if (TL.hasDirtyNode(node.getId())) {
             log.warn("DIRTY READ (onAfterLoad): " + node.getIdStr());
@@ -144,6 +159,16 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
+    /**
+     * Checks if a given path is available.
+     * 
+     * This method determines if the specified path is available for use by checking if the exact path
+     * exists or if any node starting with the specified path followed by a "/" exists, even if it is an
+     * orphaned node.
+     * 
+     * @param path the path to check for availability
+     * @return true if the path is available, false otherwise
+     */
     public boolean pathIsAvailable(String path) {
         Criteria crit = new Criteria();
         /*

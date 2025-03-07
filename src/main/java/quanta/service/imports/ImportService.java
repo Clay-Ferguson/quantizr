@@ -30,6 +30,16 @@ import quanta.util.XString;
 public class ImportService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
+    /**
+     * Streams an import of a file into a specified node.
+     *
+     * @param nodeId The ID of the target node where the file will be imported.
+     * @param uploadFiles An array of MultipartFile objects to be imported. Only a single file is
+     *        allowed.
+     * @return ResponseEntity with HTTP status OK if the import is successful.
+     * @throws RuntimeEx if the nodeId is not provided, the node is not found, the node has direct
+     *         children, multiple files are provided, or the file type is unsupported.
+     */
     public ResponseEntity<?> streamImport(String nodeId, MultipartFile[] uploadFiles) {
         MongoTranMgr.ensureTran();
         if (nodeId == null) {
@@ -102,10 +112,15 @@ public class ImportService extends ServiceBase {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /*
+    /**
+     * Imports JSON content into the system based on the provided request.
+     *
      * Assumes the node identified in 'req' contains JSON we create a subgraph under the node that's a
      * representation of the JSON, with each key/value pair (and/or array content) in the JSON being a
      * node.
+     * 
+     * @param req the request containing the node ID and type for the import operation
+     * @return an ImportJsonResponse containing the ID of the newly created node, if any
      */
     public ImportJsonResponse importJson(ImportJsonRequest req) {
         MongoTranMgr.ensureTran();
@@ -137,7 +152,15 @@ public class ImportService extends ServiceBase {
         return res;
     }
 
-    /* returns the new book node */
+    /**
+     * Traverses a map representing a table of contents (ToC) and constructs a hierarchical structure of
+     * nodes.
+     * 
+     * @param map A map containing the book's structure, including titles and chapters.
+     * @param parentNode The parent node to which the book node will be added.
+     * @param bookMasterPrompt An optional prompt providing the overall purpose of the book.
+     * @return The root node of the constructed book hierarchy, or null if required data is missing.
+     */
     public SubNode traverseToC(Map<String, Object> map, SubNode parentNode, String bookMasterPrompt) {
         String bookTitle = (String) map.get("title");
         if (bookTitle == null) {
@@ -220,6 +243,15 @@ public class ImportService extends ServiceBase {
         return bookNode;
     }
 
+    /**
+     * Traverses a map and creates a hierarchical structure of SubNode objects.
+     *
+     * @param map The map to traverse. Can contain nested maps and lists.
+     * @param parentNode The parent node to which the new nodes will be added.
+     * @param ordinal The ordinal value for ordering the nodes.
+     * @param level The current level of traversal, used for recursion depth.
+     * @return The newly created SubNode that represents the root of the traversed map.
+     */
     public SubNode traverseMap(Map<?, ?> map, SubNode parentNode, Long ordinal, int level) {
         if (map == null)
             return null;
@@ -250,6 +282,15 @@ public class ImportService extends ServiceBase {
         return newNode;
     }
 
+    /**
+     * Traverses a list and processes its elements, creating hierarchical nodes as needed.
+     *
+     * @param list the list to traverse
+     * @param parentNode the parent node to which new nodes will be added
+     * @param ordinal the ordinal position for the nodes
+     * @param level the current level of traversal
+     * @param listInList flag indicating if the current list is nested within another list
+     */
     private void traverseList(List<?> list, SubNode parentNode, Long ordinal, int level, boolean listInList) {
         if (list == null)
             return;
@@ -277,8 +318,19 @@ public class ImportService extends ServiceBase {
         }
     }
 
+    /**
+     * Adds a new JSON node as a child of the specified parent node.
+     *
+     * @param parentNode The parent node to which the new node will be added.
+     * @param content The content to be set for the new node.
+     * @param ordinal The ordinal position of the new node.
+     * @param tag An optional tag to be set for the new node. Can be null.
+     * @param aiSystemPrompt An optional AI system prompt to be set for the new node. Can be null.
+     * @return The newly created SubNode.
+     */
     private SubNode addJsonNode(SubNode parentNode, String content, Long ordinal, String tag, String aiSystemPrompt) {
-        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, null, ordinal, CreateNodeLocation.LAST, false, null);
+        SubNode newNode =
+                svc_mongoCreate.createNode(parentNode, null, null, ordinal, CreateNodeLocation.LAST, false, null);
         newNode.setContent(content);
         newNode.setAc(parentNode.getAc());
         newNode.touch();

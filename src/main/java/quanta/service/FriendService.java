@@ -45,6 +45,15 @@ import quanta.util.val.Val;
 public class FriendService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FriendService.class);
 
+    /**
+     * Creates a friend node under the specified parent friends list.
+     *
+     * @param parentFriendsList The parent node representing the friends list.
+     * @param userToFollow The username of the user to follow.
+     * @param tags Optional tags to associate with the friend node.
+     * @return The created friend node.
+     * @throws RuntimeEx if the user to follow is not found.
+     */
     public SubNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
         AccountNode userNode = svc_user.getAccountByUserNameAP(userToFollow);
@@ -68,6 +77,13 @@ public class FriendService extends ServiceBase {
         }
     }
 
+    /**
+     * Updates the tags of a friend node.
+     *
+     * @param req the request containing the node ID and new tags
+     * @return the response after updating the friend node
+     * @throws RuntimeEx if the node is not a friend node
+     */
     public UpdateFriendNodeResponse cm_updateFriendNode(UpdateFriendNodeRequest req) {
         UpdateFriendNodeResponse res = new UpdateFriendNodeResponse();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
@@ -79,6 +95,12 @@ public class FriendService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Updates the saved friend node with the user node ID if it does not already exist.
+     *
+     * @param userDoingAction The username of the user performing the action.
+     * @param node The node representing the friend to be updated.
+     */
     public void updateSavedFriendNode(String userDoingAction, SubNode node) {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
@@ -97,6 +119,13 @@ public class FriendService extends ServiceBase {
         }
     }
 
+    /**
+     * Deletes a friend node based on the provided user node ID and parent type.
+     *
+     * @param delUserNodeId the ID of the user node to be deleted.
+     * @param parentType the type of the parent node.
+     * @return a response object indicating the result of the delete operation.
+     */
     public DeleteFriendResponse deleteFriend(String delUserNodeId, String parentType) {
         MongoTranMgr.ensureTran();
         DeleteFriendResponse res = new DeleteFriendResponse();
@@ -176,6 +205,13 @@ public class FriendService extends ServiceBase {
         }
     }
 
+    /**
+     * Builds a FriendInfo object from a given friend node.
+     *
+     * @param friendNode the node representing the friend
+     * @return a FriendInfo object containing information about the friend, or null if the userName is
+     *         null or the friendAccountNode is not found
+     */
     public FriendInfo buildPersonInfoFromFriendNode(SubNode friendNode) {
         String userName = friendNode.getStr(NodeProp.USER);
         FriendInfo fi = null;
@@ -223,6 +259,12 @@ public class FriendService extends ServiceBase {
 
     private static final int MAX_THREAD_NODES = 200;
 
+    /**
+     * Retrieves the replies for a given node.
+     *
+     * @param nodeId the ID of the node for which replies are to be retrieved
+     * @return a GetThreadViewResponse object containing the list of node replies
+     */
     public GetThreadViewResponse cm_getNodeReplies(String nodeId) {
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
@@ -239,9 +281,21 @@ public class FriendService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
-     * towards the root of the tree.
+    /**
+     * Retrieves a thread view of a node and its ancestors up to a specified limit.
+     *
+     * @param nodeId The ID of the node for which the thread view is to be retrieved.
+     * @param loadOthers A boolean flag indicating whether to load child nodes of the current node.
+     * @return A GetThreadViewResponse object containing the thread view of the node and its ancestors.
+     *
+     *         This method traverses up the parent hierarchy of the specified node, collecting nodes
+     *         until the top is reached or the maximum number of nodes is gathered. If the node is part
+     *         of an AI conversation, the traversal stops when two consecutive non-answer nodes are
+     *         encountered. The method also optionally loads child nodes of the current node if the
+     *         loadOthers flag is set to true.
+     * 
+     *         Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk
+     *         up towards the root of the tree.
      */
     public GetThreadViewResponse cm_getNodeThreadView(String nodeId, boolean loadOthers) {
         boolean debug = false;
@@ -355,6 +409,12 @@ public class FriendService extends ServiceBase {
         });
     }
 
+    /**
+     * Retrieves a paginated list of followers for a specified user.
+     *
+     * @param req the request object containing the target user name and pagination information.
+     * @return a response object containing the list of followers.
+     */
     public GetFollowersResponse cm_getFollowers(GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
         return svc_arun.run(() -> {

@@ -177,8 +177,20 @@ public class SubNodeUtil extends ServiceBase {
     }
 
     /**
-     * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
-     * provides), by creating said node if not already existing or leaving it as is if it does exist.
+     * Ensures that a node exists at the specified path. If the node does not exist, it will be created
+     * along with any necessary parent nodes.
+     *
+     * @param parentPath The path of the parent node.
+     * @param pathName The name of the node to ensure exists.
+     * @param defaultContent The default content to set if the node is created.
+     * @param primaryTypeName The primary type name of the node.
+     * @param nodeClass The class type of the node.
+     * @param saveImmediate Whether to save the session immediately after creating nodes.
+     * @param props Additional properties to set on the node.
+     * @param created A boolean value holder that will be set to true if the node was created, false if
+     *        it already existed.
+     * @return The existing or newly created node.
+     * @throws RuntimeEx If the parent node is expected but not found, or if a node cannot be created.
      */
     public SubNode ensureNodeExists(String parentPath, String pathName, String defaultContent, String primaryTypeName,
             Class<? extends SubNode> nodeClass, boolean saveImmediate, HashMap<String, Object> props,
@@ -296,6 +308,13 @@ public class SubNodeUtil extends ServiceBase {
         // return String.valueOf(prng.nextLong());
     }
 
+    /**
+     * Retrieves metadata information for a given node.
+     *
+     * @param node the node for which metadata information is to be retrieved
+     * @return a NodeMetaInfo object containing metadata information about the node, or null if the node
+     *         is null
+     */
     public NodeMetaInfo getNodeMetaInfo(SubNode node) {
         if (node == null)
             return null;

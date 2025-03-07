@@ -35,6 +35,14 @@ public class AIUtil extends ServiceBase {
         }
     }
 
+    /**
+     * Parses the AI configuration from the given node and updates the system configuration accordingly.
+     *
+     * @param node The node containing the AI configuration properties.
+     * @param system The system configuration to be updated.
+     * @return true if the AI configuration was successfully parsed and the system configuration was
+     *         updated, false otherwise.
+     */
     public boolean parseAIConfig(SubNode node, SystemConfig system) {
         // once we've found an agent node we're done looking.
         if (system.getAgentNodeId() != null) {
@@ -81,12 +89,22 @@ public class AIUtil extends ServiceBase {
         return false;
     }
 
-    /*
+    /**
+     * Composes a prompt by processing lines that are enclosed within "::" and replacing them with
+     * content generated from a user-specific lookup. The method ensures that there are no duplicate
+     * node names in the prompt substitutions.
+     *
      * Allows the 'prompt' to have lines formatted like "::nodeName::" which will be replaced with the
      * content of the node with that name. This allows for embedding prompts within prompts. The system
      * is fully composable and can have multiple levels of embedding.
      * 
      * We pass nodeNames, to allow detection of dupliates.
+     * 
+     * @param prompt The initial prompt string that may contain lines enclosed within "::".
+     * @param nodeNames A set of node names to detect duplicates. If null, a new HashSet is created.
+     * @return The composed prompt with substitutions made, or the original prompt if no substitutions
+     *         were made.
+     * @throws MessageException If a duplicate node name is detected in the prompt substitutions.
      */
     public String composePrompt(String prompt, HashSet<String> nodeNames) {
         if (prompt == null)
@@ -126,6 +144,13 @@ public class AIUtil extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Builds a system prompt string from the content of a node and its sub-nodes.
+     *
+     * @param nodeName the name of the node to build the prompt from
+     * @return a string containing the concatenated content of the node and its sub-nodes
+     * @throws MessageException if the node with the specified name is not found
+     */
     public String buildSystemPromptFromNode(String nodeName) {
         StringBuilder sb = new StringBuilder();
 
@@ -149,6 +174,13 @@ public class AIUtil extends ServiceBase {
         return val.replaceAll("(?s)<!--.*?-->", "");
     }
 
+    /**
+     * Injects context into the given prompt based on the specified node's context.
+     *
+     * @param node The node for which the context is to be determined.
+     * @param prompt The initial prompt to which the context will be prepended.
+     * @return The prompt with the context prepended, or null if the prompt is null.
+     */
     public String injectTemplateContext(SubNode node, String prompt) {
         if (prompt == null) {
             return null;
@@ -174,6 +206,15 @@ public class AIUtil extends ServiceBase {
         return prompt;
     }
 
+    /**
+     * Constructs a context string for a given node by traversing its parent nodes and collecting
+     * information about the book, chapter, section, and subsection. The context is used to provide
+     * additional information for AI processing without explicitly mentioning it in the response.
+     *
+     * @param node the node for which the context is being constructed
+     * @return a formatted string containing instructions and book context if a system prompt is found
+     *         in any parent node; otherwise, an empty string
+     */
     private String insertBookContext(SubNode node) {
         String context = "";
         String instructions =
@@ -211,6 +252,15 @@ public class AIUtil extends ServiceBase {
         return "";
     }
 
+    /**
+     * Generates a context string for a given node by traversing its parent nodes and collecting their
+     * content. The context is used to provide additional information about the sections and subsections
+     * in the document hierarchy.
+     *
+     * @param node The node for which the context is being generated.
+     * @return A formatted string containing instructions and context information if a system prompt is
+     *         found in any parent node; otherwise, an empty string.
+     */
     private String insertGeneralContext(final SubNode node) {
         String context = "";
         String instructions =
@@ -235,6 +285,13 @@ public class AIUtil extends ServiceBase {
         return "";
     }
 
+    /**
+     * Retrieves AI configuration from ancestor nodes of the given node. The method traverses up the
+     * node hierarchy until it finds a node with a valid AI configuration or reaches the root node.
+     *
+     * @param node the starting node from which to begin the search for AI configuration
+     * @param system the system configuration object to be populated with AI settings
+     */
     public void getAIConfigFromAncestorNodes(SubNode node, SystemConfig system) {
         while (node != null) {
             if (parseAIConfig(node, system))
@@ -243,6 +300,17 @@ public class AIUtil extends ServiceBase {
         }
     }
 
+    /**
+     * Processes an AskSubGraphRequest to generate a response containing context information and an
+     * AI-generated answer.
+     *
+     * @param req the request containing the node ID and question for which the subgraph context and
+     *        answer are needed
+     * @return an AskSubGraphResponse containing the AI-generated answer
+     * @throws RuntimeEx if there are too many nodes or characters in the subgraph, or if no context can
+     *         be created
+     * @throws NoAgentException if no AI service is configured
+     */
     public AskSubGraphResponse cm_askSubGraph(AskSubGraphRequest req) {
         AskSubGraphResponse res = new AskSubGraphResponse();
 
@@ -303,6 +371,19 @@ public class AIUtil extends ServiceBase {
         return res;
     }
 
+    /**
+     * Prepares the AI question text based on the provided node and system configuration.
+     *
+     * <p>
+     * This method generates the input text for an AI question by either using a predefined template
+     * from the system configuration or by processing the content of the provided node. If a template is
+     * set in the system configuration, it is used as the input text. Otherwise, the content of the node
+     * is trimmed of leading '#' characters and used as the input text.
+     *
+     * @param node the node containing the content to be used for generating the AI question text
+     * @param system the system configuration containing the template for the AI question text
+     * @return the prepared AI question text
+     */
     public String prepareAIQuestionText(SubNode node, SystemConfig system) {
         String input;
 
@@ -353,6 +434,15 @@ public class AIUtil extends ServiceBase {
                 || node.getTags().contains("#section") || node.getTags().contains("#subsection"));
     }
 
+    /**
+     * Generates a book structure using AI based on the provided request.
+     *
+     * @param req the request containing the parameters for generating the book
+     * @return a response containing the ID of the newly created book node
+     * @throws NoAgentException if no AI service is configured
+     * @throws RuntimeEx if the book description is missing or if the AI fails to generate the Table of
+     *         Contents
+     */
     public GenerateBookByAIResponse cm_generateBookByAI(GenerateBookByAIRequest req) {
         GenerateBookByAIResponse res = new GenerateBookByAIResponse();
 

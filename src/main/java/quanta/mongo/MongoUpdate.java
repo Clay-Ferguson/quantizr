@@ -88,6 +88,23 @@ public class MongoUpdate extends ServiceBase {
         saveSession(false);
     }
 
+    /**
+     * Saves the current session's dirty nodes to the database.
+     * 
+     * @param asAdmin If true, the nodes will be saved with administrative privileges.
+     * 
+     *        This method first checks if there are any dirty nodes to save. If there are, it
+     *        synchronizes on the dirty nodes and the session context to ensure thread safety. It then
+     *        verifies that each node's ID matches its cached key.
+     * 
+     *        The method collects all dirty nodes into a list to avoid concurrent modification
+     *        exceptions during the save process. If the save is not being performed as an admin, it
+     *        checks that the current user has the necessary permissions to save each node.
+     * 
+     *        If the save is being performed as an admin, it runs the save operation in a separate
+     *        thread. Otherwise, it saves each node in the current thread. Any exceptions encountered
+     *        during the save process are logged but not rethrown.
+     */
     public void saveSession(boolean asAdmin) {
         if (!TL.hasDirtyNodes()) {
             return;
@@ -164,7 +181,17 @@ public class MongoUpdate extends ServiceBase {
         svc_ops.findAndModify(query, upd);
     }
 
-    // returns a new BulkOps if one not yet existing
+    /**
+     * Creates or updates a bulk operation to set a property value on a document identified by its
+     * ObjectId.
+     *
+     * @param bops The current BulkOperations object. If null, a new BulkOperations object is created.
+     * @param id The ObjectId of the document to update.
+     * @param prop The property name to set.
+     * @param val The value to set for the specified property.
+     * @param addSecurity A boolean flag indicating whether to add security criteria to the query.
+     * @return The updated BulkOperations object.
+     */
     public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val,
             boolean addSecurity) {
         if (bops == null) {
@@ -191,6 +218,21 @@ public class MongoUpdate extends ServiceBase {
         return bops;
     }
 
+    /**
+     * Prepares a SubNode object before saving it to the database.
+     * 
+     * This method performs several checks and modifications on the node: - Assigns a new ObjectId if
+     * the node is new. - Ensures accounts and repository root nodes have no sharing. - Sets the
+     * unpublished property for the home node. - Assigns a default ordinal if not set. - Assigns an
+     * owner if not already assigned, with special handling for the root node. - Sets creation and
+     * modification times if not already set. - Adjusts the node path for new nodes. - Ensures the root
+     * node has no sharing. - Verifies the parent node exists. - Saves authorization information by
+     * thread. - Sanitizes the node name to remove invalid characters. - Removes default properties from
+     * the node. - Ensures the access control list (ACL) is either null or valid. - Fixes MIME types for
+     * all attachments. - Cleans the node to ensure it is not flagged as dirty.
+     * 
+     * @param node the SubNode object to be prepared for saving
+     */
     public void beforeSave(SubNode node) {
         ObjectId id = node.getId();
         boolean isNew = false;
@@ -308,7 +350,16 @@ public class MongoUpdate extends ServiceBase {
         }
     }
 
-    /* To save a node you must own the node and have WRITE access to it's parent */
+    /**
+     * Ensures that the current thread has the necessary authorization to save the given node.
+     * 
+     * @param node The node to be saved.
+     * @param isNew A boolean indicating whether the node is new.
+     * 
+     * @throws RuntimeEx If no session context is found or if the parent node is missing.
+     * @throws ForbiddenException If the parent node is admin-owned and the current thread does not have
+     *         admin privileges.
+     */
     private void saveAuthByThread(SubNode node, boolean isNew) {
         // during server init no auth is required.
         if (!MongoRepository.fullInit) {
@@ -348,7 +399,16 @@ public class MongoUpdate extends ServiceBase {
         }
     }
 
-    // iterates over 'q' setting prop=val on every PARENT node of all those nodes.
+    /**
+     * Performs a bulk update operation to set a property value on the parent nodes of the nodes
+     * matching the given query. The updates are batched to optimize performance and avoid redundant
+     * operations.
+     *
+     * @param q the query to find the nodes whose parent nodes will be updated
+     * @param prop the property name to be set on the parent nodes
+     * @param val the value to set for the specified property
+     * @param addSecurity a flag indicating whether to add security constraints during the update
+     */
     public void bulkSetPropValOnParents(Query q, String prop, Object val, boolean addSecurity) {
         Val<BulkOperations> bops = new Val<>(null);
         IntVal batchSize = new IntVal();
@@ -382,6 +442,16 @@ public class MongoUpdate extends ServiceBase {
     }
 
     // NOTE: Note currently used
+    /**
+     * Updates a specified property for a collection of documents identified by their ObjectIds. The
+     * updates are performed in bulk operations to optimize performance.
+     *
+     * @param ids A collection of ObjectId instances representing the documents to be updated.
+     * @param prop The name of the property to be updated.
+     * @param val The new value to set for the specified property.
+     * @param addSecurity A boolean flag indicating whether to add security constraints during the
+     *        update.
+     */
     public void bulkSetPropsByIdObjs(Collection<ObjectId> ids, String prop, Object val, boolean addSecurity) {
         BulkOperations bops = null;
         int batchSize = 0;
@@ -400,6 +470,14 @@ public class MongoUpdate extends ServiceBase {
     }
 
     // NOTE: Not currently used
+    /**
+     * Updates properties in bulk for a collection of document IDs.
+     *
+     * @param ids A collection of document IDs as strings.
+     * @param prop The property to be updated.
+     * @param val The value to set for the property.
+     * @param addSecurity A boolean flag indicating whether to add security constraints.
+     */
     public void bulkSetPropsByIdStr(Collection<String> ids, String prop, Object val, boolean addSecurity) {
         BulkOperations bops = null;
         int batchSize = 0;

@@ -69,6 +69,13 @@ public class AclService extends ServiceBase {
         return res;
     }
 
+
+    /**
+     * Copies the sharing settings from the specified node to all its sub-nodes.
+     *
+     * @param req the request containing the node ID to copy sharing settings from
+     * @return a response indicating the result of the copy sharing operation
+     */
     public CopySharingResponse copySharing(CopySharingRequest req) {
         MongoTranMgr.ensureTran();
         CopySharingResponse res = new CopySharingResponse();
@@ -120,8 +127,12 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Adds or updates a new privilege to a node
+    /**
+     * Adds privileges to a node for specified principals.
+     *
+     * @param req the request containing the node ID, principals, and privileges to be added
+     * @return an AddPrivilegeResponse containing the result of the operation and updated ACL entries if
+     *         applicable
      */
     public AddPrivilegeResponse addPrivilege(AddPrivilegeRequest req) {
         MongoTranMgr.ensureTran();
@@ -151,6 +162,12 @@ public class AclService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Sets the sharing options for a specified node.
+     *
+     * @param req the request containing the node ID and sharing options
+     * @return a response indicating the result of the operation
+     */
     public SetSharingOptionResponse setSharingOption(SetSharingOptionRequest req) {
         MongoTranMgr.ensureTran();
         SetSharingOptionResponse res = new SetSharingOptionResponse();
@@ -179,6 +196,15 @@ public class AclService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Sets the cipher key for a specific principal on the given node.
+     *
+     * @param node The node on which the cipher key is to be set.
+     * @param principalNodeId The ID of the principal for whom the cipher key is to be set.
+     * @param cipherKey The cipher key to be set.
+     * @param res The response object to be populated with the result of the operation.
+     * @return true if the cipher key was successfully set, false otherwise.
+     */
     public boolean setCipherKey(SubNode node, String principalNodeId, String cipherKey, SetCipherKeyResponse res) {
         boolean ret = false;
         HashMap<String, AccessControl> acl = node.getAc();
@@ -193,10 +219,16 @@ public class AclService extends ServiceBase {
     }
 
     /**
-     * Adds the privileges to the node sharing this node to principal, which will be either a userName
-     * or 'public' (when the node is being shared to public)
+     * Adds privileges to a node for a specified principal.
      *
-     * If BulkOperations is non-null we use it instead of a non-bulk operation.
+     * @param bops Bulk operations object for batch processing.
+     * @param node The node to which privileges are being added.
+     * @param principal The principal (user or group) to whom privileges are being granted.
+     * @param principalNode The account node of the principal. If null, it will be looked up.
+     * @param privileges A list of privileges to be added (e.g., "read", "write").
+     * @param res Response object to capture any errors or additional information.
+     * @return true if privileges were successfully added, false otherwise.
+     * @throws RuntimeEx if attempting to make an encrypted node public.
      */
     public boolean addPrivilege(BulkOperations bops, SubNode node, String principal, AccountNode principalNode,
             List<String> privileges, AddPrivilegeResponse res) {
@@ -284,12 +316,26 @@ public class AclService extends ServiceBase {
         return true;
     }
 
-    // isMine
+    /**
+     * Checks if the current user owns the specified node.
+     *
+     * @param node the node to check ownership of
+     * @return true if the current user owns the node, false otherwise
+     */
     public boolean userOwnsNode(SubNode node) {
         boolean isMine = TL.getSC().getUserNodeObjId().equals(node.getOwner());
         return isMine;
     }
 
+    /**
+     * Removes an access control entry from the specified node.
+     *
+     * @param node The node from which the access control entry will be removed.
+     * @param principalNodeId The ID of the principal whose access control entry is to be removed. If
+     *        this is "*", all access control entries will be removed.
+     * @param privToRemove The specific privileges to remove. If this is "*", all privileges for the
+     *        specified principal will be removed.
+     */
     public void removeAclEntry(SubNode node, String principalNodeId, String privToRemove) {
         // special syntax is we remove all if asterisk specified
         if (principalNodeId.equals("*")) {
@@ -358,8 +404,11 @@ public class AclService extends ServiceBase {
         }
     }
 
-    /*
-     * Removes the privilege specified in the request from the node specified in the request
+    /**
+     * Removes the privilege specified in the request from the node specified in the request.
+     * 
+     * @param req the request containing the node ID and the privilege to be removed
+     * @return a response indicating the result of the remove privilege operation
      */
     public RemovePrivilegeResponse removePrivilege(RemovePrivilegeRequest req) {
         MongoTranMgr.ensureTran();
@@ -375,6 +424,13 @@ public class AclService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Retrieves a list of owner names for a given node by traversing up the tree until the root is
+     * reached or ownership is found on the node or any of its parents.
+     *
+     * @param node the starting node to check for ownership
+     * @return a sorted list of owner names
+     */
     public List<String> getOwnerNames(SubNode node) {
         Set<String> ownerSet = new HashSet<>();
         // We walk up the tree util we get to the root, or find ownership on node, or any of it's parents
@@ -424,7 +480,16 @@ public class AclService extends ServiceBase {
                 && node.getAc().get(PrincipalName.PUBLIC.s()).getPrvs().contains(PrivilegeType.WRITE.s());
     }
 
-    // The effeciency of using this function is it won't set the node to dirty of nothing changed.
+    /**
+     * Sets a keyless privilege on the given node. If the node does not have any access controls (AC)
+     * defined, it initializes the AC with the provided key and privileges. If the AC already exists for
+     * the given key, it checks if the privileges match the provided privileges. If they do not match,
+     * it updates the AC with the new privileges.
+     *
+     * @param node the node on which to set the keyless privilege
+     * @param key the key for the access control
+     * @param prvs the privileges to be set
+     */
     public void setKeylessPriv(SubNode node, String key, String prvs) {
         // if no privileges exist at all just add the one we need to add
         if (node.getAc() == null) {
@@ -455,8 +520,14 @@ public class AclService extends ServiceBase {
     }
 
     /**
+     * Inherits sharing settings from the parent node to the child node.
+     * 
      * Sets the default reply ACL on the child node to be the same as the parent node. This is used when
      * creating a new node, and we want to inherit the parent's ACL.
+     * 
+     * @param res The response object which may be updated based on the parent's properties.
+     * @param parentNode The parent node from which sharing settings are inherited.
+     * @param childNode The child node to which sharing settings are applied.
      */
     public void inheritSharingFromParent(ResponseBase res, SubNode parentNode, SubNode childNode) {
         // we always determine the access controls from the parent for any new nodes
@@ -483,8 +554,11 @@ public class AclService extends ServiceBase {
     }
 
     /**
-     * Builds a list of AccessControlInfo objects from the ACL on the node. This is used when returning
-     * ACL information to the client.
+     * Builds a list of AccessControlInfo objects for a given node.
+     *
+     * @param sc the session context
+     * @param node the node for which to build the access control list
+     * @return a list of AccessControlInfo objects, or null if the node has no access control entries
      */
     public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
         List<AccessControlInfo> ret = null;
@@ -505,6 +579,16 @@ public class AclService extends ServiceBase {
         return ret;
     }
 
+    /**
+     * Converts an AccessControl object to an AccessControlInfo object.
+     *
+     * @param sc the session context
+     * @param node the node associated with the access control
+     * @param principalId the ID of the principal (user or group)
+     * @param ac the access control object containing privileges
+     * @return an AccessControlInfo object containing the principal's ID, name, display name, and
+     *         privileges
+     */
     public AccessControlInfo convertToAcInfo(SessionContext sc, SubNode node, String principalId, AccessControl ac) {
         AccessControlInfo acInfo = new AccessControlInfo();
         acInfo.setPrincipalNodeId(principalId);

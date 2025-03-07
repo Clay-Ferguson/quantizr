@@ -77,6 +77,13 @@ public class AppConfiguration implements WebMvcConfigurer {
         return threadPoolTaskScheduler;
     }
 
+    /**
+     * Configures the ServletWebServerFactory bean with support for graceful shutdown and optional SSL.
+     *
+     * @param gracefulShutdown the GracefulShutdown bean to customize the Tomcat connectors for graceful
+     *        shutdown
+     * @return a configured instance of TomcatServletWebServerFactory
+     */
     @Bean
     public ServletWebServerFactory servletContainer(GracefulShutdown gracefulShutdown) {
         TomcatServletWebServerFactory factory = null;

@@ -43,6 +43,15 @@ public class Util {
         yamlMapper = new ObjectMapper(new YAMLFactory());
     }
 
+    /**
+     * Makes an HTTP POST request using the provided WebClient and request object.
+     *
+     * @param webClient the WebClient instance to use for making the HTTP call
+     * @param request the request object to be sent in the body of the POST request
+     * @return the response body as a String
+     * @throws RuntimeEx if an error occurs during the HTTP call, including HTTP status code errors,
+     *         connectivity issues, or other exceptions
+     */
     public static String httpCall(WebClient webClient, Object request) {
         String response = null;
         try {
@@ -80,6 +89,14 @@ public class Util {
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3");
     }
 
+    /**
+     * Calculates the data transfer rate in kilobytes per second (KBps).
+     *
+     * @param bytes the amount of data in bytes
+     * @param nanoseconds the time duration in nanoseconds
+     * @return the data transfer rate in kilobytes per second (KBps)
+     * @throws IllegalArgumentException if the bytes or nanoseconds are negative
+     */
     public static double calculateKBps(double bytes, double nanoseconds) {
         if (nanoseconds == 0)
             nanoseconds = 1; // avoid divide by zero

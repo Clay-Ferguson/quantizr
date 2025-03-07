@@ -42,6 +42,22 @@ public class PublicationService extends ServiceBase {
      */
     HashMap<String, String> adminCache = new HashMap<String, String>();
 
+    /**
+     * Retrieves a publication based on the provided parameters and writes the result to the HTTP
+     * response.
+     *
+     * @param id The unique identifier of the publication node. Can be null if nameOnAdminNode or
+     *        nameOnUserNode is provided.
+     * @param updateCache A boolean flag indicating whether to update the cache.
+     * @param nameOnAdminNode The name of the publication node on the admin node. Can be null if id or
+     *        nameOnUserNode is provided.
+     * @param nameOnUserNode The name of the publication node on the user node. Can be null if id or
+     *        nameOnAdminNode is provided.
+     * @param userName The username associated with the user node. Required if nameOnUserNode is
+     *        provided.
+     * @param response The HttpServletResponse object to which the result will be written.
+     * @throws RuntimeEx If no id or name is provided.
+     */
     public void getPublication(String id, boolean updateCache, String nameOnAdminNode, String nameOnUserNode,
             String userName, HttpServletResponse response) {
         String lookup = null;
@@ -80,6 +96,18 @@ public class PublicationService extends ServiceBase {
         getPublication(node, updateCache, response);
     }
 
+    /**
+     * Generates and returns the publication for the given node. If the publication is cached and
+     * updateCache is false, the cached version is used. Otherwise, a new publication is generated and
+     * cached.
+     *
+     * @param node the node for which the publication is to be generated
+     * @param updateCache if true, forces the generation of a new publication even if a cached version
+     *        exists
+     * @param response the HttpServletResponse to which the publication is written; if null, the
+     *        publication is not written to the response
+     * @throws RuntimeEx if an error occurs during the generation or retrieval of the publication
+     */
     public void getPublication(SubNode node, boolean updateCache, HttpServletResponse response) {
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
@@ -127,6 +155,17 @@ public class PublicationService extends ServiceBase {
         }
     }
 
+    /**
+     * Caches the provided HTML content for the given node. If the HTML content is null or identical to
+     * the existing cached content, the method returns immediately. Otherwise, it stores the new HTML
+     * content in the grid and updates the node's BIN_WEBSITE property with the new cache identifier. If
+     * there was previously cached content, it deletes the old cache entry. Additionally, if the node is
+     * admin-owned, the HTML content is also cached in memory for faster access. Finally, the node is
+     * saved to the database.
+     *
+     * @param node the node for which the HTML content is to be cached
+     * @param html the HTML content to be cached
+     */
     public void cachePut(SubNode node, String html) {
         if (html == null) {
             return;
@@ -159,6 +198,13 @@ public class PublicationService extends ServiceBase {
         svc_mongoUpdate.save(node);
     }
 
+    /**
+     * Retrieves the cached HTML content for a given node.
+     *
+     * @param node the node for which to retrieve the cached content
+     * @return the cached HTML content as a String, or null if not found
+     * @throws RuntimeEx if an error occurs while reading the content from the GridFS resource
+     */
     private String cacheGet(SubNode node) {
         String binWebsite = node.getStr(NodeProp.BIN_WEBSITE);
         if (binWebsite == null) {
