@@ -1,4 +1,4 @@
-package quanta.mongo;
+package quanta.model;
 
 import org.bson.types.ObjectId;
 
@@ -6,8 +6,6 @@ import org.bson.types.ObjectId;
  * userNodeId is required. userName is optional
  *
  * accessLevels: w = read/write r = readonly
- * 
- * todo-0: move to nearest above models folder
  */
 public class MongoPrincipal {
     private ObjectId userNodeId;
