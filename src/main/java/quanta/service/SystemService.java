@@ -53,7 +53,7 @@ public class SystemService extends ServiceBase {
     public String rebuildIndexes() {
         TL.requireAdmin();
         svc_arun.run(() -> {
-            svc_mongoUtil.rebuildIndexes();
+            svc_mongoIdxUtil.rebuildIndexes();
             return null;
         });
         return "success.";

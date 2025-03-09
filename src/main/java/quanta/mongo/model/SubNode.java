@@ -120,15 +120,6 @@ public class SubNode {
     @Field(LIKES)
     private HashSet<String> likes;
 
-    // todo-0: are mcid and prevMcid obsolete now? This was going to be part of version tracking right?
-    public static final String MCID = "mcid";
-    @Field(MCID)
-    public String mcid;
-
-    public static final String PREV_MCID = "prevMcid";
-    @Field(PREV_MCID)
-    public String prevMcid;
-
     public static final String AC = "ac";
     @Field(AC)
     private HashMap<String, AccessControl> ac;
@@ -228,9 +219,6 @@ public class SubNode {
             if (likesList != null)
                 likes = new HashSet<>(likesList);
         }
-
-        mcid = doc.getString(SubNode.MCID);
-        prevMcid = doc.getString(SubNode.PREV_MCID);
     }
 
     // we don't annotate this because we have a custom getter.
@@ -956,27 +944,5 @@ public class SubNode {
     public synchronized void addProps(HashMap<String, Object> props) {
         TL.dirty(this);
         props().putAll(props);
-    }
-
-    public String getMcid() {
-        return mcid;
-    }
-
-    public void setMcid(String mcid) {
-        if (Util.equalObjs(mcid, this.mcid))
-            return;
-        TL.dirty(this);
-        this.mcid = mcid;
-    }
-
-    public String getPrevMcid() {
-        return prevMcid;
-    }
-
-    public void setPrevMcid(String prevMcid) {
-        if (Util.equalObjs(prevMcid, this.prevMcid))
-            return;
-        TL.dirty(this);
-        this.prevMcid = prevMcid;
     }
 }

@@ -88,7 +88,7 @@ public class MongoRepository extends ServiceBase {
             // this method because of calls to getRepository() always doing an init.
             initialized = true;
             try {
-                svc_mongoUtil.createAllIndexes();
+                svc_mongoIdxUtil.createAllIndexes();
             } catch (Exception e) {
                 ExUtil.error(log, "Failed in createAlIndexes", e);
             }

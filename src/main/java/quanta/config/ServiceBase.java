@@ -19,6 +19,7 @@ import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoTemplateWrapper;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
+import quanta.mongo.MongoIndexUtil;
 import quanta.service.AIService;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
@@ -92,6 +93,7 @@ public class ServiceBase {
     public static MongoDelete svc_mongoDelete;
     public static MongoAuth svc_auth;
     public static MongoUtil svc_mongoUtil;
+    public static MongoIndexUtil svc_mongoIdxUtil;
     public static SubNodeUtil svc_snUtil;
     public static AIUtil svc_aiUtil;
     public static AclService svc_acl;
@@ -172,6 +174,7 @@ public class ServiceBase {
             svc_mongoDelete = getBean(ctx, MongoDelete.class);
             svc_auth = getBean(ctx, MongoAuth.class);
             svc_mongoUtil = getBean(ctx, MongoUtil.class);
+            svc_mongoIdxUtil = getBean(ctx, MongoIndexUtil.class);
             svc_snUtil = getBean(ctx, SubNodeUtil.class);
             svc_aiUtil = getBean(ctx, AIUtil.class);
             svc_acl = getBean(ctx, AclService.class);
