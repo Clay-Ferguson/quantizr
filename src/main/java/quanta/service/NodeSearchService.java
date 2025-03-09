@@ -17,6 +17,7 @@ import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.NodeInfo;
+import quanta.model.WordStats;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
