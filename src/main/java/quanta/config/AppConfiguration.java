@@ -25,7 +25,25 @@ import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
 
 /**
- * Standard Spring WebMvcConfigurerAdapter-derived class.
+ * Configuration class for the application. Implements WebMvcConfigurer to customize Spring MVC
+ * configuration.
+ * 
+ * This class defines several beans and configurations:
+ * 
+ * appFilterRegistration: Registers the AppFilter with specific URL patterns and order. -
+ * utilFilterRegistration: Registers the UtilFilter with specific URL patterns and order. -
+ * threadPoolTaskScheduler: Configures a ThreadPoolTaskScheduler with a pool size of 10. -
+ * servletContainer: Configures the ServletWebServerFactory with support for graceful shutdown and
+ * optional SSL. - restTemplate: Provides a singleton RestTemplate bean. - templateResolver:
+ * Configures a ClassLoaderTemplateResolver for Thymeleaf templates. - templateEngine: Configures a
+ * SpringTemplateEngine with the template resolver. - viewResolver: Configures a
+ * ThymeleafViewResolver with the template engine.
+ * 
+ * The class also contains a private method redirectConnector to configure a connector for HTTP to
+ * HTTPS redirection.
+ * 
+ * Note: Some methods and configurations are commented out for future reference or diagnostic
+ * purposes.
  */
 @Configuration
 public class AppConfiguration implements WebMvcConfigurer {

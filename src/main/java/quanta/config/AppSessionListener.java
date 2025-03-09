@@ -11,9 +11,30 @@ import org.springframework.stereotype.Component;
 import quanta.service.AppFilter;
 
 /**
- * For keeping track of sessions.
+ * AppSessionListener is a session listener that manages session creation and destruction events. It
+ * implements the HttpSessionListener interface and is annotated with @Component to be managed by
+ * Spring.
+ * 
+ * This listener performs the following tasks: - Sets the session timeout interval based on the
+ * application properties. - Adds a ReentrantLock to the session attributes to handle
+ * synchronization and deadlock detection. - Increments and decrements a session counter to keep
+ * track of active sessions.
+ * 
+ * The class also provides a static method to retrieve the current session count.
+ * 
+ * Dependencies: - AppProp: A class that provides application properties, injected via @Autowired. -
+ * AppFilter: A class that defines the SESSION_LOCK_NAME constant.
+ * 
+ * Logging: - Uses SLF4J for logging session creation and destruction events when debug mode is
+ * enabled.
+ * 
+ * Note: - The session lock is used to synchronize access and detect deadlocks.
+ * 
+ * Methods: - sessionCreated(HttpSessionEvent se): Handles session creation events. -
+ * sessionDestroyed(HttpSessionEvent se): Handles session destruction events. - getSessionCounter():
+ * Returns the current session count.
  */
-@Component 
+@Component
 public class AppSessionListener implements HttpSessionListener {
     private static Logger log = LoggerFactory.getLogger(AppSessionListener.class);
     private static final boolean debug = false;

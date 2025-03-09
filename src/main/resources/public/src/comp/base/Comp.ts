@@ -6,8 +6,17 @@ import { State } from "../../State";
 export type Attribs = { [k: string]: any };
 export type CompT = Comp | ReactNode;
 
-/* Base class for all components which encapsulates a lot of React functionality so that our
-implementation code can ignore those details. */
+/** 
+ * Base class for all components which encapsulates a lot of React functionality so that our 
+ * implementation code can ignore those details. 
+ * 
+ * The `Comp` class is an abstract base class for creating React components with additional
+ * functionality for state management, lifecycle events, and DOM manipulation. It provides a
+ * framework for building complex components with features such as debug logging, scroll
+ * position persistence, and dynamic child rendering.
+ *
+ * @abstract
+ */
 export abstract class Comp {
     private parent: Comp = null; // only used for debug logging (can be deleted without impacting app)
     static renderCounter: number = 0;
@@ -55,6 +64,23 @@ export abstract class Comp {
     // DO NOT DELETE (#monitor-lifecycle)
     // static allCompIds: Set<string> = new Set<string>();
 
+    /**
+     * Constructs a new instance of the Comp class.
+     * 
+     * @param attribs - Optional attributes for the component. If a string or array is passed, an error is thrown.
+     * @param stateMgr - Optional state manager for managing component state.
+     * 
+     * @throws {Error} If `attribs` is a string or an array.
+     * 
+     * The constructor performs the following actions:
+     * - Logs the construction of the component if debugging is enabled.
+     * - Initializes `attribs` to an empty object if not provided.
+     * - Creates a reference for the component.
+     * - Prepends "Tip:\n\n" to the `title` attribute if it exists.
+     * - Adds the class name as a `data-class` attribute for debugging purposes if `renderClassInDom` is enabled.
+     * - Removes the `c` attribute if it exists and `renderClassInDom` is not enabled.
+     * - Generates a unique `id` and `key` for the component if not provided.
+     */
     constructor(attribs?: any, private stateMgr?: State<any>) {
         if (typeof attribs === "string") {
             throw new Error("string was passed for 'attribs' in " + this.constructor.name);
