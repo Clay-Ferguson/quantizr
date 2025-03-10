@@ -36,6 +36,9 @@ class WriteFileInput(BaseModel):
 class ReadFileInput(BaseModel):
     file_name: str = Field(description="File Name")
 
+class LocateFileInput(BaseModel):
+    filename: str = Field(description="File name without path")
+
 class GetBlockInfoTool(BaseTool):
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
@@ -298,6 +301,52 @@ class WriteFileTool(BaseTool):
         print(msg)
         return msg
 
+class LocateFileTool(BaseTool):
+    """We have this tool so that we can just reference files by their name, and the
+    AI will be smart enough to use this tool to find where the file is, and then read it. 
+    So this is just a convenience so we don't have to use the full path to the file."""
+    name: str = "locate_file"
+    description: str = ""
+    args_schema: Type[BaseModel] = LocateFileInput
+    return_direct: bool = False
+    file_sources: FileSources = FileSources()
+    cache: bool = False
+    _file_cache: dict[str, List[str]] = {}
+    _cache_built: bool = False
+
+    def __init__(self, file_sources: FileSources):
+        super().__init__(description="File Locator Tool: Finds the full path of a file by searching recursively in the source directory")
+        self.file_sources = file_sources
+        self.cache = False
+        
+    def _build_cache(self) -> None:
+        """Builds a cache of filename to full paths mapping"""
+        self._file_cache.clear()
+        
+        for dirpath, _, filenames in os.walk(self.file_sources.source_folder):
+            for filename in filenames:
+                if filename not in self._file_cache:
+                    self._file_cache[filename] = []
+                full_path = os.path.join(dirpath, filename)
+                self._file_cache[filename].append(full_path)
+                
+        self._cache_built = True
+
+    def _run(
+        self,
+        filename: str,
+    ) -> str:
+        """Use the tool."""
+        if not self._cache_built:
+            self._build_cache()
+            
+        paths = self._file_cache.get(filename)
+        if paths:
+            # Return first matching path
+            relative_path = paths[0][len(self.file_sources.source_folder):]
+            return relative_path
+        return f"ERROR: File '{filename}' not found"
+
 @staticmethod
 def init_tools(file_sources: FileSources) -> List[BaseTool]:
     """Initialize tools for the agent."""
@@ -308,7 +357,6 @@ def init_tools(file_sources: FileSources) -> List[BaseTool]:
         CreateFileTool(file_sources),
         DirectoryListingTool(file_sources),
         ReadFileTool(file_sources),
-        WriteFileTool(file_sources)
+        WriteFileTool(file_sources),
+        LocateFileTool(file_sources)
     ]
-    
-    

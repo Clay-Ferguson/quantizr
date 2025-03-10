@@ -67,10 +67,7 @@ public class NodeMoveService extends ServiceBase {
         res.setNodeChanges(nodeChanges);
         String nodeId = req.getNodeId();
         SubNode node = svc_mongoRead.getNode(nodeId);
-        svc_auth.ownerAuth(node);
-        if (node == null) {
-            throw new RuntimeEx("Node not found: " + nodeId);
-        }
+        svc_auth.ownerAuth(node); // also checks for null 'node'
 
         switch (req.getTargetName()) {
             case "up":
