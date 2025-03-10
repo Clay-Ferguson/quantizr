@@ -246,7 +246,7 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
         output_ppm = 0.6
 
     elif XAI_MODEL_COMPLETION_CHAT:
-        # (todo-0: this is not true Grok pricing, they're still beta with no pricing model)
+        # (todo-0: this is not true Grok pricing. Need to update this)
         input_ppm = 15.0
         output_ppm = 60.0
 

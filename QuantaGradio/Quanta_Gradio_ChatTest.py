@@ -1,5 +1,6 @@
 """Runs a basic ChatBot using Gradio interface.
-You can use this as the simplest possible test to verify that Gradio is working (without agents or tools)
+You can use this as the simplest possible test to verify that Gradio is working (without agents or tools). Not using StateGraph (SG)
+
 """
 
 import sys

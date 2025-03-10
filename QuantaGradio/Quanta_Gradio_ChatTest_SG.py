@@ -1,5 +1,5 @@
 """Runs a basic ChatBot using Gradio interface and a true "Lang Graph" (StateGraph). We build a true
-LangGraph graph, but it's a simple one that only responds to the user prompt.
+LangGraph graph, but it's a simple one that only responds to the user prompt. Using StateGraph (SG)
 
 https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-1-build-a-basic-chatbot
 """

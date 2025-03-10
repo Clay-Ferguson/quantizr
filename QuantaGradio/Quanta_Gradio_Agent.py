@@ -1,4 +1,4 @@
-"""Runs a ChatBot using Gradio interface, with access to the QuantAgent for code refactoring.
+"""Runs a ChatBot using Gradio interface, with access to the QuantAgent for code refactoring, not using StateGraph (SG)
 
 """
 
