@@ -11,9 +11,6 @@ from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import BaseTool
 
 from ..utils import RefactorMode
-from .refactoring_tools import (
-    init_tools
-)
 from ..file_utils import FileUtils
 from ..utils import RefactorMode
 from .prompt_utils import PromptUtils
@@ -23,7 +20,7 @@ PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from common.python.agent.models import FileSources
-from common.python.agent.ai_utils import AIUtils
+from common.python.agent.ai_utils import AIUtils, init_tools
 
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""

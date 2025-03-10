@@ -14,14 +14,10 @@ PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from app_config import AppConfig
-from common.python.agent.ai_utils import AIUtils
+from common.python.agent.ai_utils import AIUtils, init_tools
 from common.python.utils import Utils
 from common.python.agent.app_agent import QuantaAgent
 from langchain.chat_models.base import BaseChatModel
-
-from common.python.agent.refactoring_tools import (
-    init_tools
-)
 
 from typing import Annotated
 from typing_extensions import TypedDict

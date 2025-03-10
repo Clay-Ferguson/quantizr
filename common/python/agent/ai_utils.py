@@ -7,6 +7,18 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from common.python.utils import AIService
 from langchain.schema import HumanMessage, AIMessage
 from gradio import ChatMessage
+from typing import List
+from pydantic import Field
+from langchain_core.tools import BaseTool
+from common.python.agent.tools.CreateFile import CreateFile
+from common.python.agent.tools.DirectoryListing import DirectoryListing
+from common.python.agent.tools.ReadFile import ReadFile
+from common.python.agent.tools.UpdateBlock import UpdateBlock
+from common.python.agent.tools.GetBlockInfo import GetBlockInfo
+from common.python.agent.tools.LocateFile import LocateFile
+from common.python.agent.tools.WriteFile import WriteFile
+from .models import FileSources
+
  
 class AIUtils:
     """AI Utilities Class"""
@@ -191,3 +203,17 @@ class AIUtils:
                                       
         messages.append(ChatMessage(role="assistant", content=content.strip()))
 
+
+@staticmethod
+def init_tools(file_sources: FileSources) -> List[BaseTool]:
+    """Initialize tools for the agent."""
+    
+    return [
+        GetBlockInfo(file_sources),
+        UpdateBlock(file_sources),
+        CreateFile(file_sources),
+        DirectoryListing(file_sources),
+        ReadFile(file_sources),
+        WriteFile(file_sources),
+        LocateFile(file_sources)
+    ]
