@@ -31,6 +31,7 @@ class AIUtils:
                     return True
         return False
     
+    # todo-0: make max_tokens configurable.
     @staticmethod
     def create_llm(
             temperature: float,
@@ -45,6 +46,7 @@ class AIUtils:
                 llm = ChatOpenAI(
                     model=cfg.openai_model,
                     temperature=temperature,
+                    max_tokens=16_000, # type: ignore
                     api_key=cfg.openai_api_key,
                     timeout=timeout,
                     cache=False
@@ -53,14 +55,16 @@ class AIUtils:
                 llm = ChatAnthropic(
                     model=cfg.anth_model, # type: ignore
                     temperature=temperature,
+                    max_tokens=40_000, # type: ignore
                     api_key=cfg.anth_api_key,
                     timeout=timeout,
                     cache=False
-                ) # type: ignore 
+                )
             elif cfg.ai_service == AIService.GEMINI.value:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,
                     temperature=temperature,
+                    max_tokens=16_000,
                     api_key=cfg.gemini_api_key,
                     timeout=timeout,
                     cache=False
@@ -69,6 +73,7 @@ class AIUtils:
                 llm = ChatXAI(
                     model=cfg.xai_model,
                     temperature=temperature,
+                    max_tokens=16_000,
                     api_key=cfg.xai_api_key,
                     timeout=timeout,
                     cache=False

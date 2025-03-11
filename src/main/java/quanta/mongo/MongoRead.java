@@ -624,6 +624,11 @@ public class MongoRead extends ServiceBase {
         return getChildren(node.getPath(), sort, limit, skip, null, moreCriteria, false);
     }
 
+    public Iterable<SubNode> getChildren(SubNode node) {
+        svc_auth.readAuth(node);
+        return getChildren(node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, null, null, false);
+    }
+
     /*
      * All we need to do here is query for children an do a "max(ordinal)" operation on that, but
      * digging the information off the web for how to do this appears to be something that may take a

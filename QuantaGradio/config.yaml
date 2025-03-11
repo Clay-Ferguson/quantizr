@@ -20,11 +20,13 @@ gemini_model: "gemini-1.5-pro"
 
 mode: "none"
 
-# OPENAI = "openai"
-# ANTHROPIC = "anth"
+# WARNING: Currently gemini doesn't seem to support Tool Calling, but I haven't started to investigate why yet.
+#
+# OPENAI = "openai" (supports Tool Calling)
+# ANTHROPIC = "anth" (supports Tool Calling)
 # GEMINI = "gemini"
 # XAI = "xai"
-ai_service: "anth"
+ai_service: "openai"
 
 scan_extensions: "py,html"
 data_folder: "/home/clay/ai-agent-temp"

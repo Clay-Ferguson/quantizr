@@ -167,7 +167,7 @@ Final Prompt:
         if QuantaAgent.tool_set is None:
             QuantaAgent.tool_set = init_tools(self.file_sources)
                 
-        # Convert messages to a format the agent can understand &&&
+        # Convert messages to a format the agent can understand 
         chat_history = AIUtils.gradio_messages_to_langchain(messages) 
 
         agent = create_react_agent(
@@ -240,7 +240,7 @@ Final Prompt:
         
         self.build_system_prompt("")
                 
-        # Convert messages to a format the agent can understand &&&
+        # Convert messages to a format the agent can understand
         chat_history = AIUtils.gradio_messages_to_langchain(messages) 
 
         chat_history.append(HumanMessage(content=self.prompt))    

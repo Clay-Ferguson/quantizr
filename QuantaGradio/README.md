@@ -38,3 +38,6 @@ Here are a couple of links to the AI Docs on Github
 * [Quanta Coding Agent Documentation on Github](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md#ai-agent-for-code-refactoring)
 * [All Quanta AI Documentation on Github](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md)
 
+## Testing (non-Automated)
+
+The following file contains some test prompts you can submit to the coding agent (like `Quanta_Gradio_Agent_SG.py`) in a chat, to verify that each of the Agent Tools are working correctly: `/common/python/agent/test/chat-scenarios.md`
