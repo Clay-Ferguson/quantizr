@@ -17,6 +17,7 @@ from common.python.agent.tools.UpdateBlock import UpdateBlock
 from common.python.agent.tools.GetBlockInfo import GetBlockInfo
 from common.python.agent.tools.LocateFile import LocateFile
 from common.python.agent.tools.WriteFile import WriteFile
+from common.python.agent.tools.ExtractJavaMethod import ExtractJavaMethod
 from .models import FileSources
 
  
@@ -220,5 +221,6 @@ def init_tools(file_sources: FileSources) -> List[BaseTool]:
         DirectoryListing(file_sources),
         ReadFile(file_sources),
         WriteFile(file_sources),
-        LocateFile(file_sources)
+        LocateFile(file_sources),
+        ExtractJavaMethod(file_sources)
     ]
