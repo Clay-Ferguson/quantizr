@@ -1,6 +1,6 @@
 # Agent Tools - Test Scenarios
 
-The following are chat messages and their expected [approximate] responses. We can use this information to run tests on `Quanta_Gradio_Agent_SG.py` for example. These scenarios make the assumption that we're using the the entire Quantizr Codebase (from github) as our root location for files, which we set in `/QuantaGradio/config.yaml` as the `source_folder` property. Wherever you see the AI answers below enclosed in parenthesis, it means that's not the actual AI output but a description of what that output should be.
+The following are chat messages and their expected [approximate] responses (and/or actions taken) from the Coding Agent. We can use this information to run tests on `Quanta_Gradio_Agent_SG.py` for example. These scenarios make the assumption that we're using the the entire Quantizr Codebase (from github) as our root location for files, which we set in `/QuantaGradio/config.yaml` as the `source_folder` property. Wherever you see the AI answers below enclosed in parenthesis, it means that's not the actual AI output but a description of what that output should be.
 
 ----
 
@@ -51,7 +51,7 @@ AI: (The AI will have now used the UpdateBlock tool and added the new print stat
 
 This conversation has also proven that our correct context is being maintained in the chat history, and so when we said "the block" it knows which block we're talking about.
 
----
+----
 
 ## Testing CreateFile Tool
 
@@ -61,7 +61,7 @@ Human: Create a text file in the root ('/') that contains the text "This awesome
 
 AI: (AI will have created the file as directed with the CreatFile tool, and knew to just invent a filename all by itself.)
 
----
+----
 
 ## Testing DirectoryListing Tool
 
@@ -75,6 +75,12 @@ AI: (AI will have used the DirectoryListing tool and listed out all the file nam
 
 It's probably obvious, but this tool is [likely] never useful just for humans to use to get names of files listed, but instead, what it does is empowers the AI to be able to get all the names of files in specific folders whenever it needs to do so to achieve some larger goal or objective.
 
+----
 
+## Testing ExtractJavaMethod Tool
 
+### Conversation
 
+Human: In file `MongoAppConfig.java`, show me the `mongoTm(MongoDatabaseFactory)` method.
+
+AI: (AI will try to read that file from the root, won't find it, then will call `locate_file` to find it, and get it's full path, then call `ExtractJavaMethod` to get the method body of the method, which it then displays in chat window!)

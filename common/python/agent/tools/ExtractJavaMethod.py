@@ -4,6 +4,14 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 from ..models import FileSources
 
+# WARNING: Upon initially researching Java AST Parsers written in Python the `javalang` package was the best option I could find, however
+# I quickly discovered that it fails to parse my XString.java class, and throws an error object that appears to be an empty string. When the agent
+# tries to use this Tool and encounters an error the agent will then intelligently fallback to reading the entire file and comprehending it as a whole
+# file which works fine, but the purpose of this Tool is to save Token Consumption, and so I'd like to get it working, so we just need to swap 
+# in some other Java AST Parser that works better.
+#
+# Need to investigate this further, but for now I will leave it as is (todo-0)
+
 class ExtractJavaMethodInput(BaseModel):
     file_name: str = Field(description="Java File Name")
     method_name: str = Field(description="Method name with signature (e.g., 'myMethod(int, String)')")
