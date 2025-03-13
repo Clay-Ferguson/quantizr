@@ -1,12 +1,14 @@
 import os
-from typing import Type
+from typing import Optional, Type
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
+
+from common.python.agent.project_loader import ProjectLoader
 from ..models import FileSources
 
 class ExtractJavaMethodInput(BaseModel):
-    file_name: str = Field(description="Java/JavaScript/TypeScript File Name")
-    method_start_line: str = Field(description="Source file line that will be the beginning of a method we want to extract (e.g., 'public void myMethod(int, String)')")
+    file_name: Optional[str] = Field(description="File Name of a Java/JavaScript/TypeScript (if known, otherwise Python `None` value)")
+    method_start_line: str = Field(description="Source file line that will mark the beginning of a method we want to extract (e.g., 'public void myMethod(int, String)')")
 
 
 class ExtractJavaMethod(BaseTool):
@@ -17,13 +19,17 @@ class ExtractJavaMethod(BaseTool):
     file_sources: FileSources = FileSources()
     
     def __init__(self, file_sources: FileSources):
-        print("Initializing ExtractJavaMethod")
-        super().__init__(description="Java/JavaScript/TypeScript Method Extractor: Extracts a specific method from a Java-like file (e.g., source files whose methods end with a closing curly brace)")
+        super().__init__(description="""Method Extractor for Java/JavaScript/TypeScript Files: Extracts a specific method 
+from a Java-like file (e.g., any computer language whose method definitions end with a closing curly brace).
+
+NOTE: This tool has the ability to automatically find the right file, if no file name is specified, so if the file name is not known this method should
+first be called without the file name specified, rather than calling another tool to locate the file.                                          
+""")
         self.file_sources = file_sources
     
     def _run(
         self,
-        file_name: str,
+        file_name: Optional[str],
         method_start_line: str,
     ) -> str:
         """Extract a method from a Java file using LanguageParser."""
@@ -35,6 +41,23 @@ class ExtractJavaMethod(BaseTool):
         
         # right trim the method_start_line
         method_start_line = method_start_line.rstrip()
+        had_file_name_arg = file_name is not None
+        
+        # if no file_name is provided
+        if not file_name:
+            # Use the first source folder as the default
+            if self.file_sources.source_folder:
+                # todo-0: we could use file-change-detection to be sure this is only rescanned when it changes and really we can also make the
+                # ProjectLoader smart enough to reload ONLY the files that have changed. For now this does a full scan every time, until we verify
+                # everything is working well.
+                prj_loader = ProjectLoader(self.file_sources)
+                prj_loader.scan_directory()
+                file_name = prj_loader.find_file_containing(method_start_line)
+            else:
+                return "Error: No file name provided and no source folder available."
+        
+        if not file_name:
+            return f"Error: No file name provided and unable to find {method_start_line} in any file."
         
         # Normalize the file path
         if not file_name.startswith("/"):
@@ -62,7 +85,9 @@ class ExtractJavaMethod(BaseTool):
                 line_stripped = line.lstrip()
                 
                 # Check if this line matches the method start line
-                if not method_found and line_stripped.startswith(normalized_method_start.lstrip()):
+                # NOTE: Using 'line_stripped.startswith' to avoid issues with indentation
+                #       if not method_found and line_stripped.startswith(normalized_method_start.lstrip()):
+                if not method_found and normalized_method_start.lstrip() in line_stripped:
                     method_found = True
                     start_indentation = len(line) - len(line_stripped)  # Calculate indentation level
                     method_content.append(all_lines[i])  # Use original line for output
@@ -79,7 +104,12 @@ class ExtractJavaMethod(BaseTool):
                         break
             
             if method_found:
-                return "```\njava\n" + "".join(method_content) + "\n```"
+                ret = ""
+                if not had_file_name_arg:
+                    # Add the file name to the output, because the AI won't know it yet, since it was not provided
+                    ret = f"Found in File: {file_name}"
+                ret += "\n```\n" + "".join(method_content).strip() + "\n```\n"
+                return ret
             else:
                 return f"Error: Method '{method_start_line}' not found in {file_name}"
             

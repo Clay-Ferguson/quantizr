@@ -11,6 +11,10 @@ class ProjectLoader:
     """
     # Dictionary to store TextBlock objects keyed by 'name'
     blocks: Dict[str, TextBlock] = {}
+
+    # Dictionary to store file contents keyed by 'file name'
+    file_contents: Dict[str, str] = {}
+    
     # All filen names encountered during the scan, relative to the source folder
     file_names: List[str] = []
     folder_names: List[str] = []
@@ -32,6 +36,12 @@ class ProjectLoader:
         # get the file name relative to the source folder
         relative_file_name: str = path[len(self.file_sources.source_folder) :]
         self.file_names.append(relative_file_name)
+
+        # Read the file content
+        content = FileUtils.read_file(path)    
+        
+        # put content in the file_contents dictionary
+        self.file_contents[relative_file_name] = content
 
         # Open the file using 'with' which ensures the file is closed after reading
         with FileUtils.open_file(path) as file:
@@ -82,6 +92,17 @@ class ProjectLoader:
         elif line.endswith(" */"):
             line = line[:-3]
         return line                            
+
+    def find_file_containing(self, search_str: str) -> Optional[str]:
+        """Finds the file containing the specified string. This is a brute force search
+        and will return the first file that contains the string. If no file is found, it returns None
+        """
+        for file_name, content in self.file_contents.items():
+            # print("Searching in file:", file_name)
+            if search_str in content:
+                return file_name # todo-0: actually we need to keep scanning to see if there are dupliates, because if so we need to just say so, and abort all logic.
+        return None
+
 
     def scan_directory(self):
         """Scans the directory for files with the specified extensions. The purpose of this scan
