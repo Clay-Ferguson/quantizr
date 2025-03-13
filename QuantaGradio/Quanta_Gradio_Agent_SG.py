@@ -103,7 +103,7 @@ if __name__ == "__main__":
         return None if len(files) == 0 else ["Select Prompt"] + files
 
     def load_prompt_content(filename):
-        """Load content of selected prompt file into input box"""
+        """Load content of selected prompt file into input box, removing meta sections"""
         if filename == "Select Prompt":
             return ""
             
@@ -111,8 +111,22 @@ if __name__ == "__main__":
         file_path = os.path.join(prompt_dir, filename)
         
         try:
+            processed_content = []
+            in_meta_section = False
+            
             with open(file_path, 'r') as file:
-                return file.read()
+                for line in file:
+                    if line.strip() == "meta_begin":
+                        in_meta_section = True
+                        continue
+                    elif line.strip() == "meta_end":
+                        in_meta_section = False
+                        continue
+                    
+                    if not in_meta_section:
+                        processed_content.append(line)
+            
+            return "".join(processed_content).strip()
         except Exception as e:
             print(f"Error loading prompt file: {e}")
             return f"Error loading file: {e}"
