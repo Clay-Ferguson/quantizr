@@ -95,14 +95,23 @@ class ProjectLoader:
 
     def find_file_containing(self, search_str: str) -> Optional[str]:
         """Finds the file containing the specified string. This is a brute force search
-        and will return the first file that contains the string. If no file is found, it returns None
+        and will return the first file that contains the string. If multiple files are found, it raises an error.
+        Additionally, if the string is found in multiple locations within a single file, it raises an error.
         """
+        found_files = []
         for file_name, content in self.file_contents.items():
-            # print("Searching in file:", file_name)
-            if search_str in content:
-                return file_name # todo-0: actually we need to keep scanning to see if there are dupliates, because if so we need to just say so, and abort all logic.
-        return None
-
+            occurrences = content.count(search_str)
+            if occurrences > 1:
+                raise Exception(f"Multiple occurrences of `{search_str}` found in file: {file_name}")
+            elif occurrences == 1:
+                found_files.append(file_name)
+        
+        if len(found_files) == 0:
+            return None
+        elif len(found_files) == 1:
+            return found_files[0]
+        else:
+            raise Exception(f"Duplicate matches for `{search_str}` found in files: {', '.join(found_files)}")
 
     def scan_directory(self):
         """Scans the directory for files with the specified extensions. The purpose of this scan
