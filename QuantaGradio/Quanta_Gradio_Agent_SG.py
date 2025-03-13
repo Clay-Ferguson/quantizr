@@ -91,6 +91,31 @@ if __name__ == "__main__":
 
     def clear_history():
         return []
+        
+    def get_prompt_files():
+        """Get list of files from the prompt folder"""
+        prompt_dir = AppConfig.file_sources.prompts_folder
+        if not os.path.exists(prompt_dir):
+            return None
+            
+        files = [f for f in os.listdir(prompt_dir) if os.path.isfile(os.path.join(prompt_dir, f))]
+        # Return None if no files, otherwise return the list with default option
+        return None if len(files) == 0 else ["Select Prompt"] + files
+
+    def load_prompt_content(filename):
+        """Load content of selected prompt file into input box"""
+        if filename == "Select Prompt":
+            return ""
+            
+        prompt_dir = AppConfig.file_sources.prompts_folder
+        file_path = os.path.join(prompt_dir, filename)
+        
+        try:
+            with open(file_path, 'r') as file:
+                return file.read()
+        except Exception as e:
+            print(f"Error loading prompt file: {e}")
+            return f"Error loading file: {e}"
 
     # This 'logo' isn't being used, but I leave this in place for future reference in case we
     # need sayling like this later.
@@ -113,7 +138,23 @@ if __name__ == "__main__":
             label="Agent",
             avatar_images=(None, "assets/logo-100px-tr.jpg")
         )
+        
+        # Check if prompt files exist
+        prompt_files = get_prompt_files()
+        
+        # Only add dropdown if prompt files exist
+        if prompt_files:
+            prompt_dropdown = gr.Dropdown(
+                choices=prompt_files,
+                label="Prompt Files",
+                value="Select Prompt"
+            )
+            
         input = gr.Textbox(lines=5, label="Chat Message", placeholder="Type your message here...")
+        
+        # Connect dropdown to input textbox only if it exists
+        if prompt_files:
+            prompt_dropdown.change(fn=load_prompt_content, inputs=prompt_dropdown, outputs=input)
         
         with gr.Row():
             submit_button = gr.Button("Submit")
@@ -123,4 +164,4 @@ if __name__ == "__main__":
         submit_button.click(query_ai, [input, chatbot, show_tool_usage], [chatbot, input])
         clear_button.click(clear_history, [], [chatbot])
     
-    demo.launch()         
+    demo.launch()

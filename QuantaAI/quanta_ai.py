@@ -117,7 +117,7 @@ temperature: {req.temperature}
 
             messages = buildContext(req)
             agent = QuantaAgent()
-            file_sources = FileSources("/projects", folders_to_include, folders_to_exclude, ext_set, "/data")
+            file_sources = FileSources("", "/projects", folders_to_include, folders_to_exclude, ext_set, "/data")
             
             agent.run(
                 req.systemPrompt if req.systemPrompt else "",

@@ -1,4 +1,4 @@
-# Experimental Prompt
+# Experimental Prompt/Briefing
 
 The purpose of the prompt below is to verify that we can use `Named Blocks` and/or long preambles in a discussion with AI to explain some architectural details similar to what you would provide to a new employee at a company getting started on working on a specific bug or feature. Instead of throwing the entire codebase at someone unfamiliar with it, you'd normally would provide specific files and chunks of files (Named Blocks!) and describe how some aspect of the overal codebase (i.e. application) to a developer, for them to focus on. This is great for AIs as well, because similar to how humans have limited ability to simply 'injest' and entire codebase and understand it (related to short term memory in humans, etc), we have a similar issue with context length in AIs and so providing them a way to focus on a specific aspect of a codebase helps them AI just like it helps a human.
 
@@ -18,4 +18,4 @@ ONE OR THE OTHER:
 
 OPTION 1: To show that you understand this stuff so far, please write the code to create a small tree structure that has a root node, with two child nodes, and then each of those two child nodes has two child nodes also. Don't worry about persistence to the DB yet. Just show the code to create this tiny tree, and don't explain any of it.
 
-OPTION 2: Given the above, please check `moveNodeUp(SubNode node)` in file `NodeMoveService.java` and let me know if you see any bugs.
+OPTION 2: Given the above, please check `moveNodeUp(SubNode node)` and let me know if you see any bugs.

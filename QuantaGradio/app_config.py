@@ -73,6 +73,9 @@ class AppConfig:
             "--source_folder", required=True, help="Folder with source files to scan"
         )
         p.add_argument(
+            "--prompts_folder", required=True, help="Folder with predefined prompts"
+        )
+        p.add_argument(
             "--mode",
             required=True,
             help="Update mode for the files (files or blocks)",
@@ -88,7 +91,8 @@ class AppConfig:
         folders_to_exclude = list(filter(None, folders_to_exclude))
         ext_set = set(ext_list)
         
-        AppConfig.file_sources = FileSources(AppConfig.cfg.source_folder, 
+        AppConfig.file_sources = FileSources(AppConfig.cfg.prompts_folder,
+                                            AppConfig.cfg.source_folder, 
                                              folders_to_include, 
                                              folders_to_exclude, 
                                              ext_set, 

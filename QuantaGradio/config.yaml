@@ -31,6 +31,7 @@ ai_service: "anth"
 scan_extensions: "py,html,java"
 data_folder: "/home/clay/ai-agent-temp"
 
+prompts_folder: "/home/clay/ferguson/Quantizr/QuantaGradio/prompts"
 source_folder: "/home/clay/ferguson/Quantizr"
 
 # Folders to include/exclude in the scan, relative to (i.e. contained within) the source_folder. In other words
