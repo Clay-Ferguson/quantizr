@@ -26,7 +26,7 @@ mode: "none"
 # ANTHROPIC = "anth" (supports Tool Calling)
 # GEMINI = "gemini"
 # XAI = "xai"
-ai_service: "openai"
+ai_service: "anth"
 
 scan_extensions: "py,html"
 data_folder: "/home/clay/ai-agent-temp"

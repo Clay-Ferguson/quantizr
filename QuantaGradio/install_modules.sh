@@ -27,8 +27,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
       langgraph \
       pydantic \
       pydantic-core \
-      configargparse \
-      javalang
+      configargparse
 else
   echo "Wrong Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s
