@@ -32,14 +32,13 @@ class AIUtils:
                     return True
         return False
     
-    # todo-0: make max_tokens configurable.
     @staticmethod
     def create_llm(
             temperature: float,
             cfg: argparse.Namespace
         ) -> BaseChatModel:
             """Creates a language model based on the AI service."""
-            print("Creating LLM: "+cfg.ai_service)
+            print("Creating LLM: "+cfg.ai_service+" max_tokens: "+str(cfg.max_tokens))
             timeout = 120  # timeout in seconds
             
             #ai-model
@@ -47,7 +46,7 @@ class AIUtils:
                 llm = ChatOpenAI(
                     model=cfg.openai_model,
                     temperature=temperature,
-                    max_tokens=16_000, # type: ignore
+                    max_tokens=int(cfg.max_tokens), # type: ignore
                     api_key=cfg.openai_api_key,
                     timeout=timeout,
                     cache=False
@@ -56,7 +55,7 @@ class AIUtils:
                 llm = ChatAnthropic(
                     model=cfg.anth_model, # type: ignore
                     temperature=temperature,
-                    max_tokens=40_000, # type: ignore
+                    max_tokens=int(cfg.max_tokens), # type: ignore
                     api_key=cfg.anth_api_key,
                     timeout=timeout,
                     cache=False
@@ -65,7 +64,7 @@ class AIUtils:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,
                     temperature=temperature,
-                    max_tokens=16_000,
+                    max_tokens=int(cfg.max_tokens), # type: ignore
                     api_key=cfg.gemini_api_key,
                     timeout=timeout,
                     cache=False
@@ -74,7 +73,7 @@ class AIUtils:
                 llm = ChatXAI(
                     model=cfg.xai_model,
                     temperature=temperature,
-                    max_tokens=16_000,
+                    max_tokens=int(cfg.max_tokens), # type: ignore
                     api_key=cfg.xai_api_key,
                     timeout=timeout,
                     cache=False

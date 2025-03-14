@@ -28,6 +28,11 @@ mode: "none"
 # XAI = "xai"
 ai_service: "anth"
 
+# The maximum number of tokens to use in the prompt. This will be unique to the `ai_service`, and you should check the
+# documentation for the service you are using to see what the maximum is, or else you can use a smaller value than that if you want
+# to for some reason restrict (cost, performance, etc.) the number of tokens used.
+max_tokens: 40000
+
 scan_extensions: "py,html,java"
 data_folder: "/home/clay/ai-agent-temp"
 

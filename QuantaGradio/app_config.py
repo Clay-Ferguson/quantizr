@@ -76,6 +76,9 @@ class AppConfig:
             "--prompts_folder", required=True, help="Folder with predefined prompts"
         )
         p.add_argument(
+            "--max_tokens", required=True, help="Maximum number of tokens to generate in an inference"
+        )
+        p.add_argument(
             "--mode",
             required=True,
             help="Update mode for the files (files or blocks)",
