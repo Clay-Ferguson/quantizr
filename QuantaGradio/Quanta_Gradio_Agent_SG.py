@@ -14,6 +14,9 @@ PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from app_config import AppConfig
+
+# WARNING: 'common' folder won't be known at runtime until the path append above is done!
+from common.python.folder_monitor import FolderMonitor
 from common.python.agent.ai_utils import AIUtils, init_tools
 from common.python.utils import Utils
 from common.python.agent.app_agent import QuantaAgent
@@ -31,6 +34,9 @@ if __name__ == "__main__":
     
     AppConfig.init_config()    
     Utils.init_logging(f"{AppConfig.cfg.data_folder}/Quanta_Gradio_Agent.log")
+    
+    monitor = FolderMonitor(AppConfig.file_sources)
+    monitor.start()
 
     class State(TypedDict):
         messages: Annotated[list, add_messages]
