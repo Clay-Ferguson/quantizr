@@ -106,11 +106,13 @@ if __name__ == "__main__":
             
         files = [f for f in os.listdir(prompt_dir) if os.path.isfile(os.path.join(prompt_dir, f))]
         # Return None if no files, otherwise return the list with default option
-        return None if len(files) == 0 else ["Select Prompt"] + files
+        return None if len(files) == 0 else ["Select"] + files
 
+    # todo-0: We already had post_process_template in the StringUtils module, and I should be combining this with that approach because they're
+    # both compatable with markdown, but I want to keep both types of preprocessing.
     def load_prompt_content(filename, sub_folder: str):
         """Load content of selected prompt file into input box, removing meta sections"""
-        if filename == "Select Prompt":
+        if filename == "Select":
             return ""
             
         prompt_dir = AppConfig.file_sources.prompts_folder+"/"+sub_folder
@@ -137,6 +139,15 @@ if __name__ == "__main__":
             print(f"Error loading prompt file: {e}")
             return f"Error loading file: {e}"
 
+    # Handler for agent prompt selection
+    def handle_agent_prompt_selection(filename):
+        if filename != "Select":
+            # todo-0: allow this to optionally set an overriding coding agent filename
+            # but remember to keep the existing one AS IS because Quanta needs to have that
+            # because the Agent runs in Quanta Web App AND in Gradio
+            print(f"Selected agent prompt: {filename}")
+        return filename
+
     # This 'logo' isn't being used, but I leave this in place for future reference in case we
     # need sayling like this later.
     css = """
@@ -159,23 +170,41 @@ if __name__ == "__main__":
             avatar_images=(None, "assets/logo-100px-tr.jpg")
         )
         
-        # Check if prompt files exist
-        prompt_files = get_prompt_files("user")
-        
-        # Only add dropdown if prompt files exist
-        if prompt_files:
-            prompt_dropdown = gr.Dropdown(
-                choices=prompt_files,
-                label="Prompt Files",
-                value="Select Prompt"
-            )
+        with gr.Row():
+            # Check if user prompt files exist
+            user_prompt_files = get_prompt_files("user")
             
+            # Only add dropdown if user prompt files exist
+            if user_prompt_files:
+                user_prompt_dropdown = gr.Dropdown(
+                    choices=user_prompt_files,
+                    label="Prompt",
+                    value="Select"
+                )
+            
+            # Check if agent prompt files exist
+            agent_prompt_files = get_prompt_files("agents")
+            
+            # Only add dropdown if agent prompt files exist
+            if agent_prompt_files:
+                agent_prompt_dropdown = gr.Dropdown(
+                    choices=agent_prompt_files,
+                    label="Agent (System Prompt)",
+                    value="Select"
+                )
+                # Add change handler to print selected filename
+                agent_prompt_dropdown.change(
+                    fn=handle_agent_prompt_selection,
+                    inputs=agent_prompt_dropdown,
+                    outputs=agent_prompt_dropdown  # Not actually changing anything, just need an output
+                )
+        
         input = gr.Textbox(lines=5, label="Chat Message", placeholder="Type your message here...")
         
-        # Connect dropdown to input textbox only if it exists
-        if prompt_files:
-            prompt_dropdown.change(fn=lambda dropdown: load_prompt_content(dropdown, "user"),
-                                   inputs=prompt_dropdown, outputs=input)
+        # Connect user dropdown to input textbox only if it exists
+        if user_prompt_files:
+            user_prompt_dropdown.change(fn=lambda dropdown: load_prompt_content(dropdown, "user"),
+                                 inputs=user_prompt_dropdown, outputs=input)
         
         with gr.Row():
             submit_button = gr.Button("Submit")
