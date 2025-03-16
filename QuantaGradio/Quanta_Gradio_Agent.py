@@ -1,5 +1,7 @@
 """Runs a ChatBot using Gradio interface, with access to the QuantAgent for code refactoring, not using StateGraph (SG)
 
+WARNING: This file is for demonstration purposes only. It was superceded by the Quanta_Gradio_Agent_SG.py file.
+
 """
 
 import sys

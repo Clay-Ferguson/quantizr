@@ -98,9 +98,9 @@ if __name__ == "__main__":
     def clear_history():
         return []
         
-    def get_prompt_files():
+    def get_prompt_files(sub_folder: str):
         """Get list of files from the prompt folder"""
-        prompt_dir = AppConfig.file_sources.prompts_folder
+        prompt_dir = AppConfig.file_sources.prompts_folder+"/"+sub_folder
         if not os.path.exists(prompt_dir):
             return None
             
@@ -108,12 +108,12 @@ if __name__ == "__main__":
         # Return None if no files, otherwise return the list with default option
         return None if len(files) == 0 else ["Select Prompt"] + files
 
-    def load_prompt_content(filename):
+    def load_prompt_content(filename, sub_folder: str):
         """Load content of selected prompt file into input box, removing meta sections"""
         if filename == "Select Prompt":
             return ""
             
-        prompt_dir = AppConfig.file_sources.prompts_folder
+        prompt_dir = AppConfig.file_sources.prompts_folder+"/"+sub_folder
         file_path = os.path.join(prompt_dir, filename)
         
         try:
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         )
         
         # Check if prompt files exist
-        prompt_files = get_prompt_files()
+        prompt_files = get_prompt_files("user")
         
         # Only add dropdown if prompt files exist
         if prompt_files:
@@ -174,7 +174,8 @@ if __name__ == "__main__":
         
         # Connect dropdown to input textbox only if it exists
         if prompt_files:
-            prompt_dropdown.change(fn=load_prompt_content, inputs=prompt_dropdown, outputs=input)
+            prompt_dropdown.change(fn=lambda dropdown: load_prompt_content(dropdown, "user"),
+                                   inputs=prompt_dropdown, outputs=input)
         
         with gr.Row():
             submit_button = gr.Button("Submit")
