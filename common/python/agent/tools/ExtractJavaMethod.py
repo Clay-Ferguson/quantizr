@@ -47,9 +47,6 @@ first be called without the file name specified, rather than calling another too
         if not file_name:
             # Use the first source folder as the default
             if self.file_sources.source_folder:
-                # todo-0: we could use file-change-detection to be sure this is only rescanned when it changes and really we can also make the
-                # ProjectLoader smart enough to reload ONLY the files that have changed. For now this does a full scan every time, until we verify
-                # everything is working well.
                 prj_loader = ProjectLoader.get_instance(self.file_sources)
                 prj_loader.scan_directory()
                 file_name = prj_loader.find_file_containing(method_start_line)

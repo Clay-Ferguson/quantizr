@@ -29,6 +29,8 @@ class LocateFile(BaseTool):
         """Builds a cache of filename to full paths mapping"""
         self._file_cache.clear()
         
+        # todo-0: Now that we have ProjectLoader, caching all files, and keeping the cache up to date in realtime, we can
+        # use that since it's all in-memory, and get rid of this file walker.
         for dirpath, _, filenames in os.walk(self.file_sources.source_folder):
             for filename in filenames:
                 if filename not in self._file_cache:
