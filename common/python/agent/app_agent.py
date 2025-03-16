@@ -164,6 +164,7 @@ Final Prompt:
             output_file_name = self.ts
         
         self.build_system_prompt("")
+        
         if QuantaAgent.tool_set is None:
             QuantaAgent.tool_set = init_tools(self.file_sources)
                 
@@ -219,6 +220,7 @@ Final Prompt:
 
     async def run_lang_graph(
         self,
+        verbatim_system_prompt: str,
         ai_service: str,
         output_file_name: str,
         messages,
@@ -238,12 +240,17 @@ Final Prompt:
         if output_file_name == "":
             output_file_name = self.ts
         
-        self.build_system_prompt("")
+        if verbatim_system_prompt:
+            self.system_prompt = verbatim_system_prompt
+        else:
+            self.build_system_prompt("")
                 
         # Convert messages to a format the agent can understand
         chat_history = AIUtils.gradio_messages_to_langchain(messages) 
 
         chat_history.append(HumanMessage(content=self.prompt))    
+        chat_history.insert(0, SystemMessage(content=self.system_prompt))
+        
         messages.append(ChatMessage(role="user", content=self.prompt))
         yield messages     
         
@@ -294,6 +301,7 @@ Final Prompt:
             return f"\nI'm working in a {file_type} file. "
         return ""
 
+    # todo-0: this would be more clear if it returned a string instead of modifying the system_prompt as a side effect.
     def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
         folders, and creating files.

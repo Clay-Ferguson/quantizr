@@ -82,6 +82,8 @@ class AIUtils:
                 raise Exception(f"Invalid AI Service: {cfg.ai_service}")
             return llm
         
+    # WARNING: If you have a System Prompt then the "SystemMessage" would need to be inserted
+    # at the beginning of the messages list. This is not done here.
     @staticmethod
     def gradio_messages_to_langchain(messages):
         """Converts Gradio messages to LangChain messages."""
