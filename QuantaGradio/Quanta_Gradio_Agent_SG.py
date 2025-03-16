@@ -7,7 +7,7 @@ https://langchain-ai.github.io/langgraph/tutorials/introduction/#requirements
 import sys
 import os
 import gradio as gr
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))

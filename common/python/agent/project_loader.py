@@ -18,9 +18,55 @@ class ProjectLoader:
     # All filen names encountered during the scan, relative to the source folder
     file_names: List[str] = []
     folder_names: List[str] = []
+    
+    # Singleton instance variables
+    _instance = None
+    _initialized = False
 
+    def __new__(cls, file_sources: FileSources):
+        if cls._instance is None:
+            cls._instance = super(ProjectLoader, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self, file_sources: FileSources):
-        self.file_sources = file_sources     
+        # Only initialize once
+        if ProjectLoader._initialized:
+            return
+            
+        if file_sources is None:
+            raise ValueError("file_sources must be provided when first initializing ProjectLoader")
+            
+        self.file_sources = file_sources
+        ProjectLoader._initialized = True     
+    
+    @classmethod
+    def is_initialized(cls) -> bool:
+        return cls._initialized
+        
+    # This class is a singleton that we access thru this method
+    @classmethod
+    def get_instance(cls, file_sources: FileSources):
+        if cls._instance is None:
+            if file_sources is None:
+                raise ValueError("file_sources must be provided when first initializing ProjectLoader")
+            return cls(file_sources)
+        
+        # Check if provided file_sources is different from the existing one
+        if file_sources is not None and not file_sources == cls._instance.file_sources:
+            raise ValueError("ProjectLoader already initialized with different FileSources. Cannot change configuration.")
+            
+        return cls._instance
+    
+    def on_file_changed(self, path: str):
+        """Called when a file is changed, to update file_contents
+        """
+        # get the file name relative to the source folder
+        relative_file_name: str = path[len(self.file_sources.source_folder) :]
+        # Read the file content
+        content = FileUtils.read_file(path)    
+        
+        # put content in the file_contents dictionary
+        self.file_contents[relative_file_name] = content
         
     def reset(self):
         self.blocks = {}

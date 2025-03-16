@@ -37,3 +37,25 @@ class FileSources:
         self.folders_to_exclude = folders_to_exclude
         self.ext_set = ext_set
         self.data_folder = data_folder
+
+    def __eq__(self, other):
+        if not isinstance(other, FileSources):
+            return False
+        
+        # Compare all relevant attributes
+        return (
+            self.source_folder == other.source_folder and
+            self.ext_set == other.ext_set and
+            self.folders_to_include == other.folders_to_include and 
+            self.folders_to_exclude == other.folders_to_exclude
+        )
+    
+    # Optional but recommended when implementing __eq__
+    def __hash__(self):
+        # Create a hash based on the immutable parts of the object
+        return hash((
+            self.source_folder,
+            frozenset(self.ext_set) if hasattr(self.ext_set, '__iter__') else self.ext_set,
+            frozenset(self.folders_to_include) if hasattr(self.folders_to_include, '__iter__') else self.folders_to_include,
+            frozenset(self.folders_to_exclude) if hasattr(self.folders_to_exclude, '__iter__') else self.folders_to_exclude
+        ))

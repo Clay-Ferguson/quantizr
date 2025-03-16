@@ -29,7 +29,7 @@ class GetBlockInfo(BaseTool):
     ) -> str:
         """Use the tool."""
         print(f"GetBlockInfoTool: {block_name}")
-        prj_loader = ProjectLoader(self.file_sources)
+        prj_loader = ProjectLoader.get_instance(self.file_sources)
         prj_loader.scan_directory()
         
         block: Optional[TextBlock] = prj_loader.blocks.get(block_name)

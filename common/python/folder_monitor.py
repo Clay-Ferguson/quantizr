@@ -5,6 +5,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import threading
 
+from common.python.agent.project_loader import ProjectLoader
 from common.python.utils import Utils
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -25,7 +26,8 @@ class FileChangeHandler(FileSystemEventHandler):
                 print(f"File Changed: {event.src_path}")
                 try:
                     FolderMonitor.active = False
-                    # todo-0: right here we will be injesting the new file into the ProjectLoader once we make ProjectLoader a singleton.
+                    ProjectLoader.get_instance(self.file_sources).on_file_changed(src_path)
+                        
                 except Exception as e:
                     print(f"Error: {e}")
                 finally:
@@ -35,13 +37,42 @@ class FileChangeHandler(FileSystemEventHandler):
 class FolderMonitor:
     active = True
     last_change_time = 0.0
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls, file_sources: FileSources):
+        if cls._instance is None:
+            cls._instance = super(FolderMonitor, cls).__new__(cls)
+        return cls._instance
     
     def __init__(self, file_sources: FileSources):
+        # Only initialize once
+        if FolderMonitor._initialized:
+            return
+            
+        if file_sources is None:
+            raise ValueError("file_sources must be provided when first initializing FolderMonitor")
+            
         self.file_sources = file_sources
         print(f"Including SubFolders: {self.file_sources.folders_to_include}")
         print(f"Excluding SubFolders: {self.file_sources.folders_to_exclude}") 
         self.observer = Observer()
         self.stop_event = threading.Event()
+        FolderMonitor._initialized = True
+
+    # This class is a singleton that we access thru this method
+    @classmethod
+    def get_instance(cls, file_sources: FileSources):
+        if cls._instance is None:
+            if file_sources is None:
+                raise ValueError("file_sources must be provided when first initializing FolderMonitor")
+            return cls(file_sources)
+        
+        # Check if provided file_sources is different from the existing one
+        if file_sources is not None and not file_sources == cls._instance.file_sources:
+            raise ValueError("FolderMonitor already initialized with different FileSources. Cannot change configuration.")
+            
+        return cls._instance
 
     def start(self):
         event_handler = FileChangeHandler(self.file_sources)   
