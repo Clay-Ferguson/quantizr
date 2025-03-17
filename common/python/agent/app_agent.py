@@ -62,7 +62,7 @@ class QuantaAgent:
         if (self.prompt_code): 
             self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
 
-        self.build_system_prompt(user_system_prompt)
+        self.system_prompt = self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
@@ -163,7 +163,7 @@ Final Prompt:
         if output_file_name == "":
             output_file_name = self.ts
         
-        self.build_system_prompt("")
+        self.system_prompt = self.build_system_prompt("")
         
         if QuantaAgent.tool_set is None:
             QuantaAgent.tool_set = init_tools(self.file_sources)
@@ -243,7 +243,7 @@ Final Prompt:
         if verbatim_system_prompt:
             self.system_prompt = verbatim_system_prompt
         else:
-            self.build_system_prompt("")
+            self.system_prompt = self.build_system_prompt("")
                 
         # Convert messages to a format the agent can understand
         chat_history = AIUtils.gradio_messages_to_langchain(messages) 
@@ -301,7 +301,6 @@ Final Prompt:
             return f"\nI'm working in a {file_type} file. "
         return ""
 
-    # todo-0: this would be more clear if it returned a string instead of modifying the system_prompt as a side effect.
     def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
         folders, and creating files.
@@ -311,38 +310,13 @@ Final Prompt:
         the AI query is made.
         """
 
-        self.system_prompt = PromptUtils.get_template(
+        system_prompt = PromptUtils.get_template(
             "../common/python/agent/prompt_templates/agent_system_prompt.md"
         )
         
         # Users themselves may have provided a system prompt so add that if so.
         if user_system_prompt:
-            self.system_prompt += f"\n----\nGeneral Instructions:\n{user_system_prompt}"
-
-
-    def add_block_handling_instructions(self):
-        """Adds instructions for updating blocks. If the prompt contains ${BlockName} tags, then we need to provide
-        instructions for how to provide the new block content."""
-        if self.mode == RefactorMode.REFACTOR.value:
-            self.system_prompt += PromptUtils.get_template(
-                "../common/python/agent/prompt_templates/block_access_instructions.txt"
-            )
+            system_prompt += f"\n----\nGeneral Instructions:\n{user_system_prompt}"
             
-            self.system_prompt += PromptUtils.get_template(
-                "../common/python/agent/prompt_templates/block_update_instructions.txt"
-            )
-           
-
-    def add_file_handling_instructions(self):
-        """Adds instructions for inserting files. If the prompt contains ${FileName} or ${FolderName/} tags, then
-        we need to provide instructions for how to provide the new file or folder names.
-        """
-        if self.mode == RefactorMode.REFACTOR.value:
-            self.system_prompt += PromptUtils.get_template(
-                "../common/python/agent/prompt_templates/file_access_instructions.txt"
-            )
-            
-            self.system_prompt += PromptUtils.get_template(
-                "../common/python/agent/prompt_templates/file_edit_instructions.txt"
-            )
+        return system_prompt
 
