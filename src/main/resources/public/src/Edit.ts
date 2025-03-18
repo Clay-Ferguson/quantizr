@@ -1038,6 +1038,11 @@ export class Edit {
         ast = ast || getAs();
         console.log("action nodesToMove: " + S.util.prettyPrint(ast.nodesToMove));
 
+        const node = S.nodeUtil.findNode(nodeId);
+        if (node) {
+            S.histUtil.pushTreeHistory(node);
+        }
+
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently
          * selected page (for the 'inside' option). Later on we can get more specific about allowing
