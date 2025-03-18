@@ -1,8 +1,12 @@
 # Gradio-based AI Web Apps
 
-* `Quanta_Gradio_Agent.py` - Quanta Coding Agent. Most of the code for this app is in `common/python` folder of the Quantizr repository. The common code is used by several other projects.
+`Quanta_Gradio_Agent_SG.py` is the primary app in this project.
 
-* `Quanta_Gradio_Agent_SG.py` - Same as `Quanta_Gradio_Agent.py` but with an actual StateGraph & Node Tree
+# Apps in this Project
+
+* `Quanta_Gradio_Agent_SG.py` - This is the primary Gradio-based Quanta Coding Agent, which the `QuantaGradio Project` is dedicated to. The other files in the root of this project that are named like `Quanta_Gradio_*.py` are primarily for demonstrating how to use Gradio in "as simple as possible" use cases. However the "Image Generation App" and "Image Understanding App" are both fully functional Gradio apps that can do generation and understanding respecively, and are not necessarily examples/demos, because they just work, and are useful as is.
+
+* `Quanta_Gradio_Agent.py` - Quanta Coding Agent. Most of the code for this app is in `common/python` folder of the Quantizr repository. The common code is used by several other projects.
 
 * `Quanta_Gradio_ChatTest.py` - Chat app
 
@@ -20,7 +24,7 @@
 The Quanta Coding Agent (QCA) features and capabilities are mostly the same regardless of whether you're running the the Quanta Web App, or the Quanta Gradio Agent (this project). Each way of using the QCA has it's own advantages and disadvantages. For example, the Quanta Web App itself is massive in size, complex, and complicated to configure and deploy, while this Quanta Gradio App is, like all Gradio apps, very easy to run, as long as you know how to run Python.
 
 
-## How Coding Agent Works
+## How Quanta Coding Agent Works
 
 A simple description of how this Gradio-based QCA works is as follows:
 
@@ -31,7 +35,7 @@ A simple description of how this Gradio-based QCA works is as follows:
 3) In the gradio app you can use the file(), folder(), and block() syntax (described in links below) to ask questions about your codebase or request actual direct real-time code refactoring to be done to your code base also.
 
 
-## Documentation - Coding Agent Features
+## Documentation - Quanta Coding Agent Features
 
 Here are a couple of links to the AI Docs on Github
 
