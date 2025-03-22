@@ -19,7 +19,7 @@ rm -rf ${QUANTA_BASE}/log/*
 
 makeDirs
 
-# Copy our primary logger file out to the live-loadable confured location
+# Copy our primary logger file out to the live-loadable configured location
 # (note: without the 'logging.config' being set in the docker yaml this file would
 # load right from /src/mai/resouces which is the spring default location.)
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
