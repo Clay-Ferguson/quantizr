@@ -11,6 +11,10 @@ import remarkMath from "remark-math";
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { dispatch, getAs } from "../../AppContext";
 
+// todo-0: React 19 says they're going to deprecate and remove forwardRef, so we need to get rid of it here:
+//   see: https://react.dev/blog/2024/12/05/react-19#improvements-in-react-19
+//   see: https://react.dev/blog/2024/12/05/react-19#new-features
+//   see: https://react.dev/blog/2024/12/05/react-19#deprecations
 const ReactMarkdownComp = forwardRef((props: any, ref) => {
     props = props || {};
 

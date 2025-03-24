@@ -1,4 +1,4 @@
-import { ReactNode, createElement, createRef, forwardRef, useEffect, useLayoutEffect } from "react";
+import { ReactNode, createElement, createRef, useEffect, useLayoutEffect } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -358,8 +358,12 @@ export abstract class Comp {
 
     // Core 'render' function used by react. This is THE function for the functional component this
     // object represents
-    renderCore(_props, _ref): any {
+    _render = (_props): any => {
         this.rendered = true;
+
+        // NOTE: Theoretically this should work, I think, but we're creating the ref earlier
+        // in the constructor, so we don't need to do this here.
+        // this.attribs.ref = _props.ref; // || createRef();
 
         try {
             if (this.stateMgr) {
@@ -413,11 +417,6 @@ export abstract class Comp {
         }
     }
 
-    // Note: forwardRef is a wrapper around the render method, so we can have 'ref' in the attribs.
-    // If we didn't need 'ref' we could have just use the render core method directly.
-    _render = forwardRef((props, ref) => {
-        return this.renderCore(props, ref);
-    });
 
     /* Get a printable string that contains the parentage of the component as far as we know it back
     to the root level */

@@ -115,24 +115,6 @@ export class TextArea extends Div implements I.TextEditorIntf {
         att.style = att.style || {};
         att.style.fontFamily = "monospace";
 
-        // Getting a bizarre React error whenver 'onKeyUp' is used.
-        //     Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
-        // Not going to take the time to troubleshoot this low-priority need. I was working on making the
-        // height of the editors automatically adjust.
-        // function calcHeight(value) {
-        //     let numberOfLineBreaks = (value.match(/\n/g) || []).length;
-        //     // min-height + lines x line-height + padding + border
-        //     let newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
-        //     return newHeight;
-        // }
-        //  att.onKeyUp = function () {
-        //     console.log("keyup.");
-        // };
-        // let textarea = document.querySelector(".resize-ta");
-        // textarea.addEventListener("keyup", () => {
-        //     textarea.style.height = calcHeight(textarea.value) + "px";
-        // });
-
         children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.minRows, this.scrollPos));
         return children;
     }
