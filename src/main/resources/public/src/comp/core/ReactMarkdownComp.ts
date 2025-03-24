@@ -1,4 +1,4 @@
-import { createElement, forwardRef } from "react";
+import { createElement } from "react";
 import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
 import rehypeSanitize from "rehype-sanitize";
@@ -11,11 +11,7 @@ import remarkMath from "remark-math";
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { dispatch, getAs } from "../../AppContext";
 
-// todo-0: React 19 says they're going to deprecate and remove forwardRef, so we need to get rid of it here:
-//   see: https://react.dev/blog/2024/12/05/react-19#improvements-in-react-19
-//   see: https://react.dev/blog/2024/12/05/react-19#new-features
-//   see: https://react.dev/blog/2024/12/05/react-19#deprecations
-const ReactMarkdownComp = forwardRef((props: any, ref) => {
+const ReactMarkdownComp = (props: any) => {
     props = props || {};
 
     // Note: mkBody doesn't have any styling, and is only used to identify the markdown body for DOM lookup
@@ -34,13 +30,12 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
 
     return createElement(Markdown as any, {
         ...props,
-        ref,
         // WARNING: The order of these plugins is VERY significant!!! DO NOT ALTER
         // NOTE: The singleDollarTextMath option is needed to avoid conflict with $ in text, and so we only use $$ for math
         remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
         rehypePlugins: [rehypeSanitize, rehypeKatex],
     });
-});
+};
 
 const _anchorFunc = (props: any) => {
     return createElement("a", { href: props.href, target: "blank" }, props.children);
