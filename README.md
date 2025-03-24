@@ -2,7 +2,7 @@
 
 # Quanta Web Platform
 
-Quanta is a Hierarchical Content Management System
+**Quanta is a Hierarchical CMS (Content Management System) **
 
 Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
 
@@ -12,6 +12,7 @@ These nodes are the main elements of the app, similar to Facebook Posts or Twitt
 
 ## Features
 
+* Block-based Editor (similar to Jypyter Notebooks)
 * AI Chat & Agents
 * Wikis & micro-blogging
 * Document collaboration and publishing
@@ -29,11 +30,14 @@ These nodes are the main elements of the app, similar to Facebook Posts or Twitt
 
 ## Technology Stack
 
-* Java Language (back end) 
-* TypeScript, ReactJS, Vite (front end)
-* Spring Boot 3 FAT Jar with embedded Tomcat (back end)
-* MongoDB as primary data store
-* Redis for Session Data
+* TypeScript, ReactJS, TailwindCSS, Vite Build (front end)
+* Java Spring Boot 3 FAT Jar with embedded Tomcat (back end)
+* MongoDB as database
+* Redis for session data
 * Python Microservice using LangChain for AI functions
 * Deployment: Docker Compose (Swarm Mode)
+
+## Notes
+
+The `QuantaGradio` folder in this repo has it's own `README.md` and contains several Python-based Gradio apps for doing AI (General Chatbot, Coding Agent Chatbox, Image Understanding, and Image Generation), and relies on the same Python in the `commmon` folder, however these Gradio apps are not actually a part of Quanta itself, and the `QuantaGradio` project can be completely omitted if you're only interested in Quanta CMS Web app.
 

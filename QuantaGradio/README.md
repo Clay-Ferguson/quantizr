@@ -1,5 +1,7 @@
 # Gradio-based AI Web Apps
 
+NOTE: This `QuantaGradio` app is not required to run the Quanta CMS Web App. All Gradio code here is for several stand-alone Gradio apps (found in this folder), which do use all the same Python code that Quanta uses to run AI, however Quanta makes use of the Microservice in the `QuantaAI` folder in order to execute the AI Python code.
+
 `Quanta_Gradio_Agent_SG.py` is the primary app in this project.
 
 # Apps in this Project
