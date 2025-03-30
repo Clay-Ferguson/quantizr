@@ -48,24 +48,9 @@ If you refresh the browser you'll need to click "Connect" again to resume, but t
 You'll notice this app has no Vue, React, Angular, or any other web frameworks, and is implemented entirely in pure JavaScript. This was done very intentionally to keep this code understandable and usable by all JavaScript developers. This app was sort of done as an experiment also just to prove what the simplest possible implementation of Chat App can look like. It would be a great app for JavaScript beginners to learn with, or for developers wanting to learn about WebRTC as well. 
 
 
-# How to Run QuantaChat
+# Download code from GitHub
 
-You'll need to install Node and NPM first. Then one of the following two options below:
-
-## Getting from Github - Option 1:
-
-Run this on some server that's visible on the web. For development purposes you can run on localhost as well of course.
-
-    # todo-0: Add instructions here on how to do just a "sparse checkout" of the QuantChat subfolder:
-    git clone https://github.com/Clay-Ferguson/quantizr
-    cd quantizr/QuantaChat
-    npm init -y
-    npm install ws
-    node QuantaChatServer.js --host 12.34.56.78 --port 8080 --httpPort 80
-
-# Getting from Github - Option 2:
-
-If you only need the QuantaChat project, you can use Git sparse checkout:
+You only need the `QuantaChat` folder (from the `quantizr` mono-repo), so use Git sparse checkout:
 
 1.  Clone the monorepo:
     ```bash
@@ -84,14 +69,16 @@ If you only need the QuantaChat project, you can use Git sparse checkout:
 
 Now, the QuantaChat project will be available in the `QuantaChat` directory. To update, simply run `git pull`.    
     
+
 # Starting the Server
 
-For running on localhost, use this node command instead of the above.
+You'll need to install Node and NPM first. Then one of the following two options below:
+
+To run on localhost, for testing (port 8000 for HTTP, port 8080 for WebRTC).
     
-    node QuantaChatServer.js --host 0.0.0.0 --port 8080 --httpPort 8000
+    node QuantaChatServer.js
 
-Once you have the project cloned, and you need to run the latest version, the following commands will get the latest from git, and run it.
+To run on a productin server:
 
-    git reset --hard HEAD
-    git pull --force
     sudo node QuantaChatServer.js --host 12.34.56.78 --port 8080 --httpPort 80
+
