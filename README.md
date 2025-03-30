@@ -37,7 +37,20 @@ These nodes are the main elements of the app, similar to Facebook Posts or Twitt
 * Python Microservice using LangChain for AI functions
 * Deployment: Docker Compose (Swarm Mode)
 
-## Notes
+## Quantizr is a Mono-Repo
 
-The `QuantaGradio` folder in this repo has it's own `README.md` and contains several Python-based Gradio apps for doing AI (General Chatbot, Coding Agent Chatbox, Image Understanding, and Image Generation), and relies on the same Python in the `commmon` folder, however these Gradio apps are not actually a part of Quanta itself, and the `QuantaGradio` project can be completely omitted if you're only interested in Quanta CMS Web app.
+Quantizr is a mono-repo that is itself (at the root level) the Quanta Web App (CMS), which is a very large app with around 500K lines of code. However inside the root folder we have two separate projects which are standalone applications themselves, and can be run independently of Quanta. These two separate apps are:
 
+**Quanta Web App (CMS)**
+
+The root level of the repository contains the Quanta App itself.
+
+
+**Quanta Gradio App**
+
+The `QuantaGradio` folder in this repo contains several Python-based Gradio apps for doing AI (General Chatbot, Coding Agent Chatbox, Image Understanding, and Image Generation), and relies on the same Python in the `commmon` folder. So to use QuantaGradio apps you only need to checkout the `QuantaGradio` and `common` folders.
+
+
+**Quanta Chat App**
+
+The `QuantaChat` folder in this repo is a Peer-to-Peer WebRTC-based Chat app that runs in web browsers, using JavaScript, and the associated Signaling Server that goes with it. This app is completely self contained, so you only need to checkout the `QuantaChat` folder.
