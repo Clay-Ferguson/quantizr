@@ -66,6 +66,11 @@ You only need the `QuantaChat` folder (from the `quantizr` mono-repo), so use Gi
     ```bash
     git checkout main
     ```
+4.  Prepare to Run
+    ```bash
+    cd QuantaChat
+    npm install
+    ```
 
 Now, the QuantaChat project will be available in the `QuantaChat` directory. To update, simply run `git pull`.    
     
@@ -75,7 +80,7 @@ Now, the QuantaChat project will be available in the `QuantaChat` directory. To 
 You'll need to install Node and NPM first. Then one of the following two options below:
 
 To run on localhost, for testing (port 8000 for HTTP, port 8080 for WebRTC).
-    
+
     node QuantaChatServer.js
 
 To run on a productin server:
