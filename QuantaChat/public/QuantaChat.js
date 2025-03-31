@@ -457,7 +457,7 @@ class QuantaChat {
 
     async initApp() {
         console.log("QuantaChat initApp");
-        this.storage = await IndexedDB.getInst();
+        this.storage = await IndexedDB.getInst("quantaChatDB", "quantaChatStore", 1);
         this.rtc = await WebRTC.getInst(this.storage, this);
 
         // Event listeners

@@ -4,20 +4,17 @@
  */
 class IndexedDB {
     constructor() {
-        this.DB_NAME = 'quantaChatDB';
-        this.STORE_NAME = 'quantaChatStore';
-        this.DB_VERSION = 1;
         console.log('IndexedDB singleton created');
     }
 
     // New static factory method to replace async constructor
-    static async getInst() {
+    static async getInst(dbName, storeName, dbVersion) {
         // Create instance if it doesn't exist
         if (!IndexedDB.inst) {
             IndexedDB.inst = new IndexedDB();
 
             console.log("Waiting for DB")
-            await IndexedDB.inst.initDB();
+            await IndexedDB.inst.initDB(dbName, storeName, dbVersion);
             console.log("DB ready")
         }
 
@@ -27,9 +24,13 @@ class IndexedDB {
     /**
      * Initialize the IndexedDB database
      */
-    async initDB() {
+    async initDB(dbName, storeName, dbVersion) {
+        this.dbName = dbName;
+        this.storeName = storeName;
+        this.dbVersion = dbVersion;
+
         const dbPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            const request = indexedDB.open(this.dbName, this.dbVersion);
 
             request.onerror = (event) => {
                 console.error('IndexedDB error:', event.target.error);
@@ -42,8 +43,8 @@ class IndexedDB {
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
-                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-                    db.createObjectStore(this.STORE_NAME);
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName);
                 }
             };
         });
@@ -61,8 +62,8 @@ class IndexedDB {
         this.checkDB();
         try {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(this.STORE_NAME, 'readwrite');
-                const store = transaction.objectStore(this.STORE_NAME);
+                const transaction = this.db.transaction(this.storeName, 'readwrite');
+                const store = transaction.objectStore(this.storeName);
                 const request = store.put(value, key);
 
                 request.onsuccess = () => resolve();
@@ -86,8 +87,8 @@ class IndexedDB {
         this.checkDB();
         try {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(this.STORE_NAME, 'readonly');
-                const store = transaction.objectStore(this.STORE_NAME);
+                const transaction = this.db.transaction(this.storeName, 'readonly');
+                const store = transaction.objectStore(this.storeName);
                 const request = store.get(key);
 
                 request.onsuccess = () => resolve(request.result);
@@ -108,8 +109,8 @@ class IndexedDB {
         this.checkDB();
         try {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(this.STORE_NAME, 'readwrite');
-                const store = transaction.objectStore(this.STORE_NAME);
+                const transaction = this.db.transaction(this.storeName, 'readwrite');
+                const store = transaction.objectStore(this.storeName);
                 const request = store.delete(key);
 
                 request.onsuccess = () => resolve();
@@ -132,8 +133,8 @@ class IndexedDB {
         this.checkDB();
         try {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(this.STORE_NAME, 'readwrite');
-                const store = transaction.objectStore(this.STORE_NAME);
+                const transaction = this.db.transaction(this.storeName, 'readwrite');
+                const store = transaction.objectStore(this.storeName);
                 const request = store.clear();
 
                 request.onsuccess = () => resolve();
@@ -156,8 +157,8 @@ class IndexedDB {
         this.checkDB();
         try {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(this.STORE_NAME, 'readonly');
-                const store = transaction.objectStore(this.STORE_NAME);
+                const transaction = this.db.transaction(this.storeName, 'readonly');
+                const store = transaction.objectStore(this.storeName);
                 const request = store.getAllKeys();
 
                 request.onsuccess = () => resolve(request.result);
