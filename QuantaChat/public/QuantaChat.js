@@ -56,21 +56,38 @@ class QuantaChat {
         const messageContent = document.createElement('div');
         messageContent.classList.add('message-content');
 
+        // Create a header container for sender and timestamp
+        const messageHeader = document.createElement('div');
+        messageHeader.classList.add('message-header');
+
+        // Add sender prefix
+        const senderSpan = document.createElement('span');
+        senderSpan.classList.add('message-sender');
+
         if (msg.sender === this.rtc.userName) {
             messageDiv.classList.add('local');
-
-            // Add sender prefix
-            const senderSpan = document.createElement('span');
             senderSpan.textContent = 'You: ';
-            messageDiv.appendChild(senderSpan);
         } else {
             messageDiv.classList.add('remote');
-
-            // Add sender prefix
-            const senderSpan = document.createElement('span');
             senderSpan.textContent = msg.sender + ': ';
-            messageDiv.appendChild(senderSpan);
         }
+
+        messageHeader.appendChild(senderSpan);
+
+        // Add timestamp if available
+        if (msg.timestamp) {
+            const timestampSpan = document.createElement('span');
+            timestampSpan.classList.add('message-timestamp');
+
+            // Format the timestamp
+            const messageDate = new Date(msg.timestamp);
+            const timeString = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timestampSpan.textContent = timeString;
+
+            messageHeader.appendChild(timestampSpan);
+        }
+
+        messageDiv.appendChild(messageHeader);
 
         // Render markdown content if there's any text message
         if (msg.content && msg.content.trim() !== '') {

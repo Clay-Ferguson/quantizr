@@ -517,11 +517,28 @@ h6 {
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 5px 10px; /* Different padding than standard */
+    padding: 5px 10px;
+    /* Different padding than standard */
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .download-button:hover {
     background-color: var(--color-primary-hover);
+}
+
+.message-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+}
+
+.message-sender {
+    font-weight: bold;
+}
+
+.message-timestamp {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 2px;
 }
