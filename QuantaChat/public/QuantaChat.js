@@ -41,6 +41,122 @@ class QuantaChat {
         return [];
     }
 
+    // Helper function to create message DOM elements
+    _createMessageElement(msg) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+
+        if (msg.sender === 'system') {
+            messageDiv.classList.add('system');
+            messageDiv.textContent = msg.content;
+            return messageDiv;
+        }
+
+        // Create container for rendered markdown
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('message-content');
+
+        if (msg.sender === this.rtc.userName) {
+            messageDiv.classList.add('local');
+
+            // Add sender prefix
+            const senderSpan = document.createElement('span');
+            senderSpan.textContent = 'You: ';
+            messageDiv.appendChild(senderSpan);
+        } else {
+            messageDiv.classList.add('remote');
+
+            // Add sender prefix
+            const senderSpan = document.createElement('span');
+            senderSpan.textContent = msg.sender + ': ';
+            messageDiv.appendChild(senderSpan);
+        }
+
+        // Render markdown content if there's any text message
+        if (msg.content && msg.content.trim() !== '') {
+            messageContent.innerHTML = util.renderContent(msg.content);
+        }
+
+        // Handle attachments if any
+        if (msg.attachments && msg.attachments.length > 0) {
+            const attachmentsDiv = document.createElement('div');
+            attachmentsDiv.classList.add('attachments');
+
+            msg.attachments.forEach(attachment => {
+                if (attachment.type.startsWith('image/')) {
+                    // Display image inline
+                    const imgContainer = document.createElement('div');
+                    imgContainer.classList.add('attachment-container');
+
+                    const img = document.createElement('img');
+                    img.src = attachment.data;
+                    img.alt = attachment.name;
+                    img.classList.add('attachment-image');
+                    img.style.maxWidth = '250px';
+                    img.style.cursor = 'pointer';
+                    img.title = "Click to view full size";
+
+                    // View full size on click
+                    img.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        this.openImageViewer(attachment.data, attachment.name);
+                        return false;
+                    });
+
+                    // Add download button for images
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.classList.add('download-button', 'image-download');
+                    downloadBtn.innerHTML = '⬇️';
+                    downloadBtn.title = `Download ${attachment.name}`;
+                    downloadBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        this.downloadAttachment(attachment.data, attachment.name);
+                    };
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(downloadBtn);
+                    attachmentsDiv.appendChild(imgContainer);
+                } else {
+                    // Create a download button for non-image files
+                    const fileContainer = document.createElement('div');
+                    fileContainer.classList.add('file-attachment');
+
+                    const fileIcon = document.createElement('span');
+                    fileIcon.textContent = '📄 ';
+                    fileContainer.appendChild(fileIcon);
+
+                    const fileName = document.createElement('span');
+                    fileName.textContent = `${attachment.name} (${util.formatFileSize(attachment.size)})`;
+                    fileContainer.appendChild(fileName);
+
+                    const downloadButton = document.createElement('button');
+                    downloadButton.classList.add('download-button');
+                    downloadButton.textContent = 'Download';
+                    downloadButton.title = `Download ${attachment.name}`;
+                    downloadButton.onclick = () => {
+                        this.downloadAttachment(attachment.data, attachment.name);
+                    };
+
+                    fileContainer.appendChild(downloadButton);
+                    attachmentsDiv.appendChild(fileContainer);
+                }
+            });
+            messageContent.appendChild(attachmentsDiv);
+        }
+        messageDiv.appendChild(messageContent);
+        return messageDiv;
+    }
+
+    // Modified display message function to use the common renderer
+    _displayMessage = (msg) => {
+        console.log("Displaying message from " + msg.sender + ": " + msg.content);
+        const chatLog = elm('chatLog');
+        const messageDiv = this._createMessageElement(msg);
+        chatLog.appendChild(messageDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
     // Load and display all messages for a room
     async displayRoomHistory(roomId) {
         if (!this.messages) {
@@ -53,10 +169,11 @@ class QuantaChat {
 
         // Display system message about history
         if (this.messages.length > 0) {
-            const systemMsg = document.createElement('div');
-            systemMsg.classList.add('message', 'system');
-            systemMsg.textContent = 'Loading message history...';
-            chatLog.appendChild(systemMsg);
+            const systemMsg = {
+                sender: 'system',
+                content: 'Loading message history...'
+            };
+            chatLog.appendChild(this._createMessageElement(systemMsg));
 
             this.messages.forEach(msg => {
                 // print the message to the console
@@ -65,90 +182,20 @@ class QuantaChat {
                     console.log('Message has ' + msg.attachments.length + ' attachment(s)');
                 }
 
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-
-                if (msg.sender === this.rtc.userName) {
-                    messageDiv.classList.add('local');
-
-                    const senderSpan = document.createElement('span');
-                    senderSpan.textContent = 'You: ';
-                    messageDiv.appendChild(senderSpan);
-                } else {
-                    messageDiv.classList.add('remote');
-
-                    const senderSpan = document.createElement('span');
-                    senderSpan.textContent = msg.sender + ': ';
-                    messageDiv.appendChild(senderSpan);
-                }
-
-                const messageContent = document.createElement('div');
-                messageContent.classList.add('message-content');
-
-                // Render markdown content if there's any text
-                if (msg.content && msg.content.trim() !== '') {
-                    // allow marked to have failed to load, and fall back to just text.
-                    messageContent.innerHTML = util.renderContent(msg.content);
-                }
-
-                // Handle attachments if any
-                if (msg.attachments && msg.attachments.length > 0) {
-                    const attachmentsDiv = document.createElement('div');
-                    attachmentsDiv.classList.add('attachments');
-
-                    msg.attachments.forEach(attachment => {
-                        if (attachment.type.startsWith('image/')) {
-                            // Display image inline
-                            const img = document.createElement('img');
-                            img.src = attachment.data;
-                            img.alt = attachment.name;
-                            img.classList.add('attachment-image');
-                            img.style.maxWidth = '250px';
-                            img.style.cursor = 'pointer';
-                            img.title = "Click to view full size"; // Add a tooltip
-
-                            // Add this inside displayRoomHistory function where we set up the image click event:
-                            img.addEventListener('click', (event) => {
-                                event.preventDefault(); // Prevent browser's default action
-                                event.stopPropagation(); // Stop event from bubbling up
-                                this.openImageViewer(attachment.data, attachment.name);
-                                return false; // Belt and suspenders approach for older browsers
-                            });
-
-                            attachmentsDiv.appendChild(img);
-                        } else {
-                            // Create a download link for non-image files
-                            const fileLink = document.createElement('div');
-                            fileLink.classList.add('file-attachment');
-
-                            const icon = document.createElement('span');
-                            icon.textContent = '📄 ';
-
-                            const link = document.createElement('a');
-                            link.href = attachment.data;
-                            link.download = attachment.name;
-                            link.textContent = `${attachment.name} (${util.formatFileSize(attachment.size)})`;
-
-                            fileLink.appendChild(icon);
-                            fileLink.appendChild(link);
-                            attachmentsDiv.appendChild(fileLink);
-                        }
-                    });
-                    messageContent.appendChild(attachmentsDiv);
-                }
-                messageDiv.appendChild(messageContent);
-                chatLog.appendChild(messageDiv);
+                chatLog.appendChild(this._createMessageElement(msg));
             });
 
-            const endMsg = document.createElement('div');
-            endMsg.classList.add('message', 'system');
-            endMsg.textContent = 'End of message history';
-            chatLog.appendChild(endMsg);
+            const endMsg = {
+                sender: 'system',
+                content: 'End of message history'
+            };
+            chatLog.appendChild(this._createMessageElement(endMsg));
         } else {
-            const noHistoryMsg = document.createElement('div');
-            noHistoryMsg.classList.add('message', 'system');
-            noHistoryMsg.textContent = 'No message history for this room';
-            chatLog.appendChild(noHistoryMsg);
+            const noHistoryMsg = {
+                sender: 'system',
+                content: 'No message history for this room'
+            };
+            chatLog.appendChild(this._createMessageElement(noHistoryMsg));
         }
 
         // Scroll to bottom
@@ -347,115 +394,6 @@ class QuantaChat {
         attachButton.title = 'Attach files';
         const fileInput = elm('fileInput');
         fileInput.value = '';
-    }
-
-    // Modified display message function to handle attachments
-    _displayMessage = (msg) => {
-        console.log("Displaying message from " + msg.sender + ": " + msg.content);
-        const chatLog = elm('chatLog');
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-
-        if (msg.sender === 'system') {
-            messageDiv.classList.add('system');
-            messageDiv.textContent = msg.content;
-        } else {
-            // Create container for rendered markdown
-            const messageContent = document.createElement('div');
-            messageContent.classList.add('message-content');
-
-            if (msg.sender === this.rtc.userName) {
-                messageDiv.classList.add('local');
-
-                // Add sender prefix
-                const senderSpan = document.createElement('span');
-                senderSpan.textContent = 'You: ';
-                messageDiv.appendChild(senderSpan);
-            } else {
-                messageDiv.classList.add('remote');
-
-                // Add sender prefix
-                const senderSpan = document.createElement('span');
-                senderSpan.textContent = msg.sender + ': ';
-                messageDiv.appendChild(senderSpan);
-            }
-
-            // Render markdown content if there's any text message
-            if (msg.content && msg.content.trim() !== '') {
-                messageContent.innerHTML = util.renderContent(msg.content);
-            }
-
-            // Handle attachments if any
-            if (msg.attachments && msg.attachments.length > 0) {
-                const attachmentsDiv = document.createElement('div');
-                attachmentsDiv.classList.add('attachments');
-
-                msg.attachments.forEach(attachment => {
-                    if (attachment.type.startsWith('image/')) {
-                        // Display image inline
-                        const imgContainer = document.createElement('div');
-                        imgContainer.classList.add('attachment-container');
-
-                        const img = document.createElement('img');
-                        img.src = attachment.data;
-                        img.alt = attachment.name;
-                        img.classList.add('attachment-image');
-                        img.style.maxWidth = '250px';
-                        img.style.cursor = 'pointer';
-                        img.title = "Click to view full size";
-
-                        // View full size on click
-                        img.addEventListener('click', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            this.openImageViewer(attachment.data, attachment.name);
-                            return false;
-                        });
-
-                        // Add download button for images
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.classList.add('download-button', 'image-download');
-                        downloadBtn.innerHTML = '⬇️';
-                        downloadBtn.title = `Download ${attachment.name}`;
-                        downloadBtn.onclick = (event) => {
-                            event.stopPropagation();
-                            this.downloadAttachment(attachment.data, attachment.name);
-                        };
-
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(downloadBtn);
-                        attachmentsDiv.appendChild(imgContainer);
-                    } else {
-                        // Create a download button for non-image files
-                        const fileContainer = document.createElement('div');
-                        fileContainer.classList.add('file-attachment');
-
-                        const fileIcon = document.createElement('span');
-                        fileIcon.textContent = '📄 ';
-                        fileContainer.appendChild(fileIcon);
-
-                        const fileName = document.createElement('span');
-                        fileName.textContent = `${attachment.name} (${util.formatFileSize(attachment.size)})`;
-                        fileContainer.appendChild(fileName);
-
-                        const downloadButton = document.createElement('button');
-                        downloadButton.classList.add('download-button');
-                        downloadButton.textContent = 'Download';
-                        downloadButton.title = `Download ${attachment.name}`;
-                        downloadButton.onclick = () => {
-                            this.downloadAttachment(attachment.data, attachment.name);
-                        };
-
-                        fileContainer.appendChild(downloadButton);
-                        attachmentsDiv.appendChild(fileContainer);
-                    }
-                });
-                messageContent.appendChild(attachmentsDiv);
-            }
-            messageDiv.appendChild(messageContent);
-        }
-        chatLog.appendChild(messageDiv);
-        chatLog.scrollTop = chatLog.scrollHeight;
     }
 
     // Add this function to create and manage the image viewer modal
