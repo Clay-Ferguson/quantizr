@@ -50,6 +50,20 @@ class Util {
         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / 1048576).toFixed(1) + ' MB';
     }
+
+    formatStorageSize(bytes) {
+        if (bytes === 0) return '0 B';
+
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+        // Return with 2 decimal places for MB and above, 0 for KB and B
+        if (i >= 2) {
+            return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + units[i];
+        } else {
+            return (bytes / Math.pow(1024, i)).toFixed(0) + ' ' + units[i];
+        }
+    }
 }
 
 export default Util;

@@ -1,5 +1,6 @@
 import WebRTC from './WebRTC.js';
 import IndexedDB from './IndexedDB.js';
+console.log("QuantaChat Version 0.1.4");
 
 import Utils from './Util.js';
 const util = Utils.getInst();
@@ -211,9 +212,95 @@ class QuantaChat {
             return false; // Message already exists, do not save again
         }
 
-        this.messages.push(msg);
-        this.saveMessages();
-        return true;
+        try {
+            await this.autoPruneDatabase(msg);
+            this.messages.push(msg);
+            this.saveMessages();
+            return true;
+        } catch (error) {
+            util.log('Error checking storage or saving message: ' + error);
+            // Still try to save the message
+            this.messages.push(msg);
+            this.saveMessages();
+            return true;
+        }
+    }
+
+    // todo-0: we could drop into the messages a note item that says "X old messages deleted to save space", and just update that every time
+    async autoPruneDatabase(msg) {
+        if (navigator.storage && navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            const remainingStorage = estimate.quota - estimate.usage;
+            const usagePercentage = (estimate.usage / estimate.quota) * 100;
+            const forceClean = false; // set to true to simuilate low storage, and cause pruning
+
+            console.log(`Storage: (${Math.round(usagePercentage)}% used). Quota: ${util.formatStorageSize(estimate.quota)}`);
+
+            // Calculate message size and check storage limits
+            const msgSize = this.calculateMessageSize(msg);
+
+            // If we're within 10% of storage limit
+            if (remainingStorage < msgSize || usagePercentage > 90 || forceClean) {
+                const warningMsg = `You're running low on storage space (${Math.round(usagePercentage)}% used). ` +
+                    `Would you like to remove the oldest 20% of messages to free up space?`;
+
+                if (confirm(warningMsg)) {
+                    // Sort messages by timestamp and remove oldest 20%
+                    this.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    const messageCountToRemove = Math.ceil(this.messages.length * 0.20);
+                    this.messages = this.messages.slice(messageCountToRemove);
+
+                    // Save the pruned messages
+                    this.saveMessages();
+                    util.log(`Removed ${messageCountToRemove} old messages due to storage constraints`);
+                }
+            }
+        }
+    }
+
+    // Calculate the size of a message object in bytes
+    calculateMessageSize(msg) {
+        let totalSize = 0;
+
+        // Text content size
+        if (msg.content) {
+            totalSize += new Blob([msg.content]).size;
+        }
+
+        // Metadata size (sender, timestamp, etc.)
+        totalSize += new Blob([JSON.stringify({
+            sender: msg.sender,
+            timestamp: msg.timestamp
+        })]).size;
+
+        // Attachments size
+        if (msg.attachments && msg.attachments.length > 0) {
+            msg.attachments.forEach(attachment => {
+                // Base64 data URLs are approximately 33% larger than the original binary
+                // The actual data portion is after the comma in "data:image/jpeg;base64,..."
+                if (attachment.data) {
+                    const dataUrl = attachment.data;
+                    const base64Index = dataUrl.indexOf(',') + 1;
+                    if (base64Index > 0) {
+                        const base64Data = dataUrl.substring(base64Index);
+                        // Convert from base64 size to binary size (approx)
+                        totalSize += Math.floor((base64Data.length * 3) / 4);
+                    } else {
+                        // Fallback if data URL format is unexpected
+                        totalSize += new Blob([dataUrl]).size;
+                    }
+                }
+
+                // Add size of attachment metadata
+                totalSize += new Blob([JSON.stringify({
+                    name: attachment.name,
+                    type: attachment.type,
+                    size: attachment.size
+                })]).size;
+            });
+        }
+
+        return totalSize;
     }
 
     messageExists(msg) {
