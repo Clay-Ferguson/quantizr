@@ -120,7 +120,7 @@ body {
 }
 
 .message {
-    margin: 5px 0;
+    margin: 0;
     text-align: left;
     /* Make all messages left-aligned */
 }
@@ -156,18 +156,19 @@ body {
     display: inline-block;
     text-align: left;
     flex-grow: 1;
-    border-radius: 8px;
     padding: 6px 10px;
-    margin: 4px 0;
+    margin: 0;
     max-width: 80%;
 }
 
 .local .message-content {
-    border: 2px solid var(--color-border-highlight);
+    border-left: 6px solid var(--color-border-highlight);
+    border-bottom: 2px solid var(--color-border-highlight);
 }
 
 .remote .message-content {
-    border: 2px solid var(--color-border-message);
+    border-left: 2px dotted gray;
+    border-bottom: 2px dotted gray;
 }
 
 /* Remove the row-reverse for local messages */
