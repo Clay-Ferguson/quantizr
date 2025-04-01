@@ -52,9 +52,9 @@ class QuantaChat {
             return messageDiv;
         }
 
-        // Create container for rendered markdown
-        const messageContent = document.createElement('div');
-        messageContent.classList.add('message-content');
+        // Create a container for the message header and content
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message-container');
 
         // Create a header container for sender and timestamp
         const messageHeader = document.createElement('div');
@@ -87,7 +87,9 @@ class QuantaChat {
             messageHeader.appendChild(timestampSpan);
         }
 
-        messageDiv.appendChild(messageHeader);
+        // Create container for rendered markdown
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('message-content');
 
         // Render markdown content if there's any text message
         if (msg.content && msg.content.trim() !== '') {
@@ -161,7 +163,12 @@ class QuantaChat {
             });
             messageContent.appendChild(attachmentsDiv);
         }
-        messageDiv.appendChild(messageContent);
+
+        // Append both elements to the container
+        messageContainer.appendChild(messageHeader);
+        messageContainer.appendChild(messageContent);
+        messageDiv.appendChild(messageContainer);
+
         return messageDiv;
     }
 

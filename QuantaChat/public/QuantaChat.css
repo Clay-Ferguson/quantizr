@@ -121,33 +121,59 @@ body {
 
 .message {
     margin: 5px 0;
+    text-align: left;
+    /* Make all messages left-aligned */
 }
 
 .local {
     color: var(--color-primary);
-    text-align: right;
-}
-
-.local .message-content {
-    border: 2px solid var(--color-border-highlight);
-    border-radius: 8px;
-    padding: 6px 10px;
-    margin: 4px 0;
-    display: inline-block;
-    max-width: 80%;
 }
 
 .remote {
     color: var(--color-text-highlight);
 }
 
-.remote .message-content {
-    border: 2px solid var(--color-border-message);
+.message-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    flex-direction: row;
+    /* Always keep header on left, content on right */
+}
+
+.message-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+    min-width: 120px;
+    /* Adjust based on your needs */
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.message-content {
+    display: inline-block;
+    text-align: left;
+    flex-grow: 1;
     border-radius: 8px;
     padding: 6px 10px;
     margin: 4px 0;
-    display: inline-block;
     max-width: 80%;
+}
+
+.local .message-content {
+    border: 2px solid var(--color-border-highlight);
+}
+
+.remote .message-content {
+    border: 2px solid var(--color-border-message);
+}
+
+/* Remove the row-reverse for local messages */
+.message.local .message-container {
+    flex-direction: row;
+    /* Same as remote messages */
 }
 
 .system {
@@ -163,11 +189,6 @@ body {
 }
 
 /* Add styles for markdown content */
-.message-content {
-    display: inline-block;
-    text-align: left;
-}
-
 .message-content code {
     background-color: var(--color-background-tertiary);
     padding: 2px 4px;
@@ -527,12 +548,6 @@ h6 {
     background-color: var(--color-primary-hover);
 }
 
-.message-header {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 4px;
-}
-
 .message-sender {
     font-weight: bold;
 }
@@ -541,4 +556,5 @@ h6 {
     font-size: 0.8em;
     color: #888;
     margin-top: 2px;
+    opacity: 0.8;
 }
