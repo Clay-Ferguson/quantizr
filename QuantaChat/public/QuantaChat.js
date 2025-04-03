@@ -4,7 +4,10 @@ console.log("QuantaChat Version 0.1.4");
 
 import Utils from './Util.js';
 const util = Utils.getInst();
-const elm = document.getElementById.bind(document);
+
+import DOM from './DOM.js';
+const dom = DOM.getInst();
+const _ = null;
 
 class QuantaChat {
     selectedFiles = [];
@@ -43,8 +46,7 @@ class QuantaChat {
 
     // Helper function to create message DOM elements
     _createMessageElement(msg) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
+        const messageDiv = dom.div(_, 'message');
 
         if (msg.sender === 'system') {
             messageDiv.classList.add('system');
@@ -53,31 +55,27 @@ class QuantaChat {
         }
 
         // Create a container for the message header and content
-        const messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-container');
+        const messageContainer = dom.div(_, 'message-container');
 
         // Create a header container for sender and timestamp
-        const messageHeader = document.createElement('div');
-        messageHeader.classList.add('message-header');
+        const messageHeader = dom.div(_, 'message-header');
 
         // Add sender prefix
-        const senderSpan = document.createElement('span');
-        senderSpan.classList.add('message-sender');
+        const senderSpan = dom.span(_, 'message-sender');
 
         if (msg.sender === this.rtc.userName) {
             messageDiv.classList.add('local');
-            senderSpan.textContent = 'You: ';
+            senderSpan.textContent = 'You';
         } else {
             messageDiv.classList.add('remote');
-            senderSpan.textContent = msg.sender + ': ';
+            senderSpan.textContent = msg.sender;
         }
 
         messageHeader.appendChild(senderSpan);
 
         // Add timestamp if available
         if (msg.timestamp) {
-            const timestampSpan = document.createElement('span');
-            timestampSpan.classList.add('message-timestamp');
+            const timestampSpan = dom.span(_, 'message-timestamp');
 
             // Format the timestamp
             const messageDate = new Date(msg.timestamp);
@@ -88,8 +86,7 @@ class QuantaChat {
         }
 
         // Create container for rendered markdown
-        const messageContent = document.createElement('div');
-        messageContent.classList.add('message-content');
+        const messageContent = dom.div(_, 'message-content');
 
         // Render markdown content if there's any text message
         if (msg.content && msg.content.trim() !== '') {
@@ -98,34 +95,30 @@ class QuantaChat {
 
         // Handle attachments if any
         if (msg.attachments && msg.attachments.length > 0) {
-            const attachmentsDiv = document.createElement('div');
-            attachmentsDiv.classList.add('attachments');
+            const attachmentsDiv = dom.div(_, 'attachments');
 
             msg.attachments.forEach(attachment => {
                 if (attachment.type.startsWith('image/')) {
                     // Display image inline
-                    const imgContainer = document.createElement('div');
-                    imgContainer.classList.add('attachment-container');
+                    const imgContainer = dom.div(_, 'attachment-container');
 
-                    const img = document.createElement('img');
+                    const img = dom.img(_, 'attachment-image');
                     img.src = attachment.data;
                     img.alt = attachment.name;
-                    img.classList.add('attachment-image');
                     img.style.maxWidth = '250px';
                     img.style.cursor = 'pointer';
                     img.title = "Click to view full size";
 
                     // View full size on click
-                    img.addEventListener('click', (event) => {
+                    img.onclick = (event) => {
                         event.preventDefault();
                         event.stopPropagation();
                         this.openImageViewer(attachment.data, attachment.name);
                         return false;
-                    });
+                    };
 
                     // Add download button for images
-                    const downloadBtn = document.createElement('button');
-                    downloadBtn.classList.add('download-button', 'image-download');
+                    const downloadBtn = dom.button(_, 'download-button image-download');
                     downloadBtn.innerHTML = '⬇️';
                     downloadBtn.title = `Download ${attachment.name}`;
                     downloadBtn.onclick = (event) => {
@@ -138,20 +131,15 @@ class QuantaChat {
                     attachmentsDiv.appendChild(imgContainer);
                 } else {
                     // Create a download button for non-image files
-                    const fileContainer = document.createElement('div');
-                    fileContainer.classList.add('file-attachment');
+                    const fileContainer = dom.div(_, 'file-attachment');
 
-                    const fileIcon = document.createElement('span');
-                    fileIcon.textContent = '📄 ';
+                    const fileIcon = dom.span('📄 ');
                     fileContainer.appendChild(fileIcon);
 
-                    const fileName = document.createElement('span');
-                    fileName.textContent = `${attachment.name} (${util.formatFileSize(attachment.size)})`;
+                    const fileName = dom.span(`${attachment.name} (${util.formatFileSize(attachment.size)})`);
                     fileContainer.appendChild(fileName);
 
-                    const downloadButton = document.createElement('button');
-                    downloadButton.classList.add('download-button');
-                    downloadButton.textContent = 'Download';
+                    const downloadButton = dom.button('Download', 'download-button');
                     downloadButton.title = `Download ${attachment.name}`;
                     downloadButton.onclick = () => {
                         this.downloadAttachment(attachment.data, attachment.name);
@@ -175,7 +163,7 @@ class QuantaChat {
     // Modified display message function to use the common renderer
     _displayMessage = (msg) => {
         console.log("Displaying message from " + msg.sender + ": " + msg.content);
-        const chatLog = elm('chatLog');
+        const chatLog = dom.byId('chatLog');
         const messageDiv = this._createMessageElement(msg);
         chatLog.appendChild(messageDiv);
         chatLog.scrollTop = chatLog.scrollHeight;
@@ -188,7 +176,7 @@ class QuantaChat {
         }
 
         // Clear the current chat log
-        const chatLog = elm('chatLog');
+        const chatLog = dom.byId('chatLog');
         chatLog.innerHTML = '';
 
         // Display system message about history
@@ -232,13 +220,11 @@ class QuantaChat {
             this.storage.removeItem('room_' + this.rtc.roomId);
 
             // Clear the chat log display
-            const chatLog = elm('chatLog');
+            const chatLog = dom.byId('chatLog');
             chatLog.innerHTML = '';
 
             // Display a system message
-            const systemMsg = document.createElement('div');
-            systemMsg.classList.add('message', 'system');
-            systemMsg.textContent = 'Chat history has been cleared';
+            const systemMsg = dom.div('Chat history has been cleared', 'message system');
             chatLog.appendChild(systemMsg);
 
             util.log('Cleared chat history for room: ' + this.rtc.roomId);
@@ -246,7 +232,7 @@ class QuantaChat {
     }
 
     _updateParticipantsList = () => {
-        const list = elm('participantsList');
+        const list = dom.byId('participantsList');
         if (this.rtc.participants.size === 0) {
             list.textContent = 'QuantaChat: No participants yet';
         } else {
@@ -258,9 +244,9 @@ class QuantaChat {
         // Enable input if we have at least one open data channel or we're connected to the signaling server
         const hasOpenChannel = Array.from(this.rtc.dataChannels.values()).some(channel => channel.readyState === 'open');
 
-        const messageInput = elm('messageInput');
-        const sendButton = elm('sendButton');
-        const attachButton = elm('attachButton');
+        const messageInput = dom.byId('messageInput');
+        const sendButton = dom.byId('sendButton');
+        const attachButton = dom.byId('attachButton');
 
         if (hasOpenChannel || this.rtc.connected) {
             messageInput.disabled = false;
@@ -297,7 +283,6 @@ class QuantaChat {
         }
     }
 
-    // todo-0: we could drop into the messages a note item that says "X old messages deleted to save space", and just update that every time
     async autoPruneDatabase(msg) {
         if (navigator.storage && navigator.storage.estimate) {
             const estimate = await navigator.storage.estimate();
@@ -383,13 +368,13 @@ class QuantaChat {
     }
 
     _handleFileSelect = () => {
-        const fileInput = elm('fileInput');
+        const fileInput = dom.byId('fileInput');
         fileInput.click();
     }
 
     // File input change handler
     _handleFiles = async () => {
-        const fileInput = elm('fileInput');
+        const fileInput = dom.byId('fileInput');
         if (fileInput.files.length > 0) {
             this.selectedFiles = [];
 
@@ -404,7 +389,7 @@ class QuantaChat {
             }
 
             // Update UI to show files are attached
-            const attachButton = elm('attachButton');
+            const attachButton = dom.byId('attachButton');
             attachButton.textContent = `📎(${this.selectedFiles.length})`;
             attachButton.title = `${this.selectedFiles.length} file(s) attached`;
         }
@@ -413,44 +398,41 @@ class QuantaChat {
     // Clear attachments after sending
     clearAttachments() {
         this.selectedFiles = [];
-        const attachButton = elm('attachButton');
+        const attachButton = dom.byId('attachButton');
         attachButton.textContent = '📎';
         attachButton.title = 'Attach files';
-        const fileInput = elm('fileInput');
+        const fileInput = dom.byId('fileInput');
         fileInput.value = '';
     }
 
     // Add this function to create and manage the image viewer modal
     createImageViewerModal() {
+        console.log("createImageViewerModal called");
         // Create modal elements if they don't exist
-        if (!elm('image-viewer-modal')) {
-            const modal = document.createElement('div');
+        if (!dom.byId('image-viewer-modal')) {
+            const modal = dom.div(_, 'image-viewer-modal')
             modal.id = 'image-viewer-modal';
-            modal.classList.add('image-viewer-modal');
 
-            const modalContent = document.createElement('div');
-            modalContent.classList.add('modal-content');
+            const modalContent = dom.div(_, 'modal-content');
 
-            const closeBtn = document.createElement('span');
-            closeBtn.classList.add('close-modal');
+            const closeBtn = dom.span(_, 'close-modal');
             closeBtn.innerHTML = '&times;';
             closeBtn.title = 'Close (Esc)';
-            closeBtn.onclick = closeImageViewer;
+            closeBtn.onclick = this.closeImageViewer;
 
-            const imageElement = document.createElement('img');
+            const imageElement = dom.img(_, 'modal-image');
             imageElement.id = 'modal-image';
-            imageElement.classList.add('modal-image');
 
             modalContent.appendChild(closeBtn);
             modalContent.appendChild(imageElement);
             modal.appendChild(modalContent);
 
             // Add click handler to close when clicking outside the image
-            modal.addEventListener('click', (event) => {
+            modal.onclick = (event) => {
                 if (event.target === modal) {
                     this.closeImageViewer();
                 }
-            });
+            };
 
             // Add keyboard handler for Escape key
             document.addEventListener('keydown', (event) => {
@@ -467,8 +449,8 @@ class QuantaChat {
     openImageViewer(imageSrc, altText) {
         this.createImageViewerModal(); // Ensure modal exists
 
-        const modal = elm('image-viewer-modal');
-        const modalImg = elm('modal-image');
+        const modal = dom.byId('image-viewer-modal');
+        const modalImg = dom.byId('modal-image');
 
         modalImg.src = imageSrc;
         modalImg.alt = altText || 'Full-size image';
@@ -482,7 +464,7 @@ class QuantaChat {
 
     // Function to close the image viewer
     closeImageViewer() {
-        const modal = elm('image-viewer-modal');
+        const modal = dom.byId('image-viewer-modal');
         if (modal) {
             modal.style.opacity = '0';
             setTimeout(() => {
@@ -494,7 +476,7 @@ class QuantaChat {
     // Function to handle downloading a file attachment
     downloadAttachment(dataUrl, fileName) {
         // Create a temporary anchor element
-        const downloadLink = document.createElement('a');
+        const downloadLink = dom.a();
         downloadLink.href = dataUrl;
         downloadLink.download = fileName;
 
@@ -510,17 +492,17 @@ class QuantaChat {
         this.rtc = await WebRTC.getInst(this.storage, this);
 
         // Event listeners
-        elm('connectButton').addEventListener('click', this._connect);
-        elm('disconnectButton').addEventListener('click', this._disconnect);
-        elm('sendButton').addEventListener('click', this._send);
-        elm('attachButton').addEventListener('click', this._handleFileSelect);
-        elm('fileInput').addEventListener('change', this._handleFiles);
-        elm('clearButton').addEventListener('click', this._clearChatHistory);
+        dom.byId('connectButton').onclick = this._connect;
+        dom.byId('disconnectButton').onclick = this._disconnect;
+        dom.byId('sendButton').onclick = this._send;
+        dom.byId('attachButton').onclick = this._handleFileSelect;
+        dom.byId('fileInput').addEventListener('change', this._handleFiles);
+        dom.byId('clearButton').onlick = this._clearChatHistory;
 
-        const usernameInput = elm('username');
-        const roomInput = elm('roomId');
+        const usernameInput = dom.byId('username');
+        const roomInput = dom.byId('roomId');
 
-        elm('clearButton').disabled = true;
+        dom.byId('clearButton').disabled = true;
 
         // Check for 'user' parameter in URL first, fallback to this.rtc.userName
         const userFromUrl = util.getUrlParameter('user');
@@ -534,7 +516,7 @@ class QuantaChat {
             setTimeout(() => {
                 this.rtc.userName = usernameInput.value;
                 this.rtc.roomId = roomInput.value;
-                elm('connectButton').click();
+                dom.byId('connectButton').click();
             }, 500);
         }
     }
@@ -543,10 +525,10 @@ class QuantaChat {
         this.messages = null;
         console.log("Connecting to room: " + this.rtc.roomId);
 
-        const usernameInput = elm('username');
+        const usernameInput = dom.byId('username');
         const user = usernameInput.value.trim();
 
-        const roomInput = elm('roomId');
+        const roomInput = dom.byId('roomId');
         const room = roomInput.value.trim();
 
         // if user or room is empty, return
@@ -560,9 +542,9 @@ class QuantaChat {
         // todo-0: need a 'stateChange' method for handling all kinds of stuff like this
         usernameInput.disabled = true;
         roomInput.disabled = true;
-        elm('connectButton').disabled = true;
-        elm('disconnectButton').disabled = false;
-        elm('clearButton').disabled = false;
+        dom.byId('connectButton').disabled = true;
+        dom.byId('disconnectButton').disabled = false;
+        dom.byId('clearButton').disabled = false;
     }
 
     _disconnect = () => {
@@ -571,18 +553,18 @@ class QuantaChat {
         this._updateParticipantsList();
 
         // Clear the chat log
-        const chatLog = elm('chatLog');
+        const chatLog = dom.byId('chatLog');
         chatLog.innerHTML = '';
 
         // Re-enable form inputs
-        elm('username').disabled = false;
-        elm('roomId').disabled = false;
-        elm('connectButton').disabled = false;
-        elm('disconnectButton').disabled = true;
-        elm('clearButton').disabled = true;
-        elm('messageInput').disabled = true;
-        elm('sendButton').disabled = true;
-        elm('attachButton').disabled = true;
+        dom.byId('username').disabled = false;
+        dom.byId('roomId').disabled = false;
+        dom.byId('connectButton').disabled = false;
+        dom.byId('disconnectButton').disabled = true;
+        dom.byId('clearButton').disabled = true;
+        dom.byId('messageInput').disabled = true;
+        dom.byId('sendButton').disabled = true;
+        dom.byId('attachButton').disabled = true;
 
         this._updateConnectionStatus();
 
@@ -592,7 +574,7 @@ class QuantaChat {
     }
 
     _send = () => {
-        const input = elm('messageInput');
+        const input = dom.byId('messageInput');
         const message = input.value.trim();
         this.rtc._sendMessage(message, this.selectedFiles);
         this.clearAttachments();

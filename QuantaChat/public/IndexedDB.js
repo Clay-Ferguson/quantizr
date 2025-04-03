@@ -7,7 +7,6 @@ class IndexedDB {
         console.log('IndexedDB singleton created');
     }
 
-    // New static factory method to replace async constructor
     static async getInst(dbName, storeName, dbVersion) {
         // Create instance if it doesn't exist
         if (!IndexedDB.inst) {

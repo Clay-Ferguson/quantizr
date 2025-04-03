@@ -20,7 +20,6 @@ class WebRTC {
         console.log('WebRTC singleton created');
     }
 
-    // New static factory method to replace async constructor
     static async getInst(storage, app) {
         // Create instance if it doesn't exist
         if (!WebRTC.inst) {

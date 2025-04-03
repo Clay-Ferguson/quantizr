@@ -3,7 +3,6 @@ class Util {
         console.log('Util singleton created');
     }
 
-    // New static factory method to replace async constructor
     static getInst() {
         // Create instance if it doesn't exist
         if (!Util.inst) {
