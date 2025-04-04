@@ -28,18 +28,12 @@ class QuantaChat {
         this.storage = await IndexedDB.getInst("quantaChatDB", "quantaChatStore", 1);
         this.rtc = await WebRTC.getInst(this.storage, this);
 
+        mr.addSection("formGroup", this._formGroup);
         mr.addSection("messageControls", this._messageControls);
         mr.refreshAll()
 
-        // Event listeners
-        dom.byId('connectButton').onclick = this._connect;
-        dom.byId('disconnectButton').onclick = this._disconnect;
-        dom.byId('clearButton').onlick = this._clearChatHistory;
-
         const usernameInput = dom.byId('username');
         const roomInput = dom.byId('roomId');
-
-        dom.byId('clearButton').disabled = true;
 
         // Check for 'user' parameter in URL first, fallback to this.rtc.userName
         const userFromUrl = util.getUrlParameter('user');
@@ -53,7 +47,8 @@ class QuantaChat {
             setTimeout(() => {
                 this.rtc.userName = usernameInput.value;
                 this.rtc.roomId = roomInput.value;
-                dom.byId('connectButton').click();
+                // dom.byId('connectButton').click();
+                this._connect();
             }, 500);
         }
     }
@@ -62,6 +57,82 @@ class QuantaChat {
         console.log("RTC state changed: connected=", this.rtc.connected);
         mr.refreshAll();
         this._updateConnectionStatus();
+    }
+
+    _formGroup = () => {
+        return {
+            type: 'div',
+            props: {
+                className: 'form-group'
+            },
+            children: [
+                {
+                    type: 'label',
+                    props: {
+                        htmlFor: 'username',
+                        text: 'Username:'
+                    }
+                },
+                {
+                    type: 'input',
+                    props: {
+                        type: 'text',
+                        id: 'username',
+                        placeholder: 'Your name',
+                        className: 'form-control',
+                        disabled: this.rtc.connected
+                    }
+                },
+                {
+                    type: 'label',
+                    props: {
+                        htmlFor: 'roomId',
+                        text: 'Room:'
+                    }
+                },
+                {
+                    type: 'input',
+                    props: {
+                        type: 'text',
+                        id: 'roomId',
+                        placeholder: 'Room name',
+                        value: 'default-room',
+                        className: 'form-control',
+                        disabled: this.rtc.connected
+                    }
+                },
+                {
+                    type: 'button',
+                    props: {
+                        id: 'connectButton',
+                        className: 'btn',
+                        text: 'Connect',
+                        onClick: this._connect,
+                        disabled: this.rtc.connected
+                    }
+                },
+                {
+                    type: 'button',
+                    props: {
+                        id: 'disconnectButton',
+                        className: 'btn',
+                        disabled: !this.rtc.connected,
+                        text: 'Disconnect',
+                        onClick: this._disconnect,
+                    }
+                },
+                {
+                    type: 'button',
+                    props: {
+                        id: 'clearButton',
+                        className: 'btn',
+                        disabled: !this.rtc.connected || this.messages.length === 0,
+                        text: 'Clear',
+                        onClick: this._clearChatHistory,
+                    }
+                }
+            ]
+        };
     }
 
     _messageControls = () => {
@@ -608,13 +679,6 @@ class QuantaChat {
         }
 
         await this.rtc._connect(user, room);
-
-        // todo-0: need a 'stateChange' method for handling all kinds of stuff like this
-        usernameInput.disabled = true;
-        roomInput.disabled = true;
-        dom.byId('connectButton').disabled = true;
-        dom.byId('disconnectButton').disabled = false;
-        dom.byId('clearButton').disabled = false;
     }
 
     _disconnect = () => {
@@ -625,14 +689,6 @@ class QuantaChat {
         // Clear the chat log
         const chatLog = dom.byId('chatLog');
         chatLog.innerHTML = '';
-
-        // Re-enable form inputs
-        dom.byId('username').disabled = false;
-        dom.byId('roomId').disabled = false;
-        dom.byId('connectButton').disabled = false;
-        dom.byId('disconnectButton').disabled = true;
-        dom.byId('clearButton').disabled = true;
-        dom.byId('messageInput').disabled = true;
 
         this.app._rtcStateChange();
 
