@@ -70,9 +70,9 @@ class WebRTC {
             util.log('User joined: ' + evt.name);
             this.participants.add(evt.name);
 
-            // todo-: these messages are not being displayed
-            const msg = this.createMessage(evt.name + ' joined the chat', 'system');
-            this.app._displayMessage(msg);
+            // Let's not do this for now.
+            // const msg = this.createMessage(evt.name + ' joined the chat', 'system');
+            // this.app._displayMessage(msg);
 
             // Create a connection with the new user (we are initiator)
             if (!this.peerConnections.has(evt.name)) {
@@ -85,8 +85,9 @@ class WebRTC {
             util.log('User left: ' + evt.name);
             this.participants.delete(evt.name);
 
-            const msg = this.createMessage(evt.name + ' left the chat', 'system');
-            this.app._displayMessage(msg);
+            // Let's not do this for now.
+            // const msg = this.createMessage(evt.name + ' left the chat', 'system');
+            // this.app._displayMessage(msg);
 
             // Clean up connections
             if (this.peerConnections.has(evt.name)) {
@@ -148,7 +149,6 @@ class WebRTC {
         else if (evt.type === 'broadcast' && evt.sender) {
             util.log('broadcast. Received broadcast message from ' + evt.sender);
             this.app._persistMessage(evt.message);
-            this.app._displayMessage(evt.message);
         }
         this.app._rtcStateChange();
     }
@@ -313,7 +313,6 @@ class WebRTC {
             try {
                 const msg = JSON.parse(event.data);
                 this.app._persistMessage(msg);
-                this.app._displayMessage(msg);
             } catch (error) {
                 util.log('Error parsing message: ' + error);
             }
@@ -342,7 +341,6 @@ class WebRTC {
 
             const msg = this.createMessage(message, this.userName, selectedFiles);
             this.app._persistMessage(msg);
-            this.app._displayMessage(msg);
 
             // Try to send through data channels first
             let channelsSent = 0;

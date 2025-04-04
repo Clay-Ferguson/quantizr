@@ -59,6 +59,7 @@ class QuantaChat {
         this._updateConnectionStatus();
     }
 
+    // Render Virtual DOM node for header
     _header = () => {
         let participants;
         if (this.rtc.participants.size === 0) {
@@ -85,6 +86,7 @@ class QuantaChat {
         };
     }
 
+    // Render Virtual DOM node for Form Group
     _formGroup = () => {
         return {
             type: 'div',
@@ -162,6 +164,7 @@ class QuantaChat {
         };
     }
 
+    // Render Virtual DOM node for Message Controls
     _messageControls = () => {
         return {
             type: 'div',
@@ -190,6 +193,7 @@ class QuantaChat {
         };
     }
 
+    // Render Virtual DOM node for buttons area
     _buttonsArea = () => {
         // const hasOpenChannel = Array.from(this.rtc.dataChannels.values()).some(channel => channel.readyState === 'open');
         console.log("_buttonsArea: this.rtc.connected=", this.rtc.connected);
@@ -474,16 +478,16 @@ class QuantaChat {
 
         try {
             await this.autoPruneDatabase(msg);
-            this.messages.push(msg);
-            this.saveMessages();
-            return true;
         } catch (error) {
             util.log('Error checking storage or saving message: ' + error);
-            // Still try to save the message
-            this.messages.push(msg);
-            this.saveMessages();
-            return true;
         }
+
+        this.messages.push(msg);
+
+        // todo-0: we could put a timer here to batch save messages instead of saving every time
+        // and also make sure the GUI never waits for the DB.
+        this.saveMessages();
+        this._displayMessage(msg);
     }
 
     async autoPruneDatabase(msg) {
