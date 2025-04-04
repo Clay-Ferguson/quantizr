@@ -56,7 +56,6 @@ class WebRTC {
 
             // Update our list of participants
             this.participants = new Set(evt.participants);
-            this.app._updateParticipantsList();
 
             // For each participant, create a peer connection and make an offer
             evt.participants.forEach(participant => {
@@ -70,7 +69,6 @@ class WebRTC {
         else if (evt.type === 'user-joined') {
             util.log('User joined: ' + evt.name);
             this.participants.add(evt.name);
-            this.app._updateParticipantsList();
 
             // todo-: these messages are not being displayed
             const msg = this.createMessage(evt.name + ' joined the chat', 'system');
@@ -86,7 +84,6 @@ class WebRTC {
         else if (evt.type === 'user-left') {
             util.log('User left: ' + evt.name);
             this.participants.delete(evt.name);
-            this.app._updateParticipantsList();
 
             const msg = this.createMessage(evt.name + ' left the chat', 'system');
             this.app._displayMessage(msg);
@@ -100,8 +97,6 @@ class WebRTC {
             if (this.dataChannels.has(evt.name)) {
                 this.dataChannels.delete(evt.name);
             }
-
-            this.app._rtcStateChange();
         }
 
         // Handle WebRTC signaling messages
@@ -155,13 +150,12 @@ class WebRTC {
             this.app._persistMessage(evt.message);
             this.app._displayMessage(evt.message);
         }
-        this.app._rtcStateChange(); // Ensure UI is updated after handling messages
+        this.app._rtcStateChange();
     }
 
     _onopen = () => {
         util.log('Connected to signaling server.');
         this.connected = true;
-        this.app._rtcStateChange(); // Ensure UI is updated after handling messages
 
         // Join a room with user name
         this.socket.send(JSON.stringify({
@@ -170,12 +164,12 @@ class WebRTC {
             name: this.userName
         }));
         util.log('Joining room: ' + this.roomId + ' as ' + this.userName);
+        this.app._rtcStateChange();
     }
 
     _onerror = (error) => {
         util.log('WebSocket error: ' + error);
         this.connected = false;
-
         this.app._rtcStateChange();
     };
 
@@ -296,6 +290,7 @@ class WebRTC {
         // Reset participants
         this.participants.clear();
         this.connected = false;
+        this.app._rtcStateChange();
     }
 
     setupDataChannel(channel, peerName) {

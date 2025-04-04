@@ -28,7 +28,7 @@ class QuantaChat {
         this.storage = await IndexedDB.getInst("quantaChatDB", "quantaChatStore", 1);
         this.rtc = await WebRTC.getInst(this.storage, this);
 
-        mr.addSection("formGroup", this._formGroup);
+        mr.addSection("header", this._header);
         mr.addSection("messageControls", this._messageControls);
         mr.refreshAll()
 
@@ -59,10 +59,37 @@ class QuantaChat {
         this._updateConnectionStatus();
     }
 
+    _header = () => {
+        let participants;
+        if (this.rtc.participants.size === 0) {
+            participants = 'QuantaChat: No participants yet';
+        } else {
+            participants = 'QuantaChat with: ' + Array.from(this.rtc.participants).join(', ');
+        }
+
+        return {
+            type: 'div',
+            props: {
+                className: 'header'
+            },
+            children: [
+                {
+                    type: 'h5',
+                    props: {
+                        id: 'participantsList',
+                        text: participants
+                    }
+                },
+                this._formGroup()
+            ]
+        };
+    }
+
     _formGroup = () => {
         return {
             type: 'div',
             props: {
+                id: 'formGroup',
                 className: 'form-group'
             },
             children: [
@@ -422,15 +449,6 @@ class QuantaChat {
         }
     }
 
-    _updateParticipantsList = () => {
-        const list = dom.byId('participantsList');
-        if (this.rtc.participants.size === 0) {
-            list.textContent = 'QuantaChat: No participants yet';
-        } else {
-            list.textContent = 'QuantaChat with: ' + Array.from(this.rtc.participants).join(', ');
-        }
-    }
-
     // todo-0: this method will soon go away completely.
     _updateConnectionStatus = () => {
         // Enable input if we have at least one open data channel or we're connected to the signaling server
@@ -684,7 +702,6 @@ class QuantaChat {
     _disconnect = () => {
         this.messages = null;
         this.rtc._disconnect();
-        this._updateParticipantsList();
 
         // Clear the chat log
         const chatLog = dom.byId('chatLog');
