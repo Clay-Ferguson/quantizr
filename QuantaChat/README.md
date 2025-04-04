@@ -87,3 +87,8 @@ To run on a productin server:
 
     sudo node QuantaChatServer.js --host 12.34.56.78 --port 8080 --httpPort 80
 
+
+# About MiniReact
+
+I want to keep all frameworks out of this app, but I did implement a version of React (in MiniReact.js) which is a 142 lines of code version of React which I'm using to automate all DOM updates and make this pure-JavaScript code as clean as a React App. However MiniReact.js is currently not fully being used in the app, but is a *Work in Progress*. Mostly just the Chat Log itself remains to be converted over from old-school DOM manipulation to using MiniReact.
+
