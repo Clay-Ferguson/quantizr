@@ -101,7 +101,7 @@ class WebRTC {
                 this.dataChannels.delete(evt.name);
             }
 
-            this.app._updateConnectionStatus();
+            this.app._rtcStateChange();
         }
 
         // Handle WebRTC signaling messages
@@ -155,12 +155,13 @@ class WebRTC {
             this.app._persistMessage(evt.message);
             this.app._displayMessage(evt.message);
         }
+        this.app._rtcStateChange(); // Ensure UI is updated after handling messages
     }
 
     _onopen = () => {
         util.log('Connected to signaling server.');
         this.connected = true;
-        this.app._updateConnectionStatus();
+        this.app._rtcStateChange(); // Ensure UI is updated after handling messages
 
         // Join a room with user name
         this.socket.send(JSON.stringify({
@@ -174,7 +175,8 @@ class WebRTC {
     _onerror = (error) => {
         util.log('WebSocket error: ' + error);
         this.connected = false;
-        this.app._updateConnectionStatus();
+
+        this.app._rtcStateChange();
     };
 
     _onclose = () => {
@@ -186,7 +188,7 @@ class WebRTC {
         this.peerConnections.clear();
         this.dataChannels.clear();
 
-        this.app._updateConnectionStatus();
+        this.app._rtcStateChange();
     }
 
     createPeerConnection(peerName, isInitiator) {
@@ -213,11 +215,10 @@ class WebRTC {
             util.log('Connection state with ' + peerName + ': ' + pc.connectionState);
             if (pc.connectionState === 'connected') {
                 util.log('WebRTC connected with ' + peerName + '!');
-                this.app._updateConnectionStatus();
             } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
                 util.log('WebRTC disconnected from ' + peerName);
-                this.app._updateConnectionStatus();
             }
+            this.app._rtcStateChange();
         };
 
         // Handle incoming data channels
@@ -303,13 +304,13 @@ class WebRTC {
 
         channel.onopen = () => {
             util.log('Data channel open with ' + peerName);
-            this.app._updateConnectionStatus();
+            this.app._rtcStateChange();
         };
 
         channel.onclose = () => {
             util.log('Data channel closed with ' + peerName);
             this.dataChannels.delete(peerName);
-            this.app._updateConnectionStatus();
+            this.app._rtcStateChange();
         };
 
         channel.onmessage = (event) => {
@@ -325,7 +326,7 @@ class WebRTC {
 
         channel.onerror = (error) => {
             util.log('Data channel error with ' + peerName + ': ' + error);
-            this.app._updateConnectionStatus();
+            this.app._rtcStateChange();
         };
     }
 

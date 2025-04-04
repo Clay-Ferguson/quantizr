@@ -2,11 +2,17 @@ import WebRTC from './WebRTC.js';
 import IndexedDB from './IndexedDB.js';
 console.log("QuantaChat Version 0.1.4");
 
+// todo-0: make sure all user actions get followed up by a mr.refreshAll() call, after the MiniReact transition is complete
+
 import Utils from './Util.js';
 const util = Utils.getInst();
 
 import DOM from './DOM.js';
 const dom = DOM.getInst();
+
+import MiniReact from './MiniReact.js';
+const mr = MiniReact.getInst();
+
 const _ = null;
 
 class QuantaChat {
@@ -14,6 +20,121 @@ class QuantaChat {
     storage = null;
     rtc = null;
     messages = null;
+
+    async initApp() {
+        console.log("QuantaChat initApp");
+
+        // todo-0: both these singletons are inconsistent with how other singletons are initialized
+        this.storage = await IndexedDB.getInst("quantaChatDB", "quantaChatStore", 1);
+        this.rtc = await WebRTC.getInst(this.storage, this);
+
+        mr.addSection("messageControls", this._messageControls);
+        mr.refreshAll()
+
+        // Event listeners
+        dom.byId('connectButton').onclick = this._connect;
+        dom.byId('disconnectButton').onclick = this._disconnect;
+        dom.byId('clearButton').onlick = this._clearChatHistory;
+
+        const usernameInput = dom.byId('username');
+        const roomInput = dom.byId('roomId');
+
+        dom.byId('clearButton').disabled = true;
+
+        // Check for 'user' parameter in URL first, fallback to this.rtc.userName
+        const userFromUrl = util.getUrlParameter('user');
+        usernameInput.value = userFromUrl || this.rtc.userName;
+
+        const roomFromUrl = util.getUrlParameter('room');
+        roomInput.value = roomFromUrl || this.rtc.roomId;
+
+        // if userFromUrl and rootFromUrl are both non-empty then wait a half second and then call _connect
+        if (userFromUrl && roomFromUrl) {
+            setTimeout(() => {
+                this.rtc.userName = usernameInput.value;
+                this.rtc.roomId = roomInput.value;
+                dom.byId('connectButton').click();
+            }, 500);
+        }
+    }
+
+    _rtcStateChange = () => {
+        console.log("RTC state changed: connected=", this.rtc.connected);
+        mr.refreshAll();
+        this._updateConnectionStatus();
+    }
+
+    _messageControls = () => {
+        return {
+            type: 'div',
+            props: {
+                className: 'message-controls'
+            },
+            children: [
+                {
+                    type: 'div',
+                    props: {
+                        id: 'inputArea'
+                    },
+                    children: [
+                        {
+                            type: 'textarea',
+                            props: {
+                                id: 'messageInput',
+                                placeholder: 'Type your message...',
+                                disabled: !this.rtc.connected
+                            }
+                        }
+                    ]
+                },
+                this._buttonsArea()
+            ]
+        };
+    }
+
+    _buttonsArea = () => {
+        // const hasOpenChannel = Array.from(this.rtc.dataChannels.values()).some(channel => channel.readyState === 'open');
+        console.log("_buttonsArea: this.rtc.connected=", this.rtc.connected);
+        return {
+            type: 'div',
+            props: {
+                id: 'buttonsArea',
+            },
+            children: [
+                {
+                    type: 'button',
+                    props: {
+                        id: 'attachButton',
+                        className: 'btn',
+                        title: (this.selectedFiles.length == 0 ? 'Attach files' : `${this.selectedFiles.length} file(s) attached`),
+                        disabled: !this.rtc.connected,
+                        text: (this.selectedFiles.length ? `📎(${this.selectedFiles.length})` : '📎'),
+                        onClick: this._handleFileSelect
+                    }
+                },
+                {
+                    type: 'button',
+                    props: {
+                        id: 'sendButton',
+                        className: 'btn',
+                        disabled: !this.rtc.connected,
+                        text: 'Send',
+                        onClick: this._send
+                    }
+                },
+                {
+                    type: 'input',
+                    props: {
+                        id: 'fileInput',
+                        type: 'file',
+                        multiple: true,
+                        style: 'display: none',
+                        onChange: this._handleFiles
+                    }
+                }
+            ]
+        };
+    }
 
     // Message storage and persistence functions
     saveMessages() {
@@ -193,7 +314,6 @@ class QuantaChat {
                 if (msg.attachments && msg.attachments.length > 0) {
                     console.log('Message has ' + msg.attachments.length + ' attachment(s)');
                 }
-
                 chatLog.appendChild(this._createMessageElement(msg));
             });
 
@@ -240,22 +360,16 @@ class QuantaChat {
         }
     }
 
+    // todo-0: this method will soon go away completely.
     _updateConnectionStatus = () => {
         // Enable input if we have at least one open data channel or we're connected to the signaling server
         const hasOpenChannel = Array.from(this.rtc.dataChannels.values()).some(channel => channel.readyState === 'open');
-
         const messageInput = dom.byId('messageInput');
-        const sendButton = dom.byId('sendButton');
-        const attachButton = dom.byId('attachButton');
 
         if (hasOpenChannel || this.rtc.connected) {
             messageInput.disabled = false;
-            sendButton.disabled = false;
-            attachButton.disabled = false;
         } else {
             messageInput.disabled = true;
-            sendButton.disabled = true;
-            attachButton.disabled = true;
         }
     }
 
@@ -387,22 +501,13 @@ class QuantaChat {
                     util.log('Error processing file: ' + error);
                 }
             }
-
-            // Update UI to show files are attached
-            const attachButton = dom.byId('attachButton');
-            attachButton.textContent = `📎(${this.selectedFiles.length})`;
-            attachButton.title = `${this.selectedFiles.length} file(s) attached`;
         }
+        mr.refreshAll();
     }
 
     // Clear attachments after sending
     clearAttachments() {
         this.selectedFiles = [];
-        const attachButton = dom.byId('attachButton');
-        attachButton.textContent = '📎';
-        attachButton.title = 'Attach files';
-        const fileInput = dom.byId('fileInput');
-        fileInput.value = '';
     }
 
     // Add this function to create and manage the image viewer modal
@@ -486,42 +591,7 @@ class QuantaChat {
         document.body.removeChild(downloadLink);
     }
 
-    async initApp() {
-        console.log("QuantaChat initApp");
-        this.storage = await IndexedDB.getInst("quantaChatDB", "quantaChatStore", 1);
-        this.rtc = await WebRTC.getInst(this.storage, this);
-
-        // Event listeners
-        dom.byId('connectButton').onclick = this._connect;
-        dom.byId('disconnectButton').onclick = this._disconnect;
-        dom.byId('sendButton').onclick = this._send;
-        dom.byId('attachButton').onclick = this._handleFileSelect;
-        dom.byId('fileInput').addEventListener('change', this._handleFiles);
-        dom.byId('clearButton').onlick = this._clearChatHistory;
-
-        const usernameInput = dom.byId('username');
-        const roomInput = dom.byId('roomId');
-
-        dom.byId('clearButton').disabled = true;
-
-        // Check for 'user' parameter in URL first, fallback to this.rtc.userName
-        const userFromUrl = util.getUrlParameter('user');
-        usernameInput.value = userFromUrl || this.rtc.userName;
-
-        const roomFromUrl = util.getUrlParameter('room');
-        roomInput.value = roomFromUrl || this.rtc.roomId;
-
-        // if userFromUrl and rootFromUrl are both non-empty then wait a half second and then call _connect
-        if (userFromUrl && roomFromUrl) {
-            setTimeout(() => {
-                this.rtc.userName = usernameInput.value;
-                this.rtc.roomId = roomInput.value;
-                dom.byId('connectButton').click();
-            }, 500);
-        }
-    }
-
-    _connect = () => {
+    _connect = async () => {
         this.messages = null;
         console.log("Connecting to room: " + this.rtc.roomId);
 
@@ -537,7 +607,7 @@ class QuantaChat {
             return;
         }
 
-        this.rtc._connect(user, room);
+        await this.rtc._connect(user, room);
 
         // todo-0: need a 'stateChange' method for handling all kinds of stuff like this
         usernameInput.disabled = true;
@@ -563,10 +633,8 @@ class QuantaChat {
         dom.byId('disconnectButton').disabled = true;
         dom.byId('clearButton').disabled = true;
         dom.byId('messageInput').disabled = true;
-        dom.byId('sendButton').disabled = true;
-        dom.byId('attachButton').disabled = true;
 
-        this._updateConnectionStatus();
+        this.app._rtcStateChange();
 
         // Clear any selected files
         this.clearAttachments();
@@ -579,6 +647,7 @@ class QuantaChat {
         this.rtc._sendMessage(message, this.selectedFiles);
         this.clearAttachments();
         input.value = '';
+        mr.refreshAll();
     }
 }
 

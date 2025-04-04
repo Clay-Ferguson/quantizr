@@ -12,6 +12,7 @@
 <body>
     <div class="wrapper">
         <div class="header">
+            <div id="root"></div>
             <h5 id="participantsList">QuantaChat: Ready to connect</h5>
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -26,22 +27,13 @@
             </div>
         </div>
 
-        <div class="message-controls">
-            <div id="inputArea">
-                <textarea id="messageInput" placeholder="Type your message..." disabled></textarea>
-            </div>
-            <div id="buttonsArea">
-                <button id="attachButton" class="btn" title="Attach files" disabled>📎</button>
-                <button id="sendButton" class="btn" disabled>Send</button>
-                <input type="file" id="fileInput" multiple style="display: none">
-            </div>
-        </div>
-
+        <div id="messageControls"></div>
         <div id="chatLog"></div>
     </div>
 
     <script>
-        // parameters inserted by server, before this HTML is sent back to the client
+        // parameters inserted by server, before this HTML is sent back to the client. This is just a trick for letting the server
+        // put information into JavaScript so the client doesn't need to make another request to get it.
         let RTC_HOST = "{{HOST}}";
         let RTC_PORT = "{{PORT}}";
     </script>
