@@ -50,7 +50,3 @@ The root level of the repository contains the Quanta App itself.
 
 The `QuantaGradio` folder in this repo contains several Python-based Gradio apps for doing AI (General Chatbot, Coding Agent Chatbox, Image Understanding, and Image Generation), and relies on the same Python in the `commmon` folder. So to use QuantaGradio apps you only need to checkout the `QuantaGradio` and `common` folders.
 
-
-**Quanta Chat App**
-
-The `QuantaChat` folder in this repo is a Peer-to-Peer WebRTC-based Chat app that runs in web browsers, using JavaScript, and the associated Signaling Server that goes with it. This app is completely self contained, so you only need to checkout the `QuantaChat` folder.
