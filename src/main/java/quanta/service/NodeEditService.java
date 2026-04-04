@@ -1,0 +1,765 @@
+package quanta.service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.StringTokenizer;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
+import quanta.exception.base.RuntimeEx;
+import quanta.model.NodeInfo;
+import quanta.model.PropertyInfo;
+import quanta.model.client.Constant;
+import quanta.model.client.NodeLink;
+import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
+import quanta.model.client.PrincipalName;
+import quanta.mongo.MongoTranMgr;
+import quanta.mongo.model.CreateNodeLocation;
+import quanta.mongo.model.SubNode;
+import quanta.rest.request.GetNodeJsonRequest;
+import quanta.rest.request.InitNodeEditRequest;
+import quanta.rest.request.LikeNodeRequest;
+import quanta.rest.request.LinkNodesRequest;
+import quanta.rest.request.ModifySubGraphRequest;
+import quanta.rest.request.SaveNodeJsonRequest;
+import quanta.rest.request.SaveNodeRequest;
+import quanta.rest.request.SearchAndReplaceRequest;
+import quanta.rest.request.SetExpandedRequest;
+import quanta.rest.request.SplitNodeRequest;
+import quanta.rest.response.GetNodeJsonResponse;
+import quanta.rest.response.InitNodeEditResponse;
+import quanta.rest.response.LikeNodeResponse;
+import quanta.rest.response.LinkNodesResponse;
+import quanta.rest.response.ModifySubGraphResponse;
+import quanta.rest.response.SaveNodeJsonResponse;
+import quanta.rest.response.SaveNodeResponse;
+import quanta.rest.response.SearchAndReplaceResponse;
+import quanta.rest.response.SetExpandedResponse;
+import quanta.rest.response.SplitNodeResponse;
+import quanta.rest.response.UpdateHeadingsResponse;
+import quanta.rest.response.base.NodeChanges;
+import quanta.types.TypeBase;
+import quanta.util.Convert;
+import quanta.util.SubNodeUtil;
+import quanta.util.TL;
+import quanta.util.Util;
+import quanta.util.XString;
+
+/**
+ * Service for editing content of nodes. That is, this method updates property values of nodes. As
+ * the user is using the application and moving, copy+paste, or editing node content this is the
+ * service that performs those operations on the server, directly called from the HTML 'controller'
+ */
+@Component
+public class NodeEditService extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
+
+    /**
+     * Handles the like or unlike action for a node.
+     * 
+     * @param req the request containing the node ID and the like/unlike action
+     * @return a response indicating the result of the like/unlike action
+     * @throws RuntimeEx if the node with the specified ID cannot be found
+     */
+    public LikeNodeResponse likeNode(LikeNodeRequest req) {
+        MongoTranMgr.ensureTran();
+        LikeNodeResponse res = new LikeNodeResponse();
+        svc_async.run(() -> {
+            svc_arun.run(() -> {
+                SubNode node = svc_mongoRead.getNode(req.getId());
+                if (node == null) {
+                    throw new RuntimeEx("Unable to find node: " + req.getId());
+                }
+                if (node.getLikes() == null) {
+                    node.setLikes(new HashSet<>());
+                }
+                String userName = TL.getSC().getUserName();
+                // local users will always just have their userName put in the 'likes'
+                if (req.isLike()) {
+                    if (node.getLikes().add(userName)) {
+                        // set node to dirty only if it just changed.
+                        TL.dirty(node);
+                    }
+                } else {
+                    if (node.getLikes().remove(userName)) {
+                        // set node to dirty only if it just changed.
+                        TL.dirty(node);
+                        if (node.getLikes().size() == 0) {
+                            node.setLikes(null);
+                        }
+                    }
+                }
+                return null;
+            });
+        });
+        return res;
+    }
+
+    /**
+     * Saves the node based on the provided request.
+     *
+     * @param req the request containing the node information to be saved
+     * @return the response containing the saved node information
+     * @throws RuntimeEx if the text length exceeds 64K or if the node name is invalid or already in use
+     */
+    public SaveNodeResponse saveNode(SaveNodeRequest req) {
+        SaveNodeResponse res = new SaveNodeResponse();
+        NodeInfo nodeInfo = req.getNode();
+        String nodeId = nodeInfo.getId();
+        SubNode node = svc_mongoRead.getNode(nodeId);
+
+        svc_auth.ownerAuth(node);
+        svc_mongoRead.forceCheckHasChildren(node);
+
+        // set new attachments
+        node.setAttachments(req.getNode().getAttachments());
+
+        svc_attach.fixAllAttachmentMimes(node);
+        node.setLinks(req.getNode().getLinks());
+        // The only purpose of this limit is to stop hackers from using up lots of space, because our only
+        // current quota is on attachment file size uploads
+        if (nodeInfo.getContent() != null && nodeInfo.getContent().length() > 64 * 1024) {
+            throw new RuntimeEx("Max text length is 64K");
+        }
+        // If current content exists content is being edited reset likes
+        if (node.getContent() != null && node.getContent().trim().length() > 0
+                && !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
+            node.setLikes(null);
+        }
+        node.setContent(nodeInfo.getContent());
+        node.setTags(nodeInfo.getTags());
+        node.touch();
+        node.setType(nodeInfo.getType());
+
+        // if node name is empty or not valid (canot have ":" in the name) set it to null quietly
+        if (StringUtils.isEmpty(nodeInfo.getName())) {
+            node.setName(null);
+        } //
+        else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
+                && !nodeInfo.getName().equals(node.getName())) { // if we're setting node name to a different node name
+            if (!svc_snUtil.validNodeName(nodeInfo.getName())) {
+                throw new RuntimeEx(
+                        "Node names can only contain letter, digit, underscore, dash, and period characters.");
+            }
+            String nodeName = nodeInfo.getName().trim();
+            // if not admin we have to lookup the node with "userName:nodeName" format
+            if (!TL.hasAdminPrivileges()) {
+                nodeName = TL.getSC().getUserName() + ":" + nodeName;
+            }
+            SubNode nodeByName = svc_mongoRead.getNodeByName(nodeName);
+            // delete if orphan (but be safe and double check we aren't deleting `nodeId` node)
+            if (nodeByName != null && !nodeId.equals(nodeByName.getIdStr())
+                    && svc_mongoRead.isOrphan(nodeByName.getPath())) {
+                // if we don't be sure to delete this orphan we might end up with a constraint violation
+                // on the node name unique index.
+                svc_mongoDelete.directDelete(nodeByName);
+                nodeByName = null;
+            }
+            if (nodeByName != null) {
+                throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
+            }
+            if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0) {
+                node.setName(nodeInfo.getName().trim());
+            }
+        }
+
+        if (nodeInfo.getProperties() != null) {
+            for (PropertyInfo property : nodeInfo.getProperties()) {
+                if ("[null]".equals(property.getValue())) {
+                    node.delete(property.getName());
+                } else {
+                    /*
+                     * save only if server determines the property is savable. Just protection. Client shouldn't be
+                     * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
+                     * client code, for security and robustness.
+                     */
+                    if (TL.hasAdminPrivileges() || SubNodeUtil.isReadonlyProp(property.getName())) {
+                        node.set(property.getName(), property.getValue());
+                    } else {
+                        log.debug("Ignoring save attempt of prop: " + property.getName());
+                    }
+                }
+            }
+        }
+
+        // if not encrypted remove ENC_KEY too. It won't be doing anything in this case.
+        if (nodeInfo.getContent() != null && !nodeInfo.getContent().startsWith(Constant.ENC_TAG.s())) {
+            node.delete(NodeProp.ENC_KEY);
+        }
+
+        // If removing encryption, remove it from all the ACL entries too.
+        String encKey = node.getStr(NodeProp.ENC_KEY);
+        if (encKey == null) {
+            svc_mongoUtil.removeAllEncryptionKeys(node);
+        }
+        /* if node is currently encrypted */
+        else {
+            res.setAclEntries(svc_auth.getAclEntries(node));
+        }
+
+        // If the node being saved is currently in the pending area /p/ then we publish it now, and move
+        // it out of pending.
+        String newPath = svc_mongoUtil.setPendingPathState(node.getPath(), false);
+
+        // Is this a changed path?
+        if (!node.getPath().equals(newPath)) {
+            node.setPath(newPath);
+        }
+
+        svc_openGraph.parseNode(node);
+
+        TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
+        if (plugin != null) {
+            plugin.beforeSaveNode(node);
+        }
+        String sessionUserName = TL.getSC().getUserName();
+        SubNode parent = svc_mongoRead.getParentAP(node);
+        if (parent != null) {
+            parent.setHasChildren(true);
+            svc_mongoUpdate.saveIfDirtyAP(parent);
+        }
+        // Send notification to local server or to remote server when a node is added (and not by admin)
+        if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
+            processAfterSave(node, parent);
+        }
+
+        NodeInfo newNodeInfo = svc_convert.toNodeInfo(false, TL.getSC(), node, false, Convert.LOGICAL_ORDINAL_GENERATE,
+                req.isReturnInlineChildren(), false, false, true, null);
+        if (newNodeInfo != null) {
+            res.setNode(newNodeInfo);
+        }
+
+        // this should be unnessary, but we do it anyway just to be safe
+        svc_mongoUpdate.saveSession();
+        return res;
+    }
+
+    /**
+     * Toggles the expanded state of a node based on the user's current state or the default state of
+     * the node.
+     *
+     * @param req the request containing the node ID for which the expanded state is to be toggled
+     * @return a response containing the updated node information with the new expanded state
+     */
+    public SetExpandedResponse cm_toggleExpanded(SetExpandedRequest req) {
+        SetExpandedResponse res = new SetExpandedResponse();
+        SubNode node = svc_mongoRead.getNode(req.getNodeId());
+
+        // get default expanded state from node itself
+        boolean expanded = node.getBool(NodeProp.INLINE_CHILDREN);
+        SessionContext sc = TL.getSC();
+
+        // if user has already taken control of state, toggle it according to their state
+        if (sc.getNodeExpandStates().containsKey(req.getNodeId())) {
+            expanded = !sc.getNodeExpandStates().get(req.getNodeId());
+        }
+        // otherwise the 'expanded' var is the thing to toggle
+        else {
+            expanded = !expanded;
+        }
+        sc.getNodeExpandStates().put(req.getNodeId(), expanded);
+        svc_mongoRead.forceCheckHasChildren(node);
+
+        NodeInfo newNodeInfo = svc_convert.toNodeInfo(false, TL.getSC(), node, false, Convert.LOGICAL_ORDINAL_GENERATE,
+                expanded, false, false, true, null);
+        if (newNodeInfo != null) {
+            res.setNode(newNodeInfo);
+        }
+        return res;
+    }
+
+    // 'parent' (of 'node') can be passed in if already known, or else null can be passed for
+    // parent and we get the parent automatically in here
+    public void processAfterSave(SubNode node, SubNode parent) {
+        // never do any of this logic if this is an admin-owned node being saved.
+        if (svc_acl.isAdminOwned(node)) {
+            return;
+        }
+        svc_arun.run(() -> {
+            HashSet<String> sessionsPushed = new HashSet<>();
+            if (node.isType(NodeType.FRIEND)) {
+                TL.getSC().setFriendsTagsDirty(true);
+            }
+
+            svc_push.pushNodeUpdateToBrowsers(sessionsPushed, node);
+            return null;
+        });
+    }
+
+    public SplitNodeResponse splitNode(SplitNodeRequest req) {
+        HashSet<String> nodesModified = new HashSet<String>();
+        SplitNodeResponse ret = svc_mongoTrans.cm_splitNode(req, nodesModified);
+        return ret;
+    }
+
+    /*
+     * When user pastes in a large amount of text and wants to have this text broken out into individual
+     * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
+     * will break it all up into individual nodes.
+     *
+     * req.splitType == 'inline' || 'children'
+     */
+    public SplitNodeResponse splitNode(SplitNodeRequest req, HashSet<String> nodesModified) {
+        MongoTranMgr.ensureTran();
+        SplitNodeResponse res = new SplitNodeResponse();
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
+        String nodeId = req.getNodeId();
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        SubNode parentNode = svc_mongoRead.getParent(node);
+        svc_auth.ownerAuth(node);
+        String content = node.getContent();
+        boolean containsDelim = content.contains(req.getDelimiter());
+
+        // If split will have no effect, just return as if successful.
+        if (!containsDelim) {
+            return res;
+        }
+
+        String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
+        SubNode parentForNewNodes = null;
+        long firstOrdinal = 0;
+
+        // When inserting inline all nodes go in right where the original node is, in order below it as
+        // siblings
+        if (req.getSplitType().equalsIgnoreCase("inline")) {
+            parentForNewNodes = parentNode;
+            firstOrdinal = node.getOrdinal();
+        }
+        // but for a 'child' insert all new nodes are inserted as children of the original node, starting
+        // at the top (ordinal), regardless of whether this node already has any children or not.
+        else {
+            parentForNewNodes = node;
+            firstOrdinal = 0L;
+        }
+
+        int numNewSlots = contentParts.length - 1;
+        if (numNewSlots > 0) {
+            firstOrdinal =
+                    svc_mongoCreate.insertOrdinal(parentForNewNodes, firstOrdinal, numNewSlots, res.getNodeChanges());
+            svc_mongoUpdate.save(parentForNewNodes);
+        }
+        int idx = 0;
+
+        for (String part : contentParts) {
+            part = part.trim();
+            if (idx == 0) {
+                node.setContent(part);
+                if (!nodeId.equals(nodeId)) {
+                    node.setOrdinal(firstOrdinal);
+                }
+                node.touch();
+                svc_mongoUpdate.save(node);
+                nodesModified.add(node.getIdStr());
+            } else {
+                // This is not a mistake that we pass null for nodeChagnes here (we already captured the shift above
+                // for the node we need to worry about)
+                SubNode newNode = svc_mongoCreate.createNode(parentForNewNodes, null, null, firstOrdinal + idx,
+                        CreateNodeLocation.ORDINAL, false, null);
+                newNode.setContent(part);
+                newNode.setAc(node.getAc());
+                newNode.touch();
+                svc_mongoUpdate.save(newNode);
+                nodesModified.add(newNode.getIdStr());
+            }
+
+            idx++;
+        }
+        if (req.getSplitType().equalsIgnoreCase("children")) {
+            parentForNewNodes.setHasChildren(true);
+            svc_mongoUpdate.saveIfDirtyAP(parentForNewNodes);
+        }
+        return res;
+    }
+
+    /**
+     * Links a source node to a target node by creating a new link and adding it to the source node.
+     *
+     * @param req the request containing the source node ID, target node ID, link name, and embed flag
+     * @return a response indicating the result of the link operation
+     */
+    public LinkNodesResponse cm_linkNodes(LinkNodesRequest req) {
+        LinkNodesResponse res = new LinkNodesResponse();
+        SubNode sourceNode = svc_mongoRead.getNode(req.getSourceNodeId());
+        if (sourceNode != null) {
+            NodeLink link = new NodeLink();
+            link.setNodeId(req.getTargetNodeId());
+            link.setName(req.getName());
+            link.setEmbed(req.getEmbed());
+            sourceNode.addLink(link);
+        }
+        return res;
+    }
+
+    /*
+     * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
+     * passed in.
+     */
+    public UpdateHeadingsResponse cm_updateHeadings(String nodeId) {
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        svc_auth.ownerAuth(node);
+        String content = node.getContent();
+        if (content != null) {
+            content = content.trim();
+            int baseLevel = XString.getHeadingLevel(content);
+            int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
+
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
+                int slashCount = StringUtils.countMatches(n.getPath(), "/");
+                int level = baseLevel + (slashCount - baseSlashCount);
+                if (level > 6)
+                    level = 6;
+                String c = translateHeadingsForLevel(n.getContent(), level);
+                if (c != null && !c.equals(n.getContent())) {
+                    n.setContent(c);
+                }
+                // only cache up to 100 dirty nodes at time time before saving/flushing changes.
+                if (TL.getDirtyNodeCount() > 100) {
+                    svc_mongoUpdate.saveSession();
+                }
+            }
+        }
+        svc_mongoUpdate.saveSession();
+        return new UpdateHeadingsResponse();
+    }
+
+    /**
+     * Translates the headings in the given node content to the specified level.
+     * 
+     * @param nodeContent the content of the node, which may contain headings
+     * @param level the level to which the headings should be translated (0-5)
+     * @return the node content with headings translated to the specified level, or null if the input is
+     *         null
+     */
+    public String translateHeadingsForLevel(final String nodeContent, int level) {
+        if (level < 0) {
+            level = 0;
+        }
+        if (nodeContent == null)
+            return null;
+        StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);
+        StringBuilder ret = new StringBuilder();
+
+        while (t.hasMoreTokens()) {
+            String tok = t.nextToken();
+            if (tok.equals("\n")) {
+                ret.append("\n");
+                continue;
+            }
+            String content = tok;
+            // if this node starts with a heading (hash marks)
+            if (content.startsWith("#") && content.indexOf(" ") < 7) {
+                int spaceIdx = content.indexOf(" ");
+                if (spaceIdx != -1) {
+                    // strip the pre-existing hashes off
+                    content = content.substring(spaceIdx + 1);
+                    // These strings (pound sign headings) could be generated dynamically, but this switch with them
+                    // hardcoded is more performant
+                    switch (level) {
+                        case 0:
+                            /*
+                             * NOTE: We never want the root node in the Table of Contents, but we do need it to have a
+                             * heading level allowed on it, which would cause the PDF renderer to INCLUDE it in the PDF
+                             * but we fix that by setting the ToC options to only include headings starting at heading
+                             * level 2 and above.
+                             */
+                            if (!nodeContent.startsWith("# ")) {
+                                ret.append("# " + content);
+                                continue;
+                            }
+                            break;
+                        case 1:
+                            if (!nodeContent.startsWith("## ")) {
+                                ret.append("## " + content);
+                                continue;
+                            }
+                            break;
+                        case 2:
+                            if (!nodeContent.startsWith("### ")) {
+                                ret.append("### " + content);
+                                continue;
+                            }
+                            break;
+                        case 3:
+                            if (!nodeContent.startsWith("#### ")) {
+                                ret.append("#### " + content);
+                                continue;
+                            }
+                            break;
+                        case 4:
+                            if (!nodeContent.startsWith("##### ")) {
+                                ret.append("##### " + content);
+                                continue;
+                            }
+                            break;
+                        case 5:
+                            if (!nodeContent.startsWith("###### ")) {
+                                ret.append("###### " + content);
+                                continue;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            ret.append(tok);
+        }
+        return ret.toString().trim();
+    }
+
+    /**
+     * Modifies a subgraph of nodes based on the provided request.
+     *
+     * @param req the request containing the details for modifying the subgraph
+     * @return a response indicating the number of nodes that were updated
+     * @throws RuntimeEx if the target set specified in the request is invalid
+     */
+    public ModifySubGraphResponse modifySubGraph(ModifySubGraphRequest req) {
+        MongoTranMgr.ensureTran();
+        ModifySubGraphResponse res = new ModifySubGraphResponse();
+        int changes = 0;
+        int cachedChanges = 0;
+        String nodeId = req.getNodeId();
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        svc_auth.ownerAuth(node);
+
+        if (processHashtags(node, req.getHashtags(), req.getAction())) {
+            changes++;
+            cachedChanges++;
+        }
+
+        Iterable<SubNode> nodes = null;
+        if (req.getTargetSet().equals("recursive")) {
+            nodes = svc_mongoRead.getSubGraph(node, null, 0, false, null);
+        } else if (req.getTargetSet().equals("children")) {
+            nodes = svc_mongoRead.getChildren(node, null, null, 0);
+        } else {
+            throw new RuntimeEx("Invalid targetSet: " + req.getTargetSet());
+        }
+
+        for (SubNode n : nodes) {
+            if (processHashtags(n, req.getHashtags(), req.getAction())) {
+                changes++;
+                cachedChanges++;
+                // save session immediately every time we get up to 100 pending updates cached.
+                if (cachedChanges >= 100) {
+                    cachedChanges = 0;
+                    svc_mongoUpdate.saveSession();
+                }
+            }
+        }
+
+        svc_mongoUpdate.saveSession();
+        res.setMessage(String.valueOf(changes) + " nodes were updated.");
+        return res;
+    }
+
+    /**
+     * Performs a search and replace operation on a node and optionally its subgraph.
+     * 
+     * todo-3: we should be using a bulk update in here and using a streaming resultset instead of
+     * holding it all in memory
+     * 
+     * @param req the request containing the search and replace parameters
+     * @return a response indicating the number of nodes that were updated
+     */
+    public SearchAndReplaceResponse searchAndReplace(SearchAndReplaceRequest req) {
+        MongoTranMgr.ensureTran();
+        SearchAndReplaceResponse res = new SearchAndReplaceResponse();
+        int replacements = 0;
+        int cachedChanges = 0;
+        String nodeId = req.getNodeId();
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        svc_auth.ownerAuth(node);
+
+        if (replaceText(node, req.getSearch(), req.getReplace())) {
+            replacements++;
+            cachedChanges++;
+        }
+
+        if (req.isRecursive()) {
+            Criteria crit = Criteria.where(SubNode.CONTENT).regex(req.getSearch());
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, crit)) {
+                if (replaceText(n, req.getSearch(), req.getReplace())) {
+                    replacements++;
+                    cachedChanges++;
+                    // save session immediately every time we get up to 100 pending updates cached.
+                    if (cachedChanges >= 100) {
+                        cachedChanges = 0;
+                        svc_mongoUpdate.saveSession();
+                    }
+                }
+            }
+        }
+        svc_mongoUpdate.saveSession();
+        res.setMessage(String.valueOf(replacements) + " nodes were updated.");
+        return res;
+    }
+
+    /**
+     * Processes hashtags for a given node based on the specified action.
+     *
+     * @param node the node to process hashtags for
+     * @param hashtags a space-separated string of hashtags to add or remove
+     * @param action the action to perform, either "addHashtags", "removeHashtags", or
+     *        "clearAllHashtags"
+     * @return true if the node's tags were changed, false otherwise
+     * @throws RuntimeEx if an invalid action is specified
+     */
+    private boolean processHashtags(SubNode node, String hashtags, String action) {
+        if (action.equals("clearAllHashtags")) {
+            node.setTags(null);
+            node.touch();
+            return true;
+        }
+
+        if (hashtags == null || hashtags.trim().length() == 0) {
+            return false;
+        }
+        // get all the current tags on the node
+        String nodeTags = node.getTags();
+        if (nodeTags == null) {
+            nodeTags = "";
+        }
+        HashSet<String> tags = new HashSet<>();
+
+        // put the tags already on the node into an array
+        String[] nodeTagsArray = nodeTags.split(" ");
+        // add all the current tags to the hashset
+        for (String tag : nodeTagsArray) {
+            tag = tag.trim();
+            if (tag.length() > 0) {
+                tags.add(tag);
+            }
+        }
+
+        String[] sentTagsArray = hashtags.split(" ");
+        boolean changed = false;
+        for (String tag : sentTagsArray) {
+            tag = tag.trim();
+            if (tag.length() > 0) {
+                if (action.equals("addHashtags")) {
+                    if (tags.add(tag)) {
+                        changed = true;
+                    }
+                } else if (action.equals("removeHashtags")) {
+                    if (tags.remove(tag)) {
+                        changed = true;
+                    }
+                } else {
+                    throw new RuntimeEx("Invalid action: " + action);
+                }
+            }
+        }
+
+        if (changed) {
+            StringBuilder newTags = new StringBuilder();
+            for (String tag : tags) {
+                newTags.append(tag + " ");
+            }
+            node.setTags(newTags.toString().trim());
+            node.touch();
+        }
+
+        return changed;
+    }
+
+    /**
+     * Replaces occurrences of a specified search string with a replacement string in the content of a
+     * given node.
+     *
+     * @param node the node whose content is to be modified
+     * @param search the string to search for in the node's content
+     * @param replace the string to replace the search string with
+     * @return true if the search string was found and replaced; false otherwise
+     */
+    private boolean replaceText(SubNode node, String search, String replace) {
+        String content = node.getContent();
+        if (content == null)
+            return false;
+        if (content.contains(search)) {
+            node.setContent(content.replace(search, replace));
+            node.touch();
+            return true;
+        }
+        return false;
+    }
+
+    public GetNodeJsonResponse cm_getNodeJson(GetNodeJsonRequest req) {
+        GetNodeJsonResponse res = new GetNodeJsonResponse();
+        TL.requireAdmin();
+        SubNode node = svc_mongoRead.getNodeAP(req.getNodeId());
+        if (node != null) {
+            res.setJson(XString.prettyPrint(node));
+        }
+        return res;
+    }
+
+    public SaveNodeJsonResponse saveNodeJson(SaveNodeJsonRequest req) {
+        MongoTranMgr.ensureTran();
+        SaveNodeJsonResponse res = new SaveNodeJsonResponse();
+        TL.requireAdmin();
+        try {
+            SubNode n = Util.simpleMapper.readValue(req.getJson(), SubNode.class);
+            svc_arun.run(() -> {
+                svc_mongoUpdate.save(n);
+                return null;
+            });
+        } catch (Exception e) {
+            throw new RuntimeEx(e);
+        }
+        return res;
+    }
+
+    /**
+     * Initializes the node editing process.
+     *
+     * @param req the request object containing the node ID and other parameters
+     * @return the response object containing the node information or an error message
+     *
+     *         This method handles the initialization of node editing. If the request indicates that the
+     *         user wants to edit their friend node, it retrieves the friend node ID based on the
+     *         provided node ID. It then fetches the node from the database and checks if the node
+     *         exists. If the node is found, it verifies the user's authorization to edit the node and
+     *         converts the node to a NodeInfo object to be included in the response.
+     */
+    public InitNodeEditResponse cm_initNodeEdit(InitNodeEditRequest req) {
+        InitNodeEditResponse res = new InitNodeEditResponse();
+        String nodeId = req.getNodeId();
+
+        // IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
+        // wanting to edit his Friend node representing this user.
+        if (req.getEditMyFriendNode()) {
+            String _nodeId = nodeId;
+            nodeId = svc_arun.run(() -> {
+                Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
+                // we query as a list, but there should only be ONE result.
+                List<SubNode> friendNodes =
+                        svc_user.getSpecialNodesList(null, NodeType.FRIEND_LIST.s(), null, false, crit);
+                if (friendNodes != null) {
+                    for (SubNode friendNode : friendNodes) {
+                        return friendNode.getIdStr();
+                    }
+                }
+                return null;
+            });
+        }
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        if (node == null) {
+            res.error("Node not found.");
+            return res;
+        }
+        svc_auth.ownerAuth(node);
+
+        NodeInfo nodeInfo = svc_convert.toNodeInfo(false, TL.getSC(), node, true, Convert.LOGICAL_ORDINAL_IGNORE, false,
+                false, false, false, null);
+        res.setNodeInfo(nodeInfo);
+        return res;
+    }
+}

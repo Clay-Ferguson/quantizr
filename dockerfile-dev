@@ -1,0 +1,30 @@
+# NOTE: Don't try 'slim' jdk. It's missing the code for our captcha image generation
+# and possibly other things
+FROM openjdk:22
+LABEL maintainer="wclayf@gmail.com"
+
+ARG PORT
+ARG PORT_DEBUG
+ARG XMS
+ARG XMX
+
+# RUN mkdir -p /dev-resource-base
+# RUN echo "dummy" > /dev-resource-base/dummy.txt
+
+RUN mkdir -p /loader-path
+RUN echo "dummy" > /loader-path/dummy.txt
+
+EXPOSE ${PORT}
+EXPOSE ${PORT_DEBUG}
+
+COPY ./target/quanta-0.0.1-SNAPSHOT.jar app.jar
+RUN sh -c 'touch app.jar' 
+
+COPY ./entrypoint-dev.sh entrypoint-dev.sh
+RUN ["chmod", "+x", "entrypoint-dev.sh"]
+ENTRYPOINT ["./entrypoint-dev.sh"]
+
+# ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint-dev.sh"]
+
+# This works too but it's more flexible to just put the commands in 'entrypoint-dev.sh'
+# ENTRYPOINT ["/bin/bash", "-c", "java -Xms${XMS} -Xmx${XMX} -Dloader.path=/loader-path -Djava.security.egd=file:/dev/./urandom -jar /quanta/app.jar"]

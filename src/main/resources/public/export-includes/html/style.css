@@ -1,0 +1,186 @@
+ /* WARNING: Only put cosmetic stuff in here that has NO impact on page layout */
+
+ .content p {
+     max-width: 50rem;
+     line-height: 1.5rem;
+     margin-bottom: 2.5rem;
+     margin-left: 1rem;
+ }
+
+ h1 a {
+     color: lightgreen;
+ }
+
+ h2 a {
+     color: orange;
+ }
+
+ h1 a {
+     text-decoration: none;
+ }
+
+ h2 a {
+     text-decoration: none;
+ }
+
+ h3 a {
+     text-decoration: none;
+ }
+
+ h4 a {
+     text-decoration: none;
+ }
+
+ h5 a {
+     text-decoration: none;
+ }
+
+ h6 a {
+     text-decoration: none;
+ }
+
+ h1 {
+     margin-top: 2.5rem;
+     color: lightgreen;
+     font-size: 2.3rem;
+     font-weight: 100;
+ }
+
+ h2 {
+     margin-top: 2rem;
+     color: orange;
+     font-size: 2rem;
+     font-weight: 100;
+ }
+
+ h3 {
+     font-size: 1.8rem;
+     font-weight: 100;
+ }
+
+ h4 {
+     font-size: 1.7rem;
+     font-weight: 100;
+ }
+
+ h5 {
+     font-size: 1.6rem;
+     font-weight: 100;
+ }
+
+ h6 {
+     font-size: 1.5rem;
+     font-weight: 100;
+ }
+
+ a {
+     color: white;
+ }
+
+ img {
+     border: 1px solid gray;
+     border-radius: 6px;
+     cursor: pointer;
+ }
+
+ .img-upper-right {
+     float: right;
+     margin-left: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-left {
+     float: left;
+     margin-right: 2rem;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ .img-upper-center {
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     margin-bottom: 2rem;
+     margin-top: 2rem;
+ }
+
+ table {
+     border-collapse: collapse;
+     border-spacing: 2px;
+ }
+
+ table,
+ th,
+ td {
+     border: 1px solid gray;
+     padding: 8px;
+ }
+
+ pre {
+     margin: 1rem 1rem 1rem 0;
+     padding: 1rem;
+     border: 1px solid gray;
+     background-color: rgb(41, 52, 68);
+     border-radius: 6px;
+     overflow: auto;
+ }
+
+ code {
+     border: 1px solid gray;
+     padding: 2px;
+     background-color: rgb(41, 52, 68);
+ }
+
+ pre code {
+     border: none;
+ }
+
+ .nav {
+     text-decoration: none;
+ }
+
+ /* This styles the top left header */
+ .nav h4 a {
+     margin-left: 1rem;
+     color: lightgreen;
+ }
+
+ .nav ul li a {
+     font-size: 1.2rem;
+     color: lightgreen;
+ }
+
+ .nav ul li ul li a {
+     font-size: 1.1rem;
+     color: orange;
+ }
+
+ .nav ul li ul li ul li a {
+     font-size: 1rem;
+     color: lightgray;
+ }
+
+ ::-webkit-scrollbar {
+     width: 20px;
+     height: 20px;
+     background-color: black;
+ }
+
+ /* NOTE: This is only required to keep my Dark Reader extension from messing up the scrollbar */
+ * {
+     scrollbar-color: unset !important;
+ }
+
+ ::-webkit-scrollbar-track {
+     background-color: rgb(41, 52, 68);
+ }
+
+ ::-webkit-scrollbar-thumb {
+     background-color: slategray;
+     border: 1px solid silver;
+ }
+
+ ::-webkit-scrollbar-thumb:hover {
+     background: darkgray;
+ }

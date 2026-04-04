@@ -1,0 +1,345 @@
+/* Tailwind CSS Cheatsheet
+
+ml = margin left
+mr = margin right
+mt = margin top
+mb = margin bottom
+
+for padding we have: pl, pr, pt, pb
+
+ml-0.5 = 2px
+ml-1 = 4px
+ml-2 = 8px
+ml-3 = 12px
+ml-4 = 16px
+ml-6 = 24px
+*/
+
+/* NOTE: According to AI when this is using as a parent of floated stuff (float left or float right)
+we could also use "display: flow-root", but I'm opting for overflow instead since it won't overwrite
+ display in case display is already set for some other reason. */
+.overflowAuto {
+    overflow: auto;
+}
+
+.lhsHeaderPanel {
+    margin-bottom: $smallGap;
+}
+
+.documentItem {
+    padding-top: 10px;
+    border-bottom: 3px dotted $nodeBorderBottomColor;
+    padding-bottom: $tinyGap;
+}
+
+.indentedDocumentItem {
+    border-left: 1px solid gray;
+}
+
+.documentItemHighlight {
+    border: 3px solid olivedrab;
+    padding: 10px;
+    border-radius: $border-radius;
+    margin-bottom: 4px;
+}
+
+.collapsibleMarkdown {
+    margin-left: $mediumGap;
+    margin-bottom: $smallGap;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.collapsibleMarkdownExpanded {
+    margin-left: $mediumGap;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.expand {
+    display: inherit;
+}
+
+.collapse {
+    display: none;
+}
+
+.expandedCollapsible {
+    border: 2px solid lightgray;
+    border-radius: $border-radius;
+    margin-bottom: $smallGap;
+    margin-left: $bigGap;
+}
+
+.aiConfigSection {
+    border: 2px solid goldenrod;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+    margin-left: $smallGap;
+}
+
+.aiImageGenSize {
+    width: 15rem;
+    padding-left: $bigGap;
+    display: inline-block;
+}
+
+.aiSpeechGenVoice {
+    width: 10rem;
+}
+
+.timelineChronoOrder {
+    width: 10rem;
+    display: inline-block;
+}
+
+.headingDropDown {
+    display: inline-block;
+    width: 4rem;
+    margin-left: $smallGap;
+}
+
+.clipboardIcon {
+    margin: 0 6px 0 0;
+}
+
+.appColumn {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+@keyframes blink {
+    50% {
+        background-color: transparent;
+    }
+}
+
+.marginLeftIfNotFirst {
+    margin-left: $smallGap;
+}
+
+.marginLeftIfNotFirst:first-child {
+    margin-left: 0;
+}
+
+.mediumMarginRight {
+    margin-right: $mediumGap;
+}
+
+.marginBottomIfNotLast {
+    &:not(:last-child) {
+        margin-bottom: $smallGap;
+    }
+}
+
+.flexAlignChildrenTop {
+    align-items: flex-start;
+}
+
+.alignBottom {
+    vertical-align: bottom;
+}
+
+// see if flexRowLayout can be used here (CSS class and or TS class)
+.horizontalLayout {
+    // flex will layout things all on the same horizontal row
+    display: flex;
+}
+
+.vertLayoutRow {
+    margin-bottom: $smallGap;
+}
+
+.noMargin {
+    margin: 0;
+}
+
+.noPaddingRight {
+    padding-right: 0px !important;
+}
+
+.verticalSpace {
+    height: 16px;
+    min-height: 16px;
+}
+
+.alignBottom {
+    vertical-align: bottom !important;
+}
+
+.inlineBlock {
+    display: inline-block;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+.centeredText {
+    text-align: center;
+    width: 100%;
+}
+
+// centers the child that's inside this div (both vertically and horizontall centering)
+.centerChild {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.flexRowLayout {
+    display: flex;
+    flex-wrap: wrap;
+
+    // WARNING: without this items can stretch vertically and this warps images 
+    align-items: flex-start;
+}
+
+// Note: This is to be used inside a flexRowLayout. 'auto' margins on something directly inside
+// a display=flex container has a very special meaning, which is to consume (use up) all available space
+// on the left or right of something. So this auto margin left has the effect of pushing
+// the element as far to the right as it can go.
+.flexFloatRight {
+    margin-left: auto;
+}
+
+.flexRowAlignBottom {
+    align-items: end;
+}
+
+.horizontalLayoutComp {
+    display: table;
+    border-spacing: 10px;
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.horizontalLayoutCompCompact {
+    display: table;
+    border-spacing: 10px;
+}
+
+.horizontalLayoutCompBorderCollapse {
+    @extend .horizontalLayoutComp;
+    border-collapse: collapse;
+}
+
+.displayTableNoSpacing {
+    display: table;
+}
+
+.displayRow {
+    display: table-row;
+}
+
+.displayCell {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.invisible {
+    display: none;
+    visibility: hidden !important;
+}
+
+// for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
+.compHidden {
+    opacity: 0;
+}
+
+.visible {
+    display: inline-block;
+    visibility: visible !important;
+}
+
+.clearBoth {
+    clear: both;
+}
+
+// I don't know where the ul and ol margins are getting zet to zero, but somewhere they are and this fixes it.
+ul {
+    margin-bottom: 1rem !important;
+}
+
+ol {
+    margin-bottom: 1rem !important;
+}
+
+.fieldDisplayPanel {
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    border-top: 1px dotted $nodeBorderBottomColor;
+    border-right: 1px dotted $nodeBorderBottomColor;
+}
+
+.fieldDisplayLabel {
+    margin-left: $smallGap;
+    margin-top: $tinyGap;
+}
+
+.fieldDisplayVal {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-size: 115%;
+    margin-left: $smallGap;
+    color: green;
+}
+
+.calcOutputArea {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-size: 120%;
+    margin-left: $smallGap;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 2px solid olivedrab;
+    margin-top: 12px;
+    padding: 8px;
+}
+
+.settingsCol {
+    width: 50%;
+    padding-right: $bigGap;
+}
+
+.settingsPanel {
+    margin-left: $smallGap;
+    width: 100%;
+}
+
+.settingsSection {
+    width: 100%;
+}
+
+.settingsLink {
+    cursor: pointer;
+    font-size: 120%;
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsButton {
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsSectionTitle {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+    margin-right: $bigGap;
+}
+
+.infoSectionTitle {
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+    font-size: large;
+}

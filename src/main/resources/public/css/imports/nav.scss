@@ -1,0 +1,34 @@
+.navbar-brand {
+    margin-left: $smallGap;
+}
+
+.navLinkBase {
+    padding: .5rem .5rem .5rem .8rem;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: $border-radius-large;
+}
+
+.nav-tabs {
+    border: none;
+    border-color: transparent;
+    border-radius: $border-radius-large;
+    padding: .5rem .5rem .5rem .8rem;
+}
+
+.nav-tabs>.nav-item>.nav-link {
+    @extend .navLinkBase;
+    border: 5px solid transparent;
+}
+
+.nav-tabs>.nav-item>.nav-link:hover {
+    @extend .navLinkBase;
+    border: 5px solid transparent;
+}
+
+.nav-tabs>.nav-item>.nav-link.active,
+.nav-tabs>.nav-item>.nav-link.active:hover,
+.nav-tabs>.nav-item>.nav-link.active:focus {
+    @extend .navLinkBase;
+    border: 5px solid $nodeBorderBottomColor;
+}

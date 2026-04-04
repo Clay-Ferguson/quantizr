@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+@tailwind base;
+
+// NOTE: Tailwind removes ALL existing styling that browsers provide so we need to build our own H1 thru H6 styling.
+@layer base {
+    h1 {
+        @apply text-4xl font-thin mb-4;
+    }
+
+    h2 {
+        @apply text-3xl font-thin mb-3;
+    }
+
+    h3 {
+        @apply text-2xl font-thin mb-2;
+    }
+
+    h4 {
+        @apply text-xl font-thin mb-2;
+    }
+
+    h5 {
+        @apply text-lg font-thin mb-2;
+    }
+
+    h6 {
+        @apply text-base font-thin mb-2;
+    }
+
+    // Base styles for lists
+    ul,
+    ol {
+        margin-left: 1.5rem;
+    }
+
+    // Unordered lists (ul) nesting behavior
+    ul {
+        list-style-type: disc;
+    }
+
+    ul ul {
+        list-style-type: circle;
+    }
+
+    ul ul ul {
+        list-style-type: square;
+    }
+
+    ul ul ul ul {
+        list-style-type: disc;
+    }
+
+    ul ul ul ul ul {
+        list-style-type: circle;
+    }
+
+    ul ul ul ul ul ul {
+        list-style-type: square;
+    }
+
+    // Ordered lists (ol) nesting behavior
+    ol {
+        list-style-type: decimal;
+    }
+
+    ol ol {
+        list-style-type: lower-alpha;
+    }
+
+    ol ol ol {
+        list-style-type: lower-roman;
+    }
+
+    ol ol ol ol {
+        list-style-type: decimal;
+    }
+
+    ol ol ol ol ol {
+        list-style-type: lower-alpha;
+    }
+
+    ol ol ol ol ol ol {
+        list-style-type: lower-roman;
+    }
+
+    select {
+        padding-right: .5rem !important;
+    }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@import "variables.scss";
+
+@layer utilities {
+    ::-webkit-scrollbar {
+        width: 20px;
+        height: 20px;
+        background-color: black;
+    }
+
+    /* NOTE: This is only required to keep my Dark Reader extension from messing up the scrollbar */
+    * {
+        scrollbar-color: unset !important;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        background-color: $gray-900;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        background-color: #444;
+        border: 1px solid gray;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}
+
+$profileImgSize: 200px;
+$highlightActiveMenuItems: false;
+
+$border-radius-small: 3px;
+$border-radius: 6px;
+$border-radius-large: 10px;
+$dlg-border-radius: 8px;
+
+$input-bg: $gray-700;
+$input-color: white;
+$input-color-placeholder: #999;
+
+$baseBgColor: black; // rgb(32, 34, 36);
+$body-bg: black; // darken($baseBgColor, 7%);
+$body-color: white;
+$font-size-base: 1rem !default;
+$disabled-body-color: gray; //darken($body-color, 90%);
+$custom-control-indicator-size: 1.75rem; // This gives us awesome large checkboxes and radio buttons!!
+$form-select-indicator-color: lightGray;
+
+$fa-font-path: "@fortawesome/fontawesome-free/webfonts";
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/solid";
+@import "@fortawesome/fontawesome-free/scss/regular";
+// @import "@fortawesome/fontawesome-free/scss/brands"; // so far we don't need brands
+
+$fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Verdana, Arial, sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+// $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
+
+* {
+    outline: none;
+}
+
+$menuItemHoverBackgroundColor: $primary;
+$nodeBorderBottomColor: $gray-700;
+$dlgBorderColor: $green;
+$dlgBorderWidth: 2px;
+$createdByMeBackgroundColor: green;
+$createdByMeTextColor: white;
+$createdByAnotherBackgroundColor: $gray-700;
+$createdByAnotherTextColor: white;
+$listBackgroundColor: lightGray;
+$smallGap: 12px;
+$mediumGap: 18px;
+$bigGap: 24px;
+$tinyGap: 8px;
+$microGap: 4px;
+$smallerFont: 80%;
+$lightenRowFactor: 5;
+$fatBorderSize: 8px;
+$mediumBorderSize: 6px;
+$highlightBorderSize: 10px;
+$highlightBorderSizeMinus1: 9px;
+$smallBorderSize: 3px;
+
+// Currently disabling our current font, just to save on app load time. Leaving for future reference.
+// @font-face {
+//     font-family: "QuantaCustomFont";
+//     /* src: url('../fonts/Roboto-Light.ttf') format('truetype'); */
+//     src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
+//     font-weight: normal;
+//     font-style: normal;
+//     font-display: swap;
+// }
+
+@import './imports/breadcrumbs.scss';
+@import './imports/button.scss';
+@import './imports/checkbox.scss';
+@import './imports/dialog.scss';
+@import './imports/dropzone.scss';
+@import './imports/edit.scss';
+@import './imports/feed.scss';
+@import './imports/friends.scss';
+@import './imports/history.scss';
+@import './imports/icon.scss';
+@import './imports/image.scss';
+@import './imports/layout.scss';
+@import './imports/bricks.scss';
+@import './imports/list.scss';
+@import './imports/media-queries.scss';
+@import './imports/menu.scss';
+@import './imports/nav.scss';
+@import './imports/nodeItem.scss';
+@import './imports/openGraph.scss';
+@import './imports/player.scss';
+@import './imports/profile.scss';
+@import './imports/rss.scss';
+@import './imports/stats.scss';
+@import './imports/tabs.scss';
+@import './imports/tags.scss';
+@import './imports/text.scss';
+@import './imports/thread.scss';
+@import './imports/tts.scss';
+@import './imports/app.scss';
+@import './imports/graphics.scss';

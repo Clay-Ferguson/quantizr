@@ -1,0 +1,36 @@
+.headerUploadPanel {
+    border: 2px solid transparent
+}
+
+.headerUploadPanel:hover {
+    border: 2px dotted gray;
+}
+
+.dropzone {
+    background-color: $modal-content-bg;
+    border: 3px dashed gray;
+    height: 420px;
+    padding: 10px;
+    margin-bottom: $smallGap;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    border-radius: $border-radius;
+}
+
+.dz-message {
+    display: none;
+}
+
+// for some reason the success and error marks are STAYING visible (my bug?) so we just hide them.
+.dz-success-mark {
+    display: none;
+}
+
+.dz-error-mark {
+    display: none;
+}
+
+.dropzone .dz-preview {
+    width: 25%;
+}

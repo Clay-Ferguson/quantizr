@@ -1,0 +1,12 @@
+brandingAppName: Quanta
+brandingMetaContent: "Quanta: Content Manager and Social Media Micro-blogging Platform!"
+
+# Tip: This 'menu' property is seen in TypeScript JSON as an array of objects in 
+# variable 'S.quanta.config'
+#
+# Links here can be full url, or node names, or "tab:tabName"
+
+rhsLinks:
+  - name: "About Quanta"
+    link: "/r/public/home"
+      

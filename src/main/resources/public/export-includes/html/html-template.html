@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        /* Do not remove. This is an insertion tag */
+        /*{{style}}*/
+
+        html,
+        body {
+            font-family: 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important;
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            /* overflow: hidden; */
+            overflow-y: auto;
+            background-color: black;
+        }
+
+        /* Main content area styling */
+        .content {
+            background-color: black;
+            color: white;
+            /* overflow-y: auto; */
+            padding: 0 2rem 0 2rem;
+            /*{{contentWidth}}*/
+        }
+
+        /* Main container using grid */
+        .container {
+            display: grid;
+            grid-template-columns: 100%;
+            height: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="{{baseFolder}}prism.css">
+    <script>/*{{script}}*/</script>
+</head>
+
+<body>
+    <div class="container">
+        <main class="content">
+            {{body}}
+        </main>
+    </div>
+    <script src="{{baseFolder}}prism.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+.menuPanel {
+    min-width: 10rem;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.menuPanelItems {
+    border-left: 3px solid $secondary;
+    border-radius: 0px !important;
+}
+
+.menuIcon {
+    vertical-align: middle;
+    margin-top: 9px;
+    margin-right: 5px;
+    color: lightgray;
+    padding-bottom: 9px;
+}
+
+.menuIconDisabled {
+    @extend .menuIcon;
+    color: gray;
+}
+
+.menuItemSeparator {
+    border-bottom: 1px solid $nodeBorderBottomColor;
+}
+
+.mainMenuItemDisabled {
+    cursor: auto;
+    font-weight: lighter;
+    background-color: transparent;
+    color: $disabled-body-color;
+    padding: 5px;
+
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid transparent;
+    }
+
+    border: 1px solid transparent;
+    border-radius: 0;
+}
+
+.mainMenuItemDisabled:hover {
+    cursor: auto;
+    font-weight: lighter;
+    background-color: transparent;
+    color: $disabled-body-color;
+}
+
+.mainMenuItemEnabled {
+    cursor: pointer;
+    font-weight: normal;
+    background-color: transparent;
+
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid $nodeBorderBottomColor;
+    }
+
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 0;
+}
+
+.mainMenuItemEnabled:hover {
+    cursor: pointer;
+    background-color: $menuItemHoverBackgroundColor;
+    border: 1px solid gray;
+}
+
+.menuBody {
+    padding: 0px 0px 0px 20px;
+}
+
+.menu {
+    border: none;
+    background-color: transparent;
+}
+
+.menuItem {
+    cursor: pointer;
+    background-color: transparent;
+    padding: 5px 5px 5px 15px;
+    border: 1px solid transparent;
+}
+
+.menuItemInner {
+    cursor: pointer;
+    background-color: transparent;
+    padding: 5px 5px 5px 5px;
+    border: 1px solid transparent;
+}
+
+.menuItem:hover {
+    background-color: $primary;
+    border: 1px solid gray;
+}
+
+.menuItemExpanded {
+    @extend .menuItem;
+    background-color: $secondary;
+    border: 1px solid gray;
+}
+
+.subMenuItem {
+    cursor: pointer;
+    padding: 5px 5px 5px 10px;
+    border-bottom: 3px solid transparent;
+}
+
+.subMenuItem:hover {
+    background-color: $primary;
+    border: 1px 1px 1px 5px solid gray;
+}
+
+.subMenuItemExpanded {
+    @extend .subMenuItem;
+    padding: 5px 5px 5px 10px;
+    border-bottom: 3px solid gray;
+}
+
+.rhsMenu {
+    width: 60%;
+    padding-left: 0;
+}
+
+.listGroupMenuItem {
+    background-color: transparent;
+    padding: 5px 5px 4px 10px;
+}
+
+.listGroupMenuItemCompact {
+    background-color: transparent;
+    padding: 0px 0px 0px 10px !important;
+}
+
+.listGroupTransparent {
+    background-color: transparent;
+    padding: 5px 5px 4px 10px;
+}

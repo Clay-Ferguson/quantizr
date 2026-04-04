@@ -1,0 +1,51 @@
+.form-check {
+    align-items: center;
+}
+
+.formCheckInlineNoMargin {
+    display: inline-block;
+    margin-right: 0px !important; // <--- this overrides the default form-check-inline margin
+}
+
+.form-check label {
+    margin-left: 10px;
+    margin-top: 7px;
+}
+
+.form-check .form-check-input[type="checkbox"] {
+    border-radius: .15rem;
+    height: 30px;
+    width: 30px;
+    border: 1px solid gray;
+    margin-top: 0;
+}
+
+.form-check .form-check-input[type="radio"] {
+    border-radius: 100%;
+    height: 30px;
+    width: 30px;
+    border: 1px solid gray;
+}
+
+.form-switch .form-check-input[type="checkbox"] {
+    border-radius: .5rem;
+    height: 30px;
+    width: 55px;
+    border: 1px solid gray;
+}
+
+.checkboxLabel {
+    margin-right: 16px;
+}
+
+.radioLabel {
+    margin-right: 14px;
+
+    // warning: for bizarre reasons I haven't researched if there's no margin here then the HORIZONTAL alignment 
+    // gets messed up. Be careful changing this.
+    margin-bottom: 10px; 
+}
+
+.radioButtonsBar {
+    margin-bottom: $smallGap;
+}
