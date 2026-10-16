@@ -1,25 +1,20 @@
 ![Quanta Logo](branding/logo-250px-tr.jpg)
 
-# Quanta Web Platform
+# Quanta Web Platform (DEPRECATED)
 
-**Quanta is a Hierarchical CMS (Content Management System) **
+## WARNING (This project is deprecated, and longer being maintained)
+
+**IMPORTANT Note from the developer (Clay Ferguson):**
+
+*This project evolved over many years (well over a decade) as my one and only side project. However as of around 2023 I abandoned this project (quantizr), to work on other things. I'm leaving it on Github only as a historical record. This 'quantizr' project was briefly replaced by one named 'quanta' (also on Github), which was written 90% by AI, but as of now (late 2026 neither of these two web apps are still being maintained)*
+
+## Quanta: A Hierarchical CMS (Content Management System)
 
 Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
 
 Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. 
 
 These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
-
-
-## WARNING (This entire project is deprecated)
-
-**IMPORTANT Note from the developer (Clay Ferguson):**
-This project evolved over many years (well over a decade) as my one and only side project. However as of around 2023 I abandoned this project, for the following reasons:
-
-* To stop doing Java Development, and work only in TypeScript and Python going forward.
-* To move away from NoSQL (MongoDB) and move back to SQL/RDBMS (PostgreSQL)
-* To go back to standard JSX/TSX-based React rather than the Pure-JS (no JSX/TSX) architecture in this application.
-* I also realized I could recreate a new version of this application, addressing all of these technical issues, using an AI Agent to do all the work — and so that's what I did. I created the [Quanta](https://github.com/Clay-Ferguson/quanta) project which is almost 100% AI Generated, which became the replacement for this project (Quantizr). That also means this project is essentially the last handwritten code done I've ever worked on, and this project is the only project on my GitHub account that isn't 100% written by AI. Every other project on my Github is written entirely by AI.
 
 
 ## Features
